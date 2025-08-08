@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:McpClient.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="400"
+             x:Class="McpClient.Views.AddServerWindow"
+             x:DataType="vm:McpViewModel"
+             Width="640" Height="400"
+             Title="Add New Server"
+             WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+             Loaded="Control_OnLoaded">
+    <Window.Styles>
+        <Style Selector="TextBox.input">
+            <Setter Property="Margin" Value="12,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.input">
+            <Setter Property="Margin" Value="12,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Styles>
+    <Panel>
+        <TextBlock Text="Add New Server" FontWeight="Bold" Margin="20,20,0,0" FontSize="16"/>
+        <Grid Margin="20,48,20,40" Name="MainGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+				<RowDefinition Height="40"/>
+				<RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Name:</TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="0" Classes="input" Name="TbServerName"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Owner:</TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="1" Classes="input" Name="TbOwner"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Type:</TextBlock>
+			<ComboBox Grid.Column="1" Grid.Row="2" Margin="12,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                      Name="CbTypes" SelectionChanged="CbTypes_OnSelectionChanged">
+                <ComboBoxItem>stdio</ComboBoxItem>
+                <ComboBoxItem>sse</ComboBoxItem>
+                <ComboBoxItem>streamableHttp</ComboBoxItem>
+            </ComboBox>
+
+			<TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Command:</TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="3" Classes="input" Name="TbCommand"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Name="TbUrlHeader">URL:</TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="4" Classes="input" Name="TbUrl"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center">Arguments:</TextBlock>
+			<TextBlock Grid.Column="1" Grid.Row="5" Classes="input" Name="TbArgs" Text="(empty)"/>
+            <Button Grid.Column="2" Grid.Row="5" Width="80" HorizontalContentAlignment="Center" Margin="8,0,0,0" 
+                    Name="BtnEditArgs" Click="BtnEditArgs_OnClick">Edit Args</Button>
+
+            <TextBlock Grid.Column="0" Grid.Row="6" VerticalAlignment="Center">Environment Variables:</TextBlock>
+			<TextBlock Grid.Column="1" Grid.Row="6" Classes="input" Name="TbEnv" Text="(empty)"/>
+            <Button Grid.Column="2" Grid.Row="6" Width="80" HorizontalContentAlignment="Center" Margin="8,0,0,0" 
+                    Name="BtnEditEnv" Click="BtnEditEnv_OnClick">Edit Env</Button>
+        </Grid>
+
+        <Button Name="ButtonApply" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Click="ButtonApply_OnClick">Apply</Button>
+    </Panel>
+</Window>

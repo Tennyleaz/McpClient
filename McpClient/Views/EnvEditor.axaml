@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="McpClient.Views.EnvEditor"
+        x:DataType="vm:EnvEditorViewModel"
+        x:Name="EnvEditWin"
+        Width="600" Height="400"
+        ShowInTaskbar="False"
+        Title="Edit Environment Variables"
+        WindowStartupLocation="CenterOwner">
+	<Panel>
+        <TextBlock Text="Environment Variables:" FontWeight="Bold" Margin="20,20,0,0"/>
+
+        <Button Content="Add Environment Variable" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,20,0"
+                Command="{Binding AddArgCommand}"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16,48,20,20">
+            <ItemsControl ItemsSource="{Binding Env}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2" ColumnDefinitions="*,Auto,*,Auto">
+                            <!-- Argument Editor -->
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="4,0,4,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="=" VerticalAlignment="Center"/>
+							<TextBox Grid.Column="2"
+                                     Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="4,0,4,0"
+                                     VerticalAlignment="Center"/>
+                            <!-- Remove Button -->
+                            <Button  Grid.Column="3"
+                                     Content="🗑"
+                                     Background="Transparent"
+                                     Foreground="Red"
+                                     DockPanel.Dock="Right"
+                                     Padding="0,0,8,0"
+                                     Command="{Binding ((vm:EnvEditorViewModel)DataContext).RemoveArgCommand, ElementName=EnvEditWin}"
+                                     CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Panel>
+</Window>

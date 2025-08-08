@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:McpClient.ViewModels"
+             xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
+             x:DataType="vm:McpServerListViewModel"
+             x:Class="McpClient.Views.TaskView"
+             x:Name="TaskViewControl"
+             Loaded="Control_OnLoaded">
+    <Design.DataContext>
+        <vm:DesignMcpServerList/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="Border.Task">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemChromeHighColor}"/>
+            <Setter Property="Background" Value="{DynamicResource SystemListLowColor}"/>
+            <!--<Style Selector="^:pointerover">
+                <Setter Property="Background" Value="{DynamicResource SystemRevealListMediumColor}"/>
+            </Style>-->
+		</Style>
+    </UserControl.Styles>
+    <Panel>
+		<TabStrip Name="Tabs" SelectionChanged="Tabs_OnSelectionChanged">
+            <TabItem Header="My Tasks">
+
+            </TabItem>
+            <TabItem Header="MCP Tools">
+                
+            </TabItem>
+        </TabStrip>
+        <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Refresh ↻" Margin="0,0,10,0"/>
+		<ItemsControl Name="TaskList" ItemsSource="{Binding ServerNames}" Margin="0,44,0,0">
+            <!-- use wrappanel as the template-->
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <!-- data here -->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0">
+                        <Panel>
+                            <TextBlock Text="{Binding .}" Margin="4,4,4,0" TextWrapping="Wrap"/>
+                            <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
+                                    Command="{Binding ElementName=TaskViewControl, Path=DataContext.RunCommand}"
+                                    CommandParameter="{Binding .}">Run ▶</Button>
+                        </Panel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemAccentColor}"
+                           Margin="0"/>
+        <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" IsVisible="False">Nothing here</Label>
+    </Panel>
+</UserControl>

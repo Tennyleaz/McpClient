@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="McpClient.Views.McpSetting"
+             xmlns:vm="clr-namespace:McpClient.ViewModels"
+             xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             x:DataType="vm:McpServerConfigViewModel"
+             x:CompileBindings="True"
+             x:Name="RootUserControl"
+             Loaded="Control_OnLoaded">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:DesignMcpServerConfigViewModel />
+	</Design.DataContext>
+	<Grid Margin="20">
+		<Label FontSize="20" Name="LbHeader" Content="{Binding McpServers.Count, StringFormat='My MCP Hosts ({0})'}"/>
+		<Button Name="BtnAdd" Click="BtnAdd_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top">Add</Button>
+
+		<Separator VerticalAlignment="Top" Margin="0,36,0,0"></Separator>
+		<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,38,0,0" Name="ScrollViewer" IsVisible="True">
+			<ItemsControl ItemsSource="{Binding McpServers}" x:Name="MsItems">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Vertical" Margin="0,0,0,8">
+							<!-- name, enabled, active -->
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Margin="8,0,0,0">Active ●</TextBlock>
+								<TextBlock IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Margin="8,0,0,0">Inactive ■</TextBlock>
+                            </StackPanel>
+                            <!-- type, owner -->
+							<Label Content="{Binding ByType}"></Label>
+							<Label Content="{Binding ByOwner}" IsVisible="{Binding HasOwner}"></Label>
+							<!-- other properties that could edit -->
+							<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,*,*,*,*" Margin="0,0,20,0">
+								<Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Command:</Label>
+								<TextBox Grid.Column="1" Grid.Row="0" Height="12" Text="{Binding Command}" Margin="4,0,8,0"/>
+								
+                                <Label Grid.Column="0" Grid.Row="1" IsVisible="{Binding IsShowSseUrl}" VerticalAlignment="Center">SSE URL:</Label>
+								<TextBox Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsShowSseUrl}" Height="12" Text="{Binding SseUrl}" Margin="4,0,8,0"/>
+								
+                                <Label Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsShowStreamablUrl}" VerticalAlignment="Center">Streamble HTTP URL:</Label>
+								<TextBox Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsShowStreamablUrl}" Height="12" Text="{Binding StreamableHttpUrl}" Margin="4,0,8,0"/>
+
+                                <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Arguments:</Label>
+								<Label Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Content="{Binding DisplayArgs}"></Label>
+								<Button Grid.Column="2" Grid.Row="3" Name="BtnEditArgs" Width="80" Click="BtnEditArgs_OnClick">Edit Args</Button>
+
+                                <Label Grid.Column="0" Grid.Row="4" VerticalAlignment="Center">Enviroment:</Label>
+                                <Label Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Content="{Binding DisplayEnv}"></Label>
+                                <Button Grid.Column="2" Grid.Row="4" Name="BtnEditEnv" Width="80" Click="BtnEditEnv_OnClick">Edit ENV</Button>
+							</Grid>
+						</StackPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+        <ring:ProgressRing Name="ProgressRing" Width="80" Height="80" IsActive="True" IsVisible="False"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemAccentColor}"
+                           Margin="0"/>
+	</Grid>
+</UserControl>

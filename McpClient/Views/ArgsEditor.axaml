@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="McpClient.Views.ArgsEditor"
+        x:DataType="vm:ArgsEditorViewModel"
+        x:Name="EditArgsWind"
+        ShowInTaskbar="False"
+        Title="Edit Arguments"
+        WindowStartupLocation="CenterOwner"
+        Width="600" Height="400">
+    <Design.DataContext>
+		<vm:DesignArgsEditorViewModel/>
+    </Design.DataContext>
+    <Panel>
+		<TextBlock Text="Arguments:" FontWeight="Bold" Margin="20,20,0,0"/>
+
+        <Button Content="Add Argument" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,20,0"
+            Command="{Binding AddArgCommand}"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20,48,20,20">
+		    <ItemsControl ItemsSource="{Binding Args}">
+			    <ItemsControl.ItemTemplate>
+				    <DataTemplate>
+					    <DockPanel Margin="0,2">
+						    <!-- Remove Button -->
+						    <Button
+                                Content="🗑"
+                                Background="Transparent"
+                                Foreground="Red"
+                                DockPanel.Dock="Right"
+                                Padding="0,0,8,0"
+                                Command="{Binding ((vm:ArgsEditorViewModel)DataContext).RemoveArgCommand, ElementName=EditArgsWind}"
+                                CommandParameter="{Binding .}"/>
+
+						    <!-- Argument Editor -->
+						    <TextBox
+                                Text="{Binding Arg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                MinWidth="200"
+                                Margin="0,0,0,0"
+                                VerticalAlignment="Center"/>
+
+					    </DockPanel>
+				    </DataTemplate>
+			    </ItemsControl.ItemTemplate>
+		    </ItemsControl>
+        </ScrollViewer>
+	</Panel>
+</Window>
