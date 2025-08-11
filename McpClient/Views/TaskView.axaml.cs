@@ -120,6 +120,8 @@ public partial class TaskView : UserControl
     {
         if (Tabs == null)
             return;
+        if (Design.IsDesignMode)
+            return;
         Tabs.IsEnabled = false;
         if (Tabs.SelectedIndex == 0)
         {

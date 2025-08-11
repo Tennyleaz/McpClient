@@ -24,13 +24,14 @@
 			<ItemsControl ItemsSource="{Binding McpServers}" x:Name="MsItems">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<StackPanel Orientation="Vertical" Margin="0,0,0,8">
+						<StackPanel Orientation="Vertical" Margin="0,0,0,8" IsEnabled="{Binding !IsBusy}">
 							<!-- name, enabled, active -->
-                            <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold" FontSize="16"/>
-                                <TextBlock IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Margin="8,0,0,0">Active ●</TextBlock>
-								<TextBlock IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Margin="8,0,0,0">Inactive ■</TextBlock>
-                            </StackPanel>
+                            <DockPanel>
+                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold" FontSize="16"/>
+								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Margin="8,0,0,0">Active ●</TextBlock>
+								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Margin="8,0,0,0">Inactive ■</TextBlock>
+								<Button DockPanel.Dock="Right" Name="BtnRestart" HorizontalAlignment="Right" Margin="0,0,20,0" Click="BtnRestart_OnClick">Restart ↻</Button>
+                            </DockPanel>
                             <!-- type, owner -->
 							<Label Content="{Binding ByType}"></Label>
 							<Label Content="{Binding ByOwner}" IsVisible="{Binding HasOwner}"></Label>

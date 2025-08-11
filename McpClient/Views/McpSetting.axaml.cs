@@ -94,6 +94,21 @@ public partial class McpSetting : UserControl
         Window parent = TopLevel.GetTopLevel(this) as Window;
         AddServerWindow addWindow = new AddServerWindow();
         await addWindow.ShowDialog(parent);
+        McpServer newServer = addWindow.Result;
+        if (newServer != null && DataContext is McpServerConfigViewModel vm)
+        {
+            // Add to server
+            McpServerConfig config = vm.ToModel();
+            config.mcp_servers.Add(newServer);
+            bool success = await _service.SetConfig(config);
+            if (success)
+            {
+                // Add to UI
+                vm.McpServers.Add(new McpViewModel(newServer, true));
+                // Scroll to end
+                ScrollViewer.ScrollToEnd();
+            }
+        }
     }
 
     private async void BtnEditArgs_OnClick(object sender, RoutedEventArgs e)
@@ -137,6 +152,27 @@ public partial class McpSetting : UserControl
             await editWindow.ShowDialog(parent);
             // Replace whole collection, so UI could change
             vm.Env = envEditorViewModel.ToCollenction();
+        }
+    }
+
+    private async void BtnRestart_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is McpViewModel vm)
+        {
+            vm.IsBusy = true;
+            // Set enable to false than true
+            vm.Enabled = false;
+            var configVm = DataContext as McpServerConfigViewModel;
+            McpServerConfig config = configVm.ToModel();
+            bool success = await _service.SetConfig(config);
+            if (success)
+            {
+                vm.Enabled = true;
+                config = configVm.ToModel();
+                success = await _service.SetConfig(config);
+            }
+
+            vm.IsBusy = false;
         }
     }
 }

@@ -43,6 +43,7 @@ internal class McpViewModel : ReactiveObject
     private string _command;
     private ObservableCollection<string> _args;
     private ObservableCollection<KeyValuePair<string, string>> _env;
+    private bool _isBusy;
 
     public bool Enabled
     {
@@ -158,6 +159,15 @@ internal class McpViewModel : ReactiveObject
         set
         {
             this.RaiseAndSetIfChanged(ref _env, value);
+        }
+    }
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isBusy, value);
         }
     }
 
