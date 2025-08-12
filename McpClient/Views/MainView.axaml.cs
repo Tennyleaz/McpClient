@@ -8,6 +8,8 @@ namespace McpClient.Views;
 
 public partial class MainView : UserControl
 {
+    public event EventHandler LogoutClick;
+
     public MainView()
     {
         InitializeComponent();
@@ -85,5 +87,10 @@ public partial class MainView : UserControl
         Chat.IsVisible = false;
         McpService.IsVisible = false;
         BtnBack.IsVisible = false;
+    }
+
+    private void BtnLogout_OnClick(object sender, RoutedEventArgs e)
+    {
+        LogoutClick?.Invoke(this, EventArgs.Empty);
     }
 }

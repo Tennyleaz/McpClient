@@ -11,17 +11,24 @@ namespace McpClient;
 
 internal sealed class SettingsManager
 {
+    private readonly string _settingDir;
     private readonly string _settingsPath;
     public static SettingsManager Local { get; } = new SettingsManager();
 
     private SettingsManager()
     {
         string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        _settingsPath = Path.Combine(appdata, "McpClient", "settings.json");
+        _settingDir = Path.Combine(appdata, "McpClient");
+        _settingsPath = Path.Combine(_settingDir, "settings.json");
     }
 
     public async Task SaveAsync(Settings settings)
     {
+        if (!Directory.Exists(_settingDir))
+        {
+            Directory.CreateDirectory(_settingDir);
+        }
+
         using (var fs = new FileStream(_settingsPath, FileMode.Create))
         {
             await JsonSerializer.SerializeAsync(fs, settings);
@@ -48,6 +55,7 @@ internal sealed class SettingsManager
 
 internal sealed record Settings
 {
-    public string UserName { get; init; }
+    public string UserName { get; set; }
     public string Token { get; set; }
+    public DateTime ExpiredAt { get; set; }
 }

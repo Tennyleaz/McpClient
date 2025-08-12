@@ -77,8 +77,7 @@ public partial class Chat : UserControl
 
     private async void ChatWebView_OnBeforeNavigate(Request request)
     {
-        string token =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZW5ueV9sdSIsImVtYWlsIjoidGVubnlfbHVAcGhpc29uLmNvbSIsImp0aSI6ImRiMGY1ZTU4LTA2MTEtNDc1YS1iMjE1LTg4ZDBhNmE4MjdlNCIsImV4cCI6MTc1NTAxOTg5MSwiaXNzIjoieW91cl9pc3N1ZXIiLCJhdWQiOiJ5b3VyX2F1ZGllbmNlIn0.NNW25nVIT5ICQaAoeZmUOueLFbYwS-pi3dAgIDOUngk";
-        await SetToken("tenny_lu", token);
+        Settings settings = SettingsManager.Local.Load();
+        await SetToken("tenny_lu", settings.Token);
     }
 }
