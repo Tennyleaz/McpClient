@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
+        x:Class="McpClient.LoginWindow"
+        Width="450" Height="450" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Login">
+    <DockPanel LastChildFill="False">
+        <Label DockPanel.Dock="Top" HorizontalAlignment="Center" FontSize="24" Margin="0,40,0,0">Phison AI Nexus</Label>
+        <Label DockPanel.Dock="Top" Margin="20,20,0,0">LDAP Accout:</Label>
+		<TextBox DockPanel.Dock="Top" Name="TbUserName" Margin="20,10,20,0"></TextBox>
+		<Label DockPanel.Dock="Top" Margin="20,20,20,0">Password:</Label>
+		<TextBox DockPanel.Dock="Top" Name="TbPassword" Margin="20,10,20,0"></TextBox>
+		<Button DockPanel.Dock="Bottom" Name="BtnLogin" Click="BtnLogin_OnClick" Width="200" Margin="0,0,0,40"
+                HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login</Button>
+    </DockPanel>
+</Window>
