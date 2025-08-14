@@ -16,7 +16,11 @@ public partial class MainWindow : Window
 
     private async void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
-        await Login();
+        bool isLogin = await Login();
+        if (isLogin)
+        {
+            await MainView.ReloadMainView();
+        }
     }
 
     private async void MainView_OnLogoutClick(object sender, EventArgs e)
@@ -28,10 +32,14 @@ public partial class MainWindow : Window
         settings.ExpiredAt = default;
         await SettingsManager.Local.SaveAsync(settings);
         // Login again
-        await Login();
+        bool isLogin = await Login();
+        if (isLogin)
+        {
+            await MainView.ReloadMainView();
+        }
     }
 
-    private async Task Login()
+    private async Task<bool> Login()
     {
         // Test saved token
         Settings settings = SettingsManager.Local.Load();
@@ -42,7 +50,7 @@ public partial class MainWindow : Window
             if (success)
             {
                 // Do not login again
-                return;
+                return true;
             }
             // Remove old token
             settings.Token = null;
@@ -57,6 +65,9 @@ public partial class MainWindow : Window
         {
             // Close on no token
             Close();
+            return false;
         }
+
+        return true;
     }
 }

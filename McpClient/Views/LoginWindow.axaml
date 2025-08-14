@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
         x:Class="McpClient.Views.LoginWindow"
         Width="450" Height="450" CanResize="False"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         Loaded="Control_OnLoaded" KeyDown="InputElement_OnKeyDown"
         Title="Login">
     <DockPanel LastChildFill="False">

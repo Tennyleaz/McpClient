@@ -93,4 +93,9 @@ public partial class MainView : UserControl
     {
         LogoutClick?.Invoke(this, EventArgs.Empty);
     }
+
+    public async Task ReloadMainView()
+    {
+        await TaskView.RefreshCurrentTab(true);
+    }
 }

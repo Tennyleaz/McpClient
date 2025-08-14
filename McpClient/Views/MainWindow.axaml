@@ -8,5 +8,5 @@
         x:Class="McpClient.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="McpClient" Loaded="Control_OnLoaded">
-        <views:MainView LogoutClick="MainView_OnLogoutClick"/>
+        <views:MainView Name="MainView" LogoutClick="MainView_OnLogoutClick"/>
 </Window>
