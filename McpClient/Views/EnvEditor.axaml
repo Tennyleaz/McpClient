@@ -25,11 +25,13 @@
                             <!-- Argument Editor -->
                             <TextBox Grid.Column="0"
                                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Watermark="name"
                                      Margin="4,0,4,0"
                                      VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="=" VerticalAlignment="Center"/>
 							<TextBox Grid.Column="2"
                                      Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Watermark="value"
                                      Margin="4,0,4,0"
                                      VerticalAlignment="Center"/>
                             <!-- Remove Button -->

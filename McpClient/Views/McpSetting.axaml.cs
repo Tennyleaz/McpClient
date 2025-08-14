@@ -108,6 +108,13 @@ public partial class McpSetting : UserControl
                 // Scroll to end
                 ScrollViewer.ScrollToEnd();
             }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add new MCP config to server.",
+                    ButtonEnum.Ok,
+                    Icon.Error);
+                await box.ShowAsync();
+            }
         }
     }
 
@@ -115,7 +122,6 @@ public partial class McpSetting : UserControl
     {
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
-            Window parent = TopLevel.GetTopLevel(this) as Window;
             ArgsEditorViewModel argsEditorViewModel = new ArgsEditorViewModel();
             // Copy the data
             foreach (string arg in vm.Args)
@@ -123,6 +129,7 @@ public partial class McpSetting : UserControl
                 argsEditorViewModel.Args.Add(new ArgsEditorItem(arg));
             }
             // Show edit window
+            Window parent = TopLevel.GetTopLevel(this) as Window;
             ArgsEditor editWindow = new ArgsEditor();
             editWindow.DataContext = argsEditorViewModel;
             await editWindow.ShowDialog(parent);
@@ -135,7 +142,6 @@ public partial class McpSetting : UserControl
     {
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
-            Window parent = TopLevel.GetTopLevel(this) as Window;
             EnvEditorViewModel envEditorViewModel = new EnvEditorViewModel();
             // Copy the data
             foreach (var pair in vm.Env)
@@ -147,6 +153,7 @@ public partial class McpSetting : UserControl
                 });
             }
             // Show edit window
+            Window parent = TopLevel.GetTopLevel(this) as Window;
             EnvEditor editWindow = new EnvEditor();
             editWindow.DataContext = envEditorViewModel;
             await editWindow.ShowDialog(parent);
@@ -157,6 +164,8 @@ public partial class McpSetting : UserControl
 
     private async void BtnRestart_OnClick(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             vm.IsBusy = true;

@@ -129,7 +129,7 @@ public partial class AddServerWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(TbCommand.Text))
+        if (CbTypes.SelectedIndex == 0 && string.IsNullOrWhiteSpace(TbCommand.Text))
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please input your command.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);

@@ -38,6 +38,7 @@
 						    <!-- Argument Editor -->
 						    <TextBox
                                 Text="{Binding Arg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Watermark="Please input arguemnt"
                                 MinWidth="200"
                                 Margin="0,0,0,0"
                                 VerticalAlignment="Center"/>
