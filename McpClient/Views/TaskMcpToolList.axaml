@@ -21,7 +21,7 @@
             <!-- data here -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0">
+                    <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0" IsEnabled="{Binding !IsBusy}">
                         <Panel>
                             <TextBlock Text="{Binding ServerName}" Margin="4,4,4,0" TextWrapping="Wrap"/>
 							<!--<Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"

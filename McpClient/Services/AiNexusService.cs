@@ -168,10 +168,11 @@ internal class AiNexusService
 
     #region Execute workflow
 
-    public async Task<(bool, string)> ExecuteOfflineWorkflow(int groupId)
+    public async Task<(bool, string)> ExecuteOfflineWorkflow(int groupId, string model)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();
         content.Add(new StringContent(groupId.ToString()), "group_id");
+        content.Add(new StringContent(model), "model");
         HttpResponseMessage response = await _httpClient.PostAsync("/api/v1/AutoGen/offline", content);
         bool success = response.IsSuccessStatusCode;
         string json = await response.Content.ReadAsStringAsync();

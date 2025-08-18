@@ -44,7 +44,7 @@ public partial class RunLocalMcpWindow : Window
         if (success)
         {
             TbOutput.Text += "Running...\n";
-            (success, result) = await _service.ExecuteOfflineWorkflow(groupId);
+            (success, result) = await _service.ExecuteOfflineWorkflow(groupId, modelName);
         }
         if (success)
         {

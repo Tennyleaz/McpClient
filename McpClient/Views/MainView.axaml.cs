@@ -13,16 +13,17 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
+
+        if (Design.IsDesignMode)
+            return;
+        BtnBack.IsVisible = false;
+        BtnSave.IsVisible = false;
+        BtnRefresh.IsVisible = false;
     }
 
     private async void BtnSetting_OnClick(object sender, RoutedEventArgs e)
     {
         await ShowSettings();
-    }
-
-    private async void BtnBack_OnClick(object sender, RoutedEventArgs e)
-    {
-        await ShowMain();
     }
 
     private void BtnChat_OnClick(object sender, RoutedEventArgs e)
@@ -35,17 +36,36 @@ public partial class MainView : UserControl
         ShowServices();
     }
 
+    private async void BtnBack_OnClick(object sender, RoutedEventArgs e)
+    {
+        await ShowMain(false);
+    }
+
+    private async void BtnSave_OnClick(object sender, RoutedEventArgs e)
+    {
+        await ShowMain(true);
+    }
+
+    private void BtnRefresh_OnClick(object sender, RoutedEventArgs e)
+    {
+        Chat.ReloadWebview();
+    }
+
     private async Task ShowSettings()
     {
-        BtnBack.Content = "Save";
+        BtnBack.Content = "Cancel";
 
         MainPanel.IsVisible = false;
         McpSetting.IsVisible = true;
         Chat.IsVisible = false;
         McpService.IsVisible = false;
         BtnBack.IsVisible = true;
+        BtnSave.IsVisible = true;
+        BtnRefresh.IsVisible = false;
 
+        BtnBack.IsEnabled = BtnSave.IsEnabled = false;
         await McpSetting.LoadConfig();
+        BtnBack.IsEnabled = BtnSave.IsEnabled = true;
     }
 
     private void ShowChat()
@@ -57,6 +77,8 @@ public partial class MainView : UserControl
         Chat.IsVisible = true;
         McpService.IsVisible = false;
         BtnBack.IsVisible = true;
+        BtnSave.IsVisible = false;
+        BtnRefresh.IsVisible = true;
     }
 
     private void ShowServices()
@@ -68,12 +90,14 @@ public partial class MainView : UserControl
         Chat.IsVisible = false;
         McpService.IsVisible = true;
         BtnBack.IsVisible = true;
+        BtnSave.IsVisible = false;
+        BtnRefresh.IsVisible = false;
     }
 
-    private async Task ShowMain()
+    private async Task ShowMain(bool isSave)
     {
         // save each settings if was visible
-        if (McpSetting.IsVisible)
+        if (isSave && McpSetting.IsVisible)
         {
             bool success = await McpSetting.SaveConfig();
             if (!success)
@@ -87,6 +111,8 @@ public partial class MainView : UserControl
         Chat.IsVisible = false;
         McpService.IsVisible = false;
         BtnBack.IsVisible = false;
+        BtnSave.IsVisible = false;
+        BtnRefresh.IsVisible = false;
     }
 
     private void BtnLogout_OnClick(object sender, RoutedEventArgs e)

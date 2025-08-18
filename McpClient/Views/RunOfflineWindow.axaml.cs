@@ -40,7 +40,7 @@ public partial class RunOfflineWindow : Window
 
         TbOutput.Text += "Running...\n";
         string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex];
-        var (success, result) = await _service.ExecuteOfflineWorkflow(_workflow.Id);
+        var (success, result) = await _service.ExecuteOfflineWorkflow(_workflow.Id, modelName);
         if (success)
         {
             TbOutput.Text += "Run success.";
@@ -51,7 +51,7 @@ public partial class RunOfflineWindow : Window
             TbOutput.Text += result;
         }
 
-        CbModelName.IsEnabled = false;
+        CbModelName.IsEnabled = true;
         BtnRun.IsEnabled = true;
     }
 }

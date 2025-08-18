@@ -62,15 +62,34 @@ public partial class TaskMcpToolList : UserControl
         //HideProgress();
     }
 
-    private void ViewModel_Restart(object sender, McpViewModel e)
+    private async void ViewModel_Restart(object sender, McpViewModel e)
     {
-        
+        //IsEnabled = false;
+        e.IsBusy = true;
+
+        bool success = true;
+        if (e.Enabled)
+        {
+            e.Enabled = false;
+            McpServerConfig config = viewModel.ToModel();
+            success = await _mcpService.SetConfig(config);
+        }
+        e.Enabled = true;
+
+        if (success)
+        {
+            McpServerConfig config = viewModel.ToModel();
+            success = await _mcpService.SetConfig(config);
+        }
+
+        e.IsBusy = false;
+        //IsEnabled = true;
     }
 
-    private async void ViewModel_RunServer(object sender, string e)
-    {
-        Window parent = TopLevel.GetTopLevel(this) as Window;
-        RunLocalMcpWindow runTaskWindow = new RunLocalMcpWindow(e, _nexusService);
-        await runTaskWindow.ShowDialog(parent);
-    }
+    //private async void ViewModel_RunServer(object sender, string e)
+    //{
+    //    Window parent = TopLevel.GetTopLevel(this) as Window;
+    //    RunLocalMcpWindow runTaskWindow = new RunLocalMcpWindow(e, _nexusService);
+    //    await runTaskWindow.ShowDialog(parent);
+    //}
 }

@@ -42,8 +42,10 @@
         <views:McpSetting Grid.Row="0" Name="McpSetting" IsVisible="False"></views:McpSetting>
         <views:McpService Grid.Row="0" Name="McpService" IsVisible="False"></views:McpService>
 
-        <Panel Grid.Row="1" Name="ControlPanel">
-            <Button Name="BtnBack" IsVisible="False" Click="BtnBack_OnClick" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">Go Back</Button>
-        </Panel>
+        <StackPanel Grid.Row="1" Name="ControlPanel" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Name="BtnBack" IsVisible="True" Click="BtnBack_OnClick" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">Go Back</Button>
+            <Button Name="BtnSave" IsVisible="True" Click="BtnSave_OnClick" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">Save</Button>
+            <Button Name="BtnRefresh" IsVisible="True" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">Refresh</Button>
+        </StackPanel>
     </Grid>
 </UserControl>

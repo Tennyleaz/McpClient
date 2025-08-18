@@ -22,7 +22,7 @@ public partial class Chat : UserControl
         ChatWebView.AllowDeveloperTools = true;
     }
 
-    private void ReloadWebview()
+    public void ReloadWebview()
     {
         ChatWebView.Reload();
     }
@@ -72,6 +72,7 @@ public partial class Chat : UserControl
 
     private void BtnF12_OnClick(object sender, RoutedEventArgs e)
     {
+        ChatWebView.AllowDeveloperTools = true;
         ChatWebView.ShowDeveloperTools();
     }
 
