@@ -26,6 +26,7 @@
 
         <DockPanel Grid.Row="0" Name="MainPanel" >
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="20,20,20,20" DockPanel.Dock="Left">
+                <Image Source="../Assets/logo.png" Width="200" Margin="0,0,0,20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 <Button Name="BtnChat" Click="BtnChat_OnClick" Margin="0,0,0,0" Classes="main" >Chat</Button>
                 <Button Name="BtnService" Click="BtnService_OnClick" Margin="0,20,0,0" Classes="main" >Services</Button>
                 <Button Name="BtnSetting" Click="BtnSetting_OnClick" Margin="0,20,0,0" Classes="main" >Settings</Button>

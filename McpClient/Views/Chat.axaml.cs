@@ -78,6 +78,6 @@ public partial class Chat : UserControl
     private async void ChatWebView_OnBeforeNavigate(Request request)
     {
         Settings settings = SettingsManager.Local.Load();
-        await SetToken("tenny_lu", settings.Token);
+        await SetToken(settings.UserName, settings.McpConfigToken);
     }
 }

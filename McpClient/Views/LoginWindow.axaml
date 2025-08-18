@@ -14,6 +14,7 @@
 		<TextBox DockPanel.Dock="Top" Name="TbUserName" Watermark="Enter your username" Margin="20,10,20,0"></TextBox>
 		<Label DockPanel.Dock="Top" Margin="20,20,20,0">Password:</Label>
 		<TextBox DockPanel.Dock="Top" Name="TbPassword" PasswordChar="*" Watermark="Enter your password" Margin="20,10,20,0"></TextBox>
+		<CheckBox DockPanel.Dock="Top" Name="CheckRememberName" Margin="20,20,20,0">Remember me</CheckBox>
 		<Button DockPanel.Dock="Bottom" Name="BtnLogin" Click="BtnLogin_OnClick" Width="200" Margin="0,0,0,40"
                 HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login</Button>
     </DockPanel>

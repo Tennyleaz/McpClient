@@ -48,6 +48,7 @@ internal sealed class SettingsManager
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return new Settings();
         }
     }
@@ -56,6 +57,7 @@ internal sealed class SettingsManager
 internal sealed record Settings
 {
     public string UserName { get; set; }
-    public string Token { get; set; }
+    public string AiNexusToken { get; set; }
+    public string McpConfigToken { get; set; }
     public DateTime ExpiredAt { get; set; }
 }

@@ -15,18 +15,31 @@ namespace McpClient.Views;
 public partial class LoginWindow : Window
 {
     private readonly McpConfigService _service;
+    private readonly AiNexusService _aiNexusService;
+    private Settings settings;
 
     public string Token { get; private set; }
 
     public LoginWindow()
     {
         InitializeComponent();
-        _service = new McpConfigService(new HttpClient());
+        _service = new McpConfigService(null);  // no token if login
+        _aiNexusService = new AiNexusService(null);  // no token if login
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
-        TbUserName.Focus();
+        settings = SettingsManager.Local.Load();
+        if (!string.IsNullOrWhiteSpace(settings.UserName))
+        {
+            TbUserName.Text = settings.UserName;
+            CheckRememberName.IsChecked = true;
+            TbPassword.Focus();
+        }
+        else
+        {
+            TbUserName.Focus();
+        }
     }
 
 
@@ -70,10 +83,30 @@ public partial class LoginWindow : Window
             return;
         }
 
+        // Also login to AI Nexus
+        LoginResponse aiResponse = await _aiNexusService.Login(TbUserName.Text, TbPassword.Text);
+        if (aiResponse == null)
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.",
+                ButtonEnum.Ok,
+                MsBox.Avalonia.Enums.Icon.Info);
+            await box.ShowAsync();
+            return;
+        }
+
+        // Remember username
+        if (CheckRememberName.IsChecked == true)
+        {
+            settings.UserName = TbUserName.Text;
+        }
+        else
+        {
+            settings.UserName = null;
+        }
+
         // save and close
-        Settings settings = SettingsManager.Local.Load();
-        settings.Token = resposne.Token;
-        settings.UserName = TbUserName.Text;
+        settings.McpConfigToken = resposne.Token;
+        settings.AiNexusToken = aiResponse.Token;
         settings.ExpiredAt = resposne.ExpiresAt;
         await SettingsManager.Local.SaveAsync(settings);
         Token = resposne.Token;

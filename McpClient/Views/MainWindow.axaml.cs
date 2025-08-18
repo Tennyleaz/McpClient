@@ -27,7 +27,8 @@ public partial class MainWindow : Window
     {
         // Delete saved token
         Settings settings = SettingsManager.Local.Load();
-        settings.Token = null;
+        settings.AiNexusToken = null;
+        settings.McpConfigToken = null;
         settings.UserName = null;
         settings.ExpiredAt = default;
         await SettingsManager.Local.SaveAsync(settings);
@@ -43,17 +44,18 @@ public partial class MainWindow : Window
     {
         // Test saved token
         Settings settings = SettingsManager.Local.Load();
-        if (!string.IsNullOrWhiteSpace(settings.Token))
+        if (!string.IsNullOrWhiteSpace(settings.McpConfigToken))
         {
-            McpConfigService service = new McpConfigService(new HttpClient());
-            bool success = await service.IsLogin(settings.Token);
+            bool success = await IsMcpConfigTokenValid(settings.McpConfigToken) &&
+                           await IsAiNexusTokenValid(settings.AiNexusToken);
             if (success)
             {
                 // Do not login again
                 return true;
             }
             // Remove old token
-            settings.Token = null;
+            settings.McpConfigToken = null;
+            settings.AiNexusToken = null;
             await SettingsManager.Local.SaveAsync(settings);
         }
 
@@ -69,5 +71,19 @@ public partial class MainWindow : Window
         }
 
         return true;
+    }
+
+    private static async Task<bool> IsMcpConfigTokenValid(string token)
+    {
+        McpConfigService service = new McpConfigService(token);
+        bool success = await service.IsLogin();
+        return success;
+    }
+
+    private static async Task<bool> IsAiNexusTokenValid(string token)
+    {
+        AiNexusService service = new AiNexusService(token);
+        var groups = await service.GetAllGroups();
+        return groups != null;
     }
 }
