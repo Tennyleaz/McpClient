@@ -2,16 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="400"
              xmlns:vm="clr-namespace:McpClient.ViewModels"
+             x:Class="McpClient.Views.TaskOfflineWorkflowList"
              x:Name="GroupList"
-             x:DataType="vm:GroupListViewModel"
-             x:Class="McpClient.Views.TaskGroupList">
+             x:DataType="vm:WorkflowListViewModel">
     <Design.DataContext>
-        <vm:DesignGroupList/>
+		<vm:DesignWorkflowListViewModel/>
     </Design.DataContext>
     <Panel>
-        <ItemsControl Name="TaskList" ItemsSource="{Binding Groups}" Margin="0,44,0,0">
+        <ItemsControl Name="TaskList" ItemsSource="{Binding OfflineWorkflows}" Margin="0,44,0,0">
             <!-- use wrappanel as the template-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -21,10 +21,9 @@
             <!-- data here -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Classes="Task" BorderThickness="1" Height="100" Width="200" Margin="0,10,10,0">
+                    <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0">
                         <Panel>
                             <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Text="{Binding Description}" Margin="4,24,4,0" TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
                             <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
                                     Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
                                     CommandParameter="{Binding .}">Run ▶</Button>
@@ -35,4 +34,5 @@
         </ItemsControl>
         <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" IsVisible="False">Nothing here</Label>
     </Panel>
+
 </UserControl>

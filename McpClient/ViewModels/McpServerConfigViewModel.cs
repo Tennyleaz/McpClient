@@ -17,6 +17,9 @@ internal class McpServerConfigViewModel: ReactiveObject
 
     public ReactiveCommand<McpViewModel, Unit> EditArgsCommand { get; }
     //public Interaction<McpViewModel, List<string>?> EditArgsInteraction { get; } = new();
+    public ReactiveCommand<McpViewModel, Unit> RestartCommand { get; }
+
+    public event EventHandler<McpViewModel> Restart;
 
     public McpServerConfigViewModel()
     {
@@ -25,6 +28,12 @@ internal class McpServerConfigViewModel: ReactiveObject
         {
             Console.WriteLine("edit!");
         });
+        RestartCommand = ReactiveCommand.Create<McpViewModel>(RestartAction);
+    }
+
+    private void RestartAction(McpViewModel vm)
+    {
+        Restart?.Invoke(this, vm);
     }
 
     // This method is called by any child when 'edit args' is required

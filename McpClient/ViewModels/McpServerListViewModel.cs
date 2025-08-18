@@ -16,17 +16,25 @@ internal class McpServerListViewModel : ReactiveObject
 
     public ReactiveCommand<string, Unit> RunCommand { get; }
 
-    public event EventHandler<string> RunServer;
+    public ReactiveCommand<string, Unit> RestartCommand { get; }
+
+    public event EventHandler<string> RunServer, Restart;
 
     public McpServerListViewModel()
     {
         RunCommand = ReactiveCommand.Create<string>(PerformAction);
+        RestartCommand = ReactiveCommand.Create<string>(RestartAction);
     }
 
     private void PerformAction(string serverName)
     {
         //Debug.WriteLine("The action was called: " + serverName);
         RunServer?.Invoke(this, serverName);
+    }
+
+    private void RestartAction(string serverName)
+    {
+        Restart?.Invoke(this, serverName);
     }
 }
 

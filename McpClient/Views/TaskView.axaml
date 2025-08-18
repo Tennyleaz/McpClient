@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:McpClient.ViewModels"
              xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              xmlns:local="clr-namespace:McpClient.Views"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
              x:DataType="vm:McpServerListViewModel"
              x:Class="McpClient.Views.TaskView"
              x:Name="TaskViewControl"
@@ -15,16 +15,17 @@
     </Design.DataContext>
     <Panel>
 		<TabStrip Name="Tabs" SelectionChanged="Tabs_OnSelectionChanged">
-            <TabItem Header="My Tasks">
-
+            <TabItem Header="My Groups">
+            </TabItem>
+			<TabItem Header="Local Workflows">
             </TabItem>
             <TabItem Header="MCP Tools">
-                
             </TabItem>
         </TabStrip>
         <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Refresh ↻" Margin="0,0,10,0"/>
 		<local:TaskGroupList Name="GroupList"/>
-        <local:TaskMcpToolList Name="McpToolList"/>
+        <local:TaskOfflineWorkflowList Name="OfflineWorkflowList" IsVisible="False"/>
+        <local:TaskMcpToolList Name="McpToolList" IsVisible="False"/>
         <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="{DynamicResource SystemAccentColor}"

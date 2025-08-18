@@ -1,15 +1,17 @@
-﻿using McpClient.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using McpClient.Models;
+using McpClient.ViewModels;
 
 namespace McpClient.Services;
 
@@ -18,10 +20,20 @@ internal class McpConfigService
     private const string BASE_URL = "http://192.168.41.60:7235";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _options;
+    private string _token;
 
-    public McpConfigService(HttpClient httpClient)
+    public McpConfigService(string token, HttpClient httpClient = null)
     {
-        _httpClient = httpClient;
+        if (httpClient == null)
+            _httpClient = new HttpClient();
+        else
+            _httpClient = httpClient;
+        if (!string.IsNullOrEmpty(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            _token = token;
+        }
+
         _options = new JsonSerializerOptions();
         _options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         _options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -64,6 +76,22 @@ internal class McpConfigService
         return servers;
     }
 
+    public async Task<McpServerConfigViewModel> GetAllConfigAndStatus()
+    {
+        // Load all configs
+        McpServerConfig config = await GetConfig();
+        // Load server status
+        McpServerListResponse listResponse = await ListCurrent();
+        if (listResponse != null && config != null)
+        {
+            // Merge each server's status into main view model;
+            McpServerConfigViewModel viewModel = new McpServerConfigViewModel(config, listResponse.data);
+            return viewModel;
+        }
+        // Retun null on fail
+        return null;
+    }
+
     public async Task<LoginResponse> Login(string username, string password)
     {
         var body = new
@@ -79,21 +107,29 @@ internal class McpConfigService
 
         string json = await response.Content.ReadAsStringAsync();
         LoginResponse result = JsonSerializer.Deserialize<LoginResponse>(json, _options);
+
+        // Also set self's token for future use
+        if (!string.IsNullOrEmpty(result.Token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+            _token = result.Token;
+        }
+
         return result;
     }
 
-    public async Task<bool> IsLogin(string token)
+    public async Task<bool> IsLogin()
     {
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(BASE_URL + "/user/isLogin"),
-            Headers = {
-                { HttpRequestHeader.Accept.ToString(), "application/json" },
-                { "Authorization", $"Bearer {token}" }
-            }
-        };
-        HttpResponseMessage response = await _httpClient.SendAsync(httpRequestMessage);
+        //HttpRequestMessage httpRequestMessage = new HttpRequestMessage
+        //{
+        //    Method = HttpMethod.Get,
+        //    RequestUri = new Uri(BASE_URL + "/user/isLogin"),
+        //    Headers = {
+        //        { HttpRequestHeader.Accept.ToString(), "application/json" },
+        //        { "Authorization", $"Bearer {token}" }
+        //    }
+        //};
+        HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/user/isLogin");
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return false;

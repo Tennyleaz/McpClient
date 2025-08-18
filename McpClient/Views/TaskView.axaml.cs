@@ -15,16 +15,30 @@ namespace McpClient.Views;
 
 public partial class TaskView : UserControl
 {
+    private McpConfigService _mcpService;
+    private AiNexusService _nexusService;
+
     public TaskView()
     {
         InitializeComponent();
     }
 
-    private async void Control_OnLoaded(object sender, RoutedEventArgs e)
+    private void TryCreateService()
+    {
+        if (_mcpService != null && _nexusService != null)
+            return;
+        Settings settings = SettingsManager.Local.Load();
+        _mcpService = new McpConfigService(settings.McpConfigToken);
+        _nexusService = new AiNexusService(settings.AiNexusToken);
+        GroupList.SetService(_nexusService);
+        OfflineWorkflowList.SetServices(_nexusService);
+        McpToolList.SetServices(_nexusService, _mcpService);
+    }
+
+    private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (Design.IsDesignMode)
             return;
-        //await LoadList();
     }
 
     private async void BtnRefresh_OnClick(object sender, RoutedEventArgs e)
@@ -43,24 +57,34 @@ public partial class TaskView : UserControl
             return;
         if (Design.IsDesignMode)
             return;
-
+        
         ShowProgress();
+        TryCreateService();
         if (Tabs.SelectedIndex == 0)
         {
             // My tasks
             GroupList.IsVisible = true;
+            OfflineWorkflowList.IsVisible = false;
             McpToolList.IsVisible = false;
             await GroupList.LoadGroupList(forceRefresh);
+        }
+        else if (Tabs.SelectedIndex == 1)
+        {
+            // Offline workflow
+            GroupList.IsVisible = false;
+            OfflineWorkflowList.IsVisible = true;
+            McpToolList.IsVisible = false;
+            await OfflineWorkflowList.LoadOfflineList(forceRefresh);
         }
         else
         {
             // MCP tools
             GroupList.IsVisible = false;
+            OfflineWorkflowList.IsVisible = false;
             McpToolList.IsVisible = true;
             await McpToolList.LoadMcpList(forceRefresh);
         }
         HideProgress();
-        
     }
 
     private void ShowProgress()

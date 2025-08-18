@@ -14,14 +14,17 @@ namespace McpClient.Views;
 
 public partial class TaskGroupList : UserControl
 {
-    private readonly AiNexusService _service;
+    private AiNexusService _service;
     private GroupListViewModel groupListViewModel;
-    private int userId = 0;
 
     public TaskGroupList()
     {
         InitializeComponent();
-        _service = new AiNexusService();
+    }
+
+    internal void SetService(AiNexusService service)
+    {
+        _service = service;
     }
 
     public async Task LoadGroupList(bool forceRefresh)
@@ -38,7 +41,7 @@ public partial class TaskGroupList : UserControl
         //ShowProgress();
 
         // Load server status
-        List<Group> groups = await _service.GetAllGroups(userId);
+        List<Group> groups = await _service.GetAllGroups();
         if (groups != null)
         {
             // Merge each server's status into main view model;
@@ -66,10 +69,10 @@ public partial class TaskGroupList : UserControl
         //HideProgress();
     }
 
-    private async void ViewModel_RunServer(object sender, string e)
+    private async void ViewModel_RunServer(object sender, Group e)
     {
         Window parent = TopLevel.GetTopLevel(this) as Window;
-        RunTaskWindow runTaskWindow = new RunTaskWindow(e);
-        await runTaskWindow.ShowDialog(parent);
+        RunStaticTaskWindow runStaticTaskWindow = new RunStaticTaskWindow(e, _service);
+        await runStaticTaskWindow.ShowDialog(parent);
     }
 }

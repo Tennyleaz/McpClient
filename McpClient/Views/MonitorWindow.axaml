@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="150"
+        x:Class="McpClient.Views.MonitorWindow"
+        Width="150" Height="150"
+        Topmost="True"
+        SystemDecorations="BorderOnly"
+        Loaded="Control_OnLoaded" Closing="Window_OnClosing"
+        Title="Monitor">
+    <Grid ColumnDefinitions="*,*" RowDefinitions="*,Auto,*">
+		<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">30%</Label>
+        <Label Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center">100%</Label>
+        <Rectangle Grid.Column="0" Grid.Row="1" Name="RectCpu" Height="30" Width="40" Fill="{DynamicResource SystemAccentColor}" VerticalAlignment="Bottom"/>
+        <Rectangle Grid.Column="1" Grid.Row="1" Name="RectGpu" Height="100" Width="40" Fill="{DynamicResource SystemAccentColor}" VerticalAlignment="Bottom"/>
+        <Label Grid.Column="0" Grid.Row="2" FontSize="16" HorizontalAlignment="Center">CPU</Label>
+        <Label Grid.Column="1" Grid.Row="2" FontSize="16" HorizontalAlignment="Center">GPU</Label>
+    </Grid>
+</Window>

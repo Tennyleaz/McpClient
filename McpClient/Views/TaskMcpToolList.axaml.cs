@@ -13,22 +13,29 @@ namespace McpClient.Views;
 
 public partial class TaskMcpToolList : UserControl
 {
-    private readonly McpConfigService _service;
-    private McpServerListViewModel mcpListViewModel;
+    private McpConfigService _mcpService;
+    private AiNexusService _nexusService;
+    //private McpServerListViewModel mcpListViewModel;
+    private McpServerConfigViewModel viewModel;
 
     public TaskMcpToolList()
     {
         InitializeComponent();
-        _service = new McpConfigService(new HttpClient());
+    }
+
+    internal void SetServices(AiNexusService aiNexusService, McpConfigService mcpConfigService)
+    {
+        _nexusService = aiNexusService;
+        _mcpService = mcpConfigService;
     }
 
     public async Task LoadMcpList(bool forceRefresh)
     {
         // Do not refresh if there are items
-        if (!forceRefresh && mcpListViewModel != null && mcpListViewModel.ServerNames.Count > 0)
+        if (!forceRefresh && viewModel != null && viewModel.McpServers.Count > 0)
         {
             LbEmptyList.IsVisible = false;
-            DataContext = mcpListViewModel;
+            DataContext = viewModel;
             return;
         }
 
@@ -36,24 +43,12 @@ public partial class TaskMcpToolList : UserControl
         //ShowProgress();
 
         // Load server status
-        McpServerListResponse listResponse = await _service.ListCurrent();
-        if (listResponse != null)
+        //McpServerListResponse listResponse = await _mcpService.ListCurrent();
+        viewModel = await _mcpService.GetAllConfigAndStatus();
+        if (viewModel != null)
         {
-            // Merge each server's status into main view model;
-            if (mcpListViewModel == null)
-            {
-                mcpListViewModel = new McpServerListViewModel();
-                mcpListViewModel.RunServer += ViewModel_RunServer;
-            }
-            else
-            {
-                mcpListViewModel.ServerNames.Clear();
-            }
-            foreach (McpServerItem item in listResponse.data)
-            {
-                mcpListViewModel.ServerNames.Add(item.server_name);
-            }
-            DataContext = mcpListViewModel;
+            viewModel.Restart += ViewModel_Restart;
+            DataContext = viewModel;
         }
         else
         {
@@ -63,14 +58,19 @@ public partial class TaskMcpToolList : UserControl
             var result = await box.ShowAsync();
         }
 
-        LbEmptyList.IsVisible = mcpListViewModel == null || mcpListViewModel.ServerNames.Count == 0;
+        LbEmptyList.IsVisible = viewModel == null || viewModel.McpServers.Count == 0;
         //HideProgress();
+    }
+
+    private void ViewModel_Restart(object sender, McpViewModel e)
+    {
+        
     }
 
     private async void ViewModel_RunServer(object sender, string e)
     {
         Window parent = TopLevel.GetTopLevel(this) as Window;
-        RunTaskWindow runTaskWindow = new RunTaskWindow(e);
+        RunLocalMcpWindow runTaskWindow = new RunLocalMcpWindow(e, _nexusService);
         await runTaskWindow.ShowDialog(parent);
     }
 }
