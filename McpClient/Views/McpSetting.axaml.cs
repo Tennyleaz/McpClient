@@ -19,12 +19,11 @@ namespace McpClient.Views;
 
 public partial class McpSetting : UserControl
 {
-    private readonly McpConfigService _service;
+    private McpConfigService _service;
 
     public McpSetting()
     {
         InitializeComponent();
-        _service = new McpConfigService(new HttpClient());
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -33,22 +32,30 @@ public partial class McpSetting : UserControl
             return;
     }
 
+    private void TryCreateService()
+    {
+        if (_service != null)
+            return;
+        Settings settings = SettingsManager.Local.Load();
+        _service = new McpConfigService(settings.McpConfigToken);
+    }
+
     public async Task LoadConfig()
     {
+        if (Design.IsDesignMode)
+            return;
+        TryCreateService();
+
         // Show progress
         ProgressRing.IsVisible = true;
         ScrollViewer.IsVisible = false;
         BtnAdd.IsVisible = false;
         // Scroll back to top
         ScrollViewer.ScrollToHome();
-        // Load all configs
-        McpServerConfig config = await _service.GetConfig();
-        // Load server status
-        McpServerListResponse listResponse = await _service.ListCurrent();
-        if (listResponse != null && config != null)
+        // Load server config and status at once
+        McpServerConfigViewModel viewModel = await _service.GetAllConfigAndStatus();
+        if (viewModel != null)
         {
-            // Merge each server's status into main view model;
-            McpServerConfigViewModel viewModel = new McpServerConfigViewModel(config, listResponse.data);
             DataContext = viewModel;
 
             ProgressRing.IsVisible = false;
@@ -66,6 +73,10 @@ public partial class McpSetting : UserControl
 
     public async Task<bool> SaveConfig()
     {
+        if (Design.IsDesignMode)
+            return true;
+        TryCreateService();
+
         if (DataContext is McpServerConfigViewModel vm)
         {
             ProgressRing.IsVisible = true;
@@ -91,6 +102,8 @@ public partial class McpSetting : UserControl
 
     private async void BtnAdd_OnClick(object sender, RoutedEventArgs e)
     {
+        TryCreateService();
+
         Window parent = TopLevel.GetTopLevel(this) as Window;
         AddServerWindow addWindow = new AddServerWindow();
         await addWindow.ShowDialog(parent);
@@ -120,6 +133,8 @@ public partial class McpSetting : UserControl
 
     private async void BtnEditArgs_OnClick(object sender, RoutedEventArgs e)
     {
+        TryCreateService();
+
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             ArgsEditorViewModel argsEditorViewModel = new ArgsEditorViewModel();
@@ -140,6 +155,8 @@ public partial class McpSetting : UserControl
 
     private async void BtnEditEnv_OnClick(object sender, RoutedEventArgs e)
     {
+        TryCreateService();
+
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             EnvEditorViewModel envEditorViewModel = new EnvEditorViewModel();
@@ -166,6 +183,9 @@ public partial class McpSetting : UserControl
     {
         if (Design.IsDesignMode)
             return;
+
+        TryCreateService();
+
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             vm.IsBusy = true;

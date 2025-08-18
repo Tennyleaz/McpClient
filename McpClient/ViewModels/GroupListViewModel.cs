@@ -14,18 +14,18 @@ internal class GroupListViewModel : ReactiveObject
 {
     public ObservableCollection<Group> Groups { get; set; } = new();
 
-    public ReactiveCommand<string, Unit> RunCommand { get; }
+    public ReactiveCommand<Group, Unit> RunCommand { get; }
 
-    public event EventHandler<string> RunServer;
+    public event EventHandler<Group> RunServer;
 
     public GroupListViewModel()
     {
-        RunCommand = ReactiveCommand.Create<string>(PerformAction);
+        RunCommand = ReactiveCommand.Create<Group>(PerformAction);
     }
 
-    private void PerformAction(string serverName)
+    private void PerformAction(Group group)
     {
         //Debug.WriteLine("The action was called: " + serverName);
-        RunServer?.Invoke(this, serverName);
+        RunServer?.Invoke(this, group);
     }
 }

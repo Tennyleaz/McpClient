@@ -12,5 +12,10 @@
             </FluentTheme.Palettes>
         </FluentTheme>
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <Style Selector="Border.Task">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemChromeHighColor}"/>
+            <Setter Property="Background" Value="{DynamicResource SystemListLowColor}"/>
+        </Style>
     </Application.Styles>
 </Application>
