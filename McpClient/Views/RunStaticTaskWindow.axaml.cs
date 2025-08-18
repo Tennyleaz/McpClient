@@ -11,6 +11,7 @@ public partial class RunStaticTaskWindow : Window
 {
     private readonly Group _group;
     private readonly AiNexusService _service;
+    private bool isRunning;
 
     public RunStaticTaskWindow()
     {
@@ -33,6 +34,7 @@ public partial class RunStaticTaskWindow : Window
         TbQuery.IsEnabled = false;
         TbOutput.Text = string.Empty;
 
+        isRunning = true;
         TbOutput.Text += "Running...\n";
         var (success, result) = await _service.ExecuteStaticWorkflow("0", null, _group.Id, TbQuery.Text);
         if (success)
@@ -44,8 +46,17 @@ public partial class RunStaticTaskWindow : Window
             TbOutput.Text += "Run fail.\n";
             TbOutput.Text += result;
         }
+        isRunning = false;
 
         BtnRun.IsEnabled = true;
         TbQuery.IsEnabled = true;
+    }
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        if (isRunning)
+        {
+            e.Cancel = true;
+        }
     }
 }

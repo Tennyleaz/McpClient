@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
         x:Class="McpClient.Views.RunStaticTaskWindow"
         Title="Run Task"
-        Width="640" Height="480"
+        Width="640" Height="480" Closing="Window_OnClosing"
         WindowStartupLocation="CenterOwner">
     <DockPanel>
         <Label Name="LbHeader" DockPanel.Dock="Top" FontSize="20" Margin="20,20,0,0">Run Group Task</Label>

@@ -12,6 +12,7 @@ public partial class RunOfflineWindow : Window
 {
     private readonly OfflineWorkflow _workflow;
     private readonly AiNexusService _service;
+    private bool isRunning;
 
     public RunOfflineWindow()
     {
@@ -37,7 +38,7 @@ public partial class RunOfflineWindow : Window
         CbModelName.IsEnabled = false;
         TbOutput.Text = string.Empty;
 
-
+        isRunning = true;
         TbOutput.Text += "Running...\n";
         string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex];
         var (success, result) = await _service.ExecuteOfflineWorkflow(_workflow.Id, modelName);
@@ -50,8 +51,17 @@ public partial class RunOfflineWindow : Window
             TbOutput.Text += "Run fail.\n";
             TbOutput.Text += result;
         }
+        isRunning = false;
 
         CbModelName.IsEnabled = true;
         BtnRun.IsEnabled = true;
+    }
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        if (isRunning)
+        {
+            e.Cancel = true;
+        }
     }
 }
