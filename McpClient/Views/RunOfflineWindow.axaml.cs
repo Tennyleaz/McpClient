@@ -7,10 +7,10 @@ using McpClient.Models;
 using McpClient.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using WebViewControl;
 
 namespace McpClient.Views;
 
@@ -20,6 +20,7 @@ public partial class RunOfflineWindow : Window
     private readonly AiNexusService _service;
     private readonly JsonNode jsonNode;
     private bool isRunning;
+    private const int STREAM_CHUNK_SIZE = 10;
 
     public RunOfflineWindow()
     {
@@ -48,7 +49,7 @@ public partial class RunOfflineWindow : Window
                 jsonNode = JsonNode.Parse(_workflow.Payload);
                 if (jsonNode != null && jsonNode["message"] != null)
                 {
-                    TbPayload.Text = jsonNode["message"].ToString();
+                    TbPayload.Text = jsonNode["message"].ToString().Trim();
                 }
                 else
                 {
@@ -80,7 +81,7 @@ public partial class RunOfflineWindow : Window
         string payload;
         if (jsonNode != null)
         {
-            jsonNode["message"] = TbPayload.Text;
+            jsonNode["message"] = TbPayload.Text?.Trim();
             payload = jsonNode.ToJsonString();
         }
         else
@@ -98,23 +99,46 @@ public partial class RunOfflineWindow : Window
     {
         try
         {
-            IAsyncEnumerable<AutogenResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, payload);
-            await foreach (AutogenResponse response in responses)
+            IAsyncEnumerable<AutogenStreamResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, payload);
+            string text = string.Empty;
+            await foreach (AutogenStreamResponse response in responses)
             {
-                Dispatcher.UIThread.Invoke(() =>
+                AutogenChoice choice = response.Choices?.FirstOrDefault();
+                if (choice == null)
                 {
-                    TbOutput.Text += response + "\n";
-                    if (response.IsTerminated)
-                    {
-                        TbOutput.Text += "Run task done.";
+                    continue;
+                }
 
-                        isRunning = false;
-                        CbModelName.IsEnabled = true;
-                        BtnRun.IsEnabled = true;
-                        TbPayload.IsEnabled = true;
-                    }
-                });
+                // Gather streamed text
+                text += choice.Delta.Content;
+
+                // Update to UI after text is long enough
+                if (text.Length > STREAM_CHUNK_SIZE)
+                {
+                    // Clear the partial text
+                    string tempText = text;
+                    text = string.Empty;
+                    // Update to UI
+                    Dispatcher.UIThread.Invoke(() =>
+                    {
+                        TbOutput.Text += tempText;
+                        OutputScroller.ScrollToEnd();
+                    });
+                }
             }
+
+            // After workflow is done, enable UI
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                // Remember to update last bit of text
+                TbOutput.Text += text + "\n\nRun task done.";
+                OutputScroller.ScrollToEnd();
+
+                isRunning = false;
+                CbModelName.IsEnabled = true;
+                BtnRun.IsEnabled = true;
+                TbPayload.IsEnabled = true;
+            });
         }
         catch (Exception ex)
         {

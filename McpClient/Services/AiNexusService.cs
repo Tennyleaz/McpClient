@@ -191,7 +191,7 @@ internal class AiNexusService
 
     #region Execute workflow
 
-    public async IAsyncEnumerable<AutogenResponse> ExecuteOfflineWorkflow(int groupId, string model, string payload)
+    public async IAsyncEnumerable<AutogenStreamResponse> ExecuteOfflineWorkflow(int groupId, string model, string payload)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();
         content.Add(new StringContent(groupId.ToString()), "group_id");
@@ -221,28 +221,28 @@ internal class AiNexusService
                 if (!string.IsNullOrEmpty(sseData))
                 {
                     // Some events (like :heartbeat) may not be JSON
-                    AutogenResponse autogenResponse;
+                    AutogenStreamResponse autogenResponse;
                     try
                     {
-                        autogenResponse = JsonSerializer.Deserialize<AutogenResponse>(sseData, _options);
+                        autogenResponse = JsonSerializer.Deserialize<AutogenStreamResponse>(sseData, _options);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex);
-                        break;
+                        continue;
                     }
 
-                    Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
-                    Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
-
-                    yield return autogenResponse;
+                    //Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
+                    //Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
+                    if (autogenResponse != null)
+                        yield return autogenResponse;
 
                     // You can add your own logic/handlers here, e.g. break if IsTerminated is true
-                    if (autogenResponse.IsTerminated)
-                    {
-                        Console.WriteLine("Stream terminated by server. Exiting SSE loop.");
-                        break;
-                    }
+                    //if (autogenResponse.IsTerminated)
+                    //{
+                    //    Console.WriteLine("Stream terminated by server. Exiting SSE loop.");
+                    //    break;
+                    //}
                 }
                 // Reset event/data for next message
                 sseEvent = null;
@@ -262,6 +262,10 @@ internal class AiNexusService
                     sseData = dataLine;
                 else
                     sseData += "\n" + dataLine; // multi-line data support
+            }
+            else if (line.StartsWith("[DONE]"))
+            {
+                sseEvent = "DONE";
             }
         }
     }
