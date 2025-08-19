@@ -111,6 +111,8 @@ internal class McpViewModel : ReactiveObject
         }
     }
 
+    public bool IsShowCommand => _type == "stdio";
+
     public bool IsShowSseUrl => _type == "sse";
 
     public bool IsShowStreamablUrl => _type == "streamableHttp";

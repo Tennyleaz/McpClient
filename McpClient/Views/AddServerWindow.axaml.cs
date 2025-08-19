@@ -107,15 +107,21 @@ public partial class AddServerWindow : Window
     {
         if (CbTypes.SelectedIndex <= 0)
         {
-            // stdio
+            // stdio, has command, no URL
             TbUrlHeader.IsVisible = TbUrl.IsVisible = false;
             MainGrid.RowDefinitions[4].Height = GridLength.Parse("0");
+
+            TbCommandHeader.IsVisible = TbCommand.IsVisible = true;
+            MainGrid.RowDefinitions[3].Height = GridLength.Parse("40");
         }
         else
         {
-            // sse, streamableHttp
+            // sse, streamableHttp has URL, no command
             TbUrlHeader.IsVisible = TbUrl.IsVisible = true;
             MainGrid.RowDefinitions[4].Height = GridLength.Parse("40");
+
+            TbCommandHeader.IsVisible = TbCommand.IsVisible = false;
+            MainGrid.RowDefinitions[3].Height = GridLength.Parse("0");
         }
     }
 

@@ -39,10 +39,10 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Name:</TextBlock>
-            <TextBox Grid.Column="1" Grid.Row="0" Classes="input" Name="TbServerName"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Classes="input" Name="TbServerName" Watermark="Name of the server"/>
 
             <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Owner:</TextBlock>
-            <TextBox Grid.Column="1" Grid.Row="1" Classes="input" Name="TbOwner"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Classes="input" Name="TbOwner" Watermark="Who created this"/>
 
             <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Type:</TextBlock>
 			<ComboBox Grid.Column="1" Grid.Row="2" Margin="12,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch"
@@ -52,11 +52,11 @@
                 <ComboBoxItem>streamableHttp</ComboBoxItem>
             </ComboBox>
 
-			<TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Command:</TextBlock>
-            <TextBox Grid.Column="1" Grid.Row="3" Classes="input" Name="TbCommand"/>
+			<TextBlock Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" Name="TbCommandHeader">Command:</TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="3" Classes="input" Name="TbCommand" Watermark="Your command"/>
 
             <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Name="TbUrlHeader">URL:</TextBlock>
-            <TextBox Grid.Column="1" Grid.Row="4" Classes="input" Name="TbUrl"/>
+            <TextBox Grid.Column="1" Grid.Row="4" Classes="input" Name="TbUrl" Watermark="Server's address"/>
 
             <TextBlock Grid.Column="0" Grid.Row="5" VerticalAlignment="Center">Arguments:</TextBlock>
 			<TextBlock Grid.Column="1" Grid.Row="5" Classes="input" Name="TbArgs" Text="(empty)"/>
