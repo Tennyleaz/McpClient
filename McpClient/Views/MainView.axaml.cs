@@ -92,6 +92,8 @@ public partial class MainView : UserControl
         BtnBack.IsVisible = true;
         BtnSave.IsVisible = false;
         BtnRefresh.IsVisible = false;
+
+        McpService.LoadFromSettings();
     }
 
     private async Task ShowMain(bool isSave)

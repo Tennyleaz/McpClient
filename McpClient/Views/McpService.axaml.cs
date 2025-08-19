@@ -22,7 +22,10 @@ public partial class McpService : UserControl
     {
         if (Design.IsDesignMode)
             return;
+    }
 
+    internal void LoadFromSettings()
+    {
         settings = SettingsManager.Local.Load();
         TbRagFolder.Text = "RAG Folder: " + settings.RagFolder;
         if (Directory.Exists(settings.RagFolder))
