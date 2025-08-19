@@ -1,9 +1,15 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using McpClient.Models;
 using McpClient.Services;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using WebViewControl;
 
 namespace McpClient.Views;
 
@@ -36,20 +42,39 @@ public partial class RunStaticTaskWindow : Window
 
         isRunning = true;
         TbOutput.Text += "Running...\n";
-        var (success, result) = await _service.ExecuteStaticWorkflow("0", null, _group.Id, TbQuery.Text);
-        if (success)
-        {
-            TbOutput.Text += "Run success.";
-        }
-        else
-        {
-            TbOutput.Text += "Run fail.\n";
-            TbOutput.Text += result;
-        }
-        isRunning = false;
 
-        BtnRun.IsEnabled = true;
-        TbQuery.IsEnabled = true;
+        AutoGenRequest request = new AutoGenRequest
+        {
+            connectionId = "0",
+            agents = null,
+            group = _group.Id,
+            query = TbQuery.Text
+        };
+
+        await Task.Run(async () =>
+        {
+            await ExecuteWorkflow(request);
+        });
+    }
+
+    private async Task ExecuteWorkflow(AutoGenRequest request)
+    {
+        IAsyncEnumerable<AutogenResponse> responses = _service.ExecuteStaticWorkflow(request);
+        await foreach (AutogenResponse response in responses)
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                TbOutput.Text += response + "\n";
+                if (response.IsTerminated)
+                {
+                    TbOutput.Text += "Run task done.";
+
+                    isRunning = false;
+                    BtnRun.IsEnabled = true;
+                    TbQuery.IsEnabled = true;
+                }
+            });
+        }
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)

@@ -1,9 +1,12 @@
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using McpClient.Models;
 using McpClient.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace McpClient.Views;
 
@@ -44,20 +47,39 @@ public partial class RunLocalMcpWindow : Window
         if (success)
         {
             TbOutput.Text += "Running...\n";
-            (success, result) = await _service.ExecuteOfflineWorkflow(groupId, modelName);
-        }
-        if (success)
-        {
-            TbOutput.Text += "Run success.";
+            await Task.Run(async () =>
+            {
+                await ExecuteWorkflow(groupId, modelName);
+            });
         }
         else
         {
             TbOutput.Text += "Run fail.\n";
             TbOutput.Text += result;
-        }
 
-        BtnRun.IsEnabled = true;
-        //TbQuery.IsEnabled = true;
-        CbModelName.IsEnabled = true;
+            BtnRun.IsEnabled = true;
+            //TbQuery.IsEnabled = true;
+            CbModelName.IsEnabled = true;
+        }
+    }
+
+    private async Task ExecuteWorkflow(int id, string modelName)
+    {
+        IAsyncEnumerable<AutogenResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, null);
+        await foreach (AutogenResponse response in responses)
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                TbOutput.Text += response + "\n";
+                if (response.IsTerminated)
+                {
+                    TbOutput.Text += "Run task done.";
+
+                    //isRunning = false;
+                    CbModelName.IsEnabled = true;
+                    BtnRun.IsEnabled = true;
+                }
+            });
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using McpClient.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -40,33 +41,48 @@ internal class AiNexusService
             username = username,
             password = password
         };
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/v1/login", body);
-        if (response.StatusCode != HttpStatusCode.OK)
+        try
         {
+            using HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/v1/login", body);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return null;
+            }
+
+            string json = await response.Content.ReadAsStringAsync();
+            LoginResponse result = JsonSerializer.Deserialize<LoginResponse>(json, _options);
+
+            // Also set self's token for future use
+            if (!string.IsNullOrEmpty(result.Token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
             return null;
         }
-
-        string json = await response.Content.ReadAsStringAsync();
-        LoginResponse result = JsonSerializer.Deserialize<LoginResponse>(json, _options);
-
-        // Also set self's token for future use
-        if (!string.IsNullOrEmpty(result.Token))
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
-        }
-
-        return result;
     }
 
     #region Groups
 
     public async Task<List<Group>> GetAllGroups()
     {
-        HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups");
-        if (response.IsSuccessStatusCode)
+        try
         {
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<Group>>(json, _options);
+            using HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups");
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<Group>>(json, _options);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
 
         return null;
@@ -74,11 +90,18 @@ internal class AiNexusService
 
     public async Task<List<OfflineWorkflow>> GetOfflineGroups()
     {
-        HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups/offline");
-        if (response.IsSuccessStatusCode)
+        try
         {
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<OfflineWorkflow>>(json, _options);
+            using HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups/offline");
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<OfflineWorkflow>>(json, _options);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
 
         return null;
@@ -168,15 +191,79 @@ internal class AiNexusService
 
     #region Execute workflow
 
-    public async Task<(bool, string)> ExecuteOfflineWorkflow(int groupId, string model)
+    public async IAsyncEnumerable<AutogenResponse> ExecuteOfflineWorkflow(int groupId, string model, string payload)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();
         content.Add(new StringContent(groupId.ToString()), "group_id");
         content.Add(new StringContent(model), "model");
-        HttpResponseMessage response = await _httpClient.PostAsync("/api/v1/AutoGen/offline", content);
-        bool success = response.IsSuccessStatusCode;
-        string json = await response.Content.ReadAsStringAsync();
-        return (success, json);
+        if (!string.IsNullOrWhiteSpace(payload))
+            content.Add(new StringContent(model), "payload");
+
+        // Making a SSE request
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/AutoGen/offline");
+        request.Content = content;
+
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        using Stream stream = await response.Content.ReadAsStreamAsync();
+        using StreamReader reader = new StreamReader(stream);
+        string sseEvent = null;
+        string sseData = null;
+
+        while (!reader.EndOfStream)
+        {
+            string line = await reader.ReadLineAsync();
+
+            // Check if line is empty, ready to parse
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                // Finished reading one SSE event, now process it
+                if (!string.IsNullOrEmpty(sseData))
+                {
+                    // Some events (like :heartbeat) may not be JSON
+                    AutogenResponse autogenResponse;
+                    try
+                    {
+                        autogenResponse = JsonSerializer.Deserialize<AutogenResponse>(sseData, _options);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        break;
+                    }
+
+                    Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
+                    Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
+
+                    yield return autogenResponse;
+
+                    // You can add your own logic/handlers here, e.g. break if IsTerminated is true
+                    if (autogenResponse.IsTerminated)
+                    {
+                        Console.WriteLine("Stream terminated by server. Exiting SSE loop.");
+                        break;
+                    }
+                }
+                // Reset event/data for next message
+                sseEvent = null;
+                sseData = null;
+                continue;
+            }
+
+            // Each SSE line is of the form: "field: value"
+            if (line.StartsWith("event:"))
+            {
+                sseEvent = line.Substring("event:".Length).Trim();
+            }
+            else if (line.StartsWith("data:"))
+            {
+                string dataLine = line.Substring("data:".Length).Trim();
+                if (sseData == null)
+                    sseData = dataLine;
+                else
+                    sseData += "\n" + dataLine; // multi-line data support
+            }
+        }
     }
 
     public async Task<bool> ExecuteDynamicWorkflow(string connectionId, string query)
@@ -196,33 +283,94 @@ internal class AiNexusService
         return false;
     }
 
-    public async Task<(bool, string)> ExecuteStaticWorkflow(string connectionId, List<int> agents, int group, string query)
+    public async IAsyncEnumerable<AutogenResponse> ExecuteStaticWorkflow(AutoGenRequest autoGenRequest)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();
-        content.Add(new StringContent(group.ToString()), "group");
+        content.Add(new StringContent(autoGenRequest.group.ToString()), "group");
 
-        if (!string.IsNullOrEmpty(connectionId))
+        if (!string.IsNullOrEmpty(autoGenRequest.connectionId))
         {
-            content.Add(new StringContent(connectionId), "connectionId");
+            content.Add(new StringContent(autoGenRequest.connectionId), "connectionId");
         }
 
-        if (agents != null)
+        if (autoGenRequest.agents != null)
         {
-            foreach (int agent in agents)
+            foreach (int agent in autoGenRequest.agents)
             {
                 content.Add(new StringContent(agent.ToString()), "agents");
             }
         }
-        
-        if (!string.IsNullOrEmpty(query))
+
+        if (!string.IsNullOrEmpty(autoGenRequest.query))
         {
-            content.Add(new StringContent(query), "query");
+            content.Add(new StringContent(autoGenRequest.query), "query");
         }
 
-        HttpResponseMessage response = await _httpClient.PostAsync("/api/v1/AutoGen/static", content);
-        bool success = response.IsSuccessStatusCode;
-        string json = await response.Content.ReadAsStringAsync();
-        return (success, json);
+        // Making a SSE request
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/AutoGen/static");
+        request.Content = content;
+
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+        using Stream stream = await response.Content.ReadAsStreamAsync();
+        using StreamReader reader = new StreamReader(stream);
+        string sseEvent = null;
+        string sseData = null;
+
+        while (!reader.EndOfStream)
+        {
+            string line = await reader.ReadLineAsync();
+
+            // Check if line is empty, ready to parse
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                // Finished reading one SSE event, now process it
+                if (!string.IsNullOrEmpty(sseData))
+                {
+                    // Some events (like :heartbeat) may not be JSON
+                    AutogenResponse autogenResponse;
+                    try
+                    {
+                        autogenResponse = JsonSerializer.Deserialize<AutogenResponse>(sseData, _options);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        break;
+                    }
+
+                    Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
+                    Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
+
+                    yield return autogenResponse;
+
+                    // You can add your own logic/handlers here, e.g. break if IsTerminated is true
+                    if (autogenResponse.IsTerminated)
+                    {
+                        Console.WriteLine("Stream terminated by server. Exiting SSE loop.");
+                        break;
+                    }
+                }
+                // Reset event/data for next message
+                sseEvent = null;
+                sseData = null;
+                continue;
+            }
+
+            // Each SSE line is of the form: "field: value"
+            if (line.StartsWith("event:"))
+            {
+                sseEvent = line.Substring("event:".Length).Trim();
+            }
+            else if (line.StartsWith("data:"))
+            {
+                string dataLine = line.Substring("data:".Length).Trim();
+                if (sseData == null)
+                    sseData = dataLine;
+                else
+                    sseData += "\n" + dataLine; // multi-line data support
+            }
+        }
     }
 
     #endregion

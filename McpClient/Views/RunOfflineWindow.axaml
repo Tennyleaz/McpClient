@@ -9,9 +9,12 @@
         WindowStartupLocation="CenterOwner">
     <DockPanel>
         <Label Name="LbHeader" DockPanel.Dock="Top" FontSize="20" Margin="20,20,0,0">Run Local:</Label>
-        <TextBlock Name="TbDescription" DockPanel.Dock="Top" Margin="24,0,20,0" Foreground="{DynamicResource SystemBaseMediumHighColor}">Select a local model:</TextBlock>
+        <TextBlock Name="TbDescription" DockPanel.Dock="Top" Margin="24,0,20,0" Foreground="{DynamicResource SystemBaseMediumHighColor}">Select a model:</TextBlock>
         <ComboBox Name="CbModelName" DockPanel.Dock="Top" Margin="20,10,20,0" MinWidth="200"/>
+        <TextBox Name="TbPayload" DockPanel.Dock="Top" Margin="20,10,20,0" Height="100" VerticalAlignment="Top" AcceptsReturn="True" Watermark="Input your query here."></TextBox>
         <Button Name="BtnRun" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Click="BtnRun_OnClick" Margin="0,0,0,20">Run This Task!</Button>
-        <TextBlock Name="TbOutput" Margin="20,10,20,20" TextWrapping="Wrap">Output log here</TextBlock>
-    </DockPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20,10,20,20">
+            <TextBlock Name="TbOutput" TextWrapping="Wrap">Output log here</TextBlock>
+		</ScrollViewer>
+	</DockPanel>
 </Window>
