@@ -40,6 +40,9 @@ public partial class RunOfflineWindow : Window
         TbOutput.Text = string.Empty;
         CbModelName.ItemsSource = Constants.LOCAL_MODELS;
         CbModelName.SelectedIndex = 0;
+
+        // Set custom message
+        TbPayload.IsVisible = false;
         if (!string.IsNullOrWhiteSpace(_workflow.Payload))
         {
             TbPayload.IsVisible = true;
@@ -50,20 +53,13 @@ public partial class RunOfflineWindow : Window
                 if (jsonNode != null && jsonNode["message"] != null)
                 {
                     TbPayload.Text = jsonNode["message"].ToString().Trim();
-                }
-                else
-                {
-                    TbPayload.Text = _workflow.Payload;
+                    TbPayload.IsVisible = true;
                 }
             }
             catch (Exception ex)
             {
-                TbPayload.Text = _workflow.Payload;
+                //TbPayload.Text = _workflow.Payload;
             }
-        }
-        else
-        {
-            TbPayload.IsVisible = false;
         }
     }
 
@@ -78,28 +74,19 @@ public partial class RunOfflineWindow : Window
         TbOutput.Text += "Running...\n";
 
         string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex];
-        string payload;
-        if (jsonNode != null)
-        {
-            jsonNode["message"] = TbPayload.Text?.Trim();
-            payload = jsonNode.ToJsonString();
-        }
-        else
-        {
-            payload = TbPayload.Text;
-        }
+        string message = TbPayload.Text?.Trim();
 
         await Task.Run(async () =>
         {
-            await ExecuteWorkflow(_workflow.Id, modelName, payload);
+            await ExecuteWorkflow(_workflow.Id, modelName, message);
         });
     }
 
-    private async Task ExecuteWorkflow(int id, string modelName, string payload)
+    private async Task ExecuteWorkflow(int id, string modelName, string message)
     {
         try
         {
-            IAsyncEnumerable<AutogenStreamResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, payload);
+            IAsyncEnumerable<AutogenStreamResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, message);
             string text = string.Empty;
             await foreach (AutogenStreamResponse response in responses)
             {

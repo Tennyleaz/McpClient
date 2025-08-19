@@ -191,13 +191,13 @@ internal class AiNexusService
 
     #region Execute workflow
 
-    public async IAsyncEnumerable<AutogenStreamResponse> ExecuteOfflineWorkflow(int groupId, string model, string payload)
+    public async IAsyncEnumerable<AutogenStreamResponse> ExecuteOfflineWorkflow(int groupId, string model, string message)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();
         content.Add(new StringContent(groupId.ToString()), "group_id");
         content.Add(new StringContent(model), "model");
-        if (!string.IsNullOrWhiteSpace(payload))
-            content.Add(new StringContent(model), "payload");
+        if (!string.IsNullOrWhiteSpace(message))
+            content.Add(new StringContent(message), "message");
 
         // Making a SSE request
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/AutoGen/offline");
@@ -221,19 +221,17 @@ internal class AiNexusService
                 if (!string.IsNullOrEmpty(sseData))
                 {
                     // Some events (like :heartbeat) may not be JSON
-                    AutogenStreamResponse autogenResponse;
+                    AutogenStreamResponse autogenResponse = null;
                     try
                     {
                         autogenResponse = JsonSerializer.Deserialize<AutogenStreamResponse>(sseData, _options);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
-                        continue;
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine("Cannot parse sseData: " + sseData);
                     }
 
-                    //Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
-                    //Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
                     if (autogenResponse != null)
                         yield return autogenResponse;
 
@@ -265,7 +263,7 @@ internal class AiNexusService
             }
             else if (line.StartsWith("[DONE]"))
             {
-                sseEvent = "DONE";
+                sseEvent = line.Substring("[DONE]".Length).Trim();
             }
         }
     }
