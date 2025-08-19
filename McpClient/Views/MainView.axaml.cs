@@ -124,4 +124,11 @@ public partial class MainView : UserControl
     {
         await TaskView.RefreshCurrentTab(true);
     }
+
+    private void BtnStore_OnClick(object sender, RoutedEventArgs e)
+    {
+        Uri uri = new Uri("https://www.google.com");
+        var launcher = TopLevel.GetTopLevel(this).Launcher;
+        launcher.LaunchUriAsync(uri);
+    }
 }

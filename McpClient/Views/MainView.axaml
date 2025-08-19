@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:McpClient.ViewModels"
              xmlns:views="clr-namespace:McpClient.Views"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:Class="McpClient.Views.MainView"
              x:DataType="vm:MainViewModel">
     <UserControl.Styles>
@@ -27,9 +27,30 @@
         <DockPanel Grid.Row="0" Name="MainPanel" >
             <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="20,20,20,20" DockPanel.Dock="Left">
                 <Image Source="../Assets/logo.png" Width="200" Margin="0,0,0,20" RenderOptions.BitmapInterpolationMode="HighQuality"/>
-                <Button Name="BtnChat" Click="BtnChat_OnClick" Margin="0,0,0,0" Classes="main" >Chat</Button>
-                <Button Name="BtnService" Click="BtnService_OnClick" Margin="0,20,0,0" Classes="main" >Services</Button>
-                <Button Name="BtnSetting" Click="BtnSetting_OnClick" Margin="0,20,0,0" Classes="main" >Settings</Button>
+                <Button Name="BtnChat" Click="BtnChat_OnClick" Margin="0,0,0,0" Classes="main" >
+                    <Panel>
+                        <TextBlock>Chat</TextBlock>
+                        <TextBlock Classes="MainFont" Text="&#xF075;"/>
+                    </Panel>
+				</Button>
+                <Button Name="BtnService" Click="BtnService_OnClick" Margin="0,20,0,0" Classes="main" >
+                    <Panel>
+                        <TextBlock>Services</TextBlock>
+                        <TextBlock Classes="MainFont" Text="&#xF01D;"/>
+                    </Panel>
+				</Button>
+                <Button Name="BtnSetting" Click="BtnSetting_OnClick" Margin="0,20,0,0" Classes="main" >
+                    <Panel>
+                        <TextBlock>Settings</TextBlock>
+                        <TextBlock Classes="MainFont" Text="&#x26BD;"/>
+                    </Panel>
+				</Button>
+                <Button Name="BtnStore" Click="BtnStore_OnClick" Margin="0,20,0,0" Classes="main" >
+                    <Panel>
+                        <TextBlock>Store</TextBlock>
+                        <TextBlock Classes="MainFontSolid" Text="&#xE4CF;"/>
+                    </Panel>
+                </Button>
 		    </StackPanel>
             <Panel Name="RightPanel" DockPanel.Dock="Right">
                 <ToggleSwitch Content="Dark Mode" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" IsChecked="{Binding IsNightMode}"></ToggleSwitch>

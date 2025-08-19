@@ -22,7 +22,7 @@
             <TabItem Header="MCP Tools">
             </TabItem>
         </TabStrip>
-        <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Refresh ↻" Margin="0,0,10,0"/>
+        <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Refresh ↻" Margin="0,0,10,0"/>
 		<local:TaskGroupList Name="GroupList"/>
         <local:TaskOfflineWorkflowList Name="OfflineWorkflowList" IsVisible="False"/>
         <local:TaskMcpToolList Name="McpToolList" IsVisible="False"/>
