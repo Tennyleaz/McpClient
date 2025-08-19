@@ -80,5 +80,8 @@ public partial class Chat : UserControl
     {
         Settings settings = SettingsManager.Local.Load();
         await SetToken(settings.UserName, settings.McpConfigToken);
+
+        // Remove event handler beacause we only need to set token once
+        ChatWebView.BeforeNavigate -= ChatWebView_OnBeforeNavigate;
     }
 }

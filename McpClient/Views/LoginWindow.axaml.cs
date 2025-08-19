@@ -84,6 +84,7 @@ public partial class LoginWindow : Window
         }
 
         // Also login to AI Nexus
+        BtnLogin.IsEnabled = false;
         LoginResponse aiResponse = await _aiNexusService.Login(TbUserName.Text, TbPassword.Text);
         if (aiResponse == null)
         {
@@ -91,6 +92,7 @@ public partial class LoginWindow : Window
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
             await box.ShowAsync();
+            BtnLogin.IsEnabled = true;
             return;
         }
 
