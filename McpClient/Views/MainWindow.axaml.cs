@@ -2,13 +2,18 @@
 using Avalonia.Interactivity;
 using McpClient.Services;
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
+using McpClient.Models;
 
 namespace McpClient.Views;
 
 public partial class MainWindow : Window
 {
+    private BackgroundWorker ragWorker;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -21,6 +26,18 @@ public partial class MainWindow : Window
         {
             await MainView.ReloadMainView();
         }
+
+        // start upload docments in background
+
+        ragWorker = new BackgroundWorker();
+        ragWorker.WorkerSupportsCancellation = true;
+        ragWorker.DoWork += RagWorker_DoWork;
+        ragWorker.RunWorkerAsync();
+    }
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        ragWorker?.CancelAsync();
     }
 
     private async void MainView_OnLogoutClick(object sender, EventArgs e)
@@ -71,6 +88,57 @@ public partial class MainWindow : Window
         }
 
         return true;
+    }
+
+    private async void RagWorker_DoWork(object sender, DoWorkEventArgs e)
+    {
+        List<DocumentHistory> histories = SettingsManager.Local.LoadDocumentHistories();
+        RagService service = new RagService();
+
+        do
+        {
+            Settings settings = SettingsManager.Local.Load();
+            string folder = settings.RagFolder;
+            if (Directory.Exists(folder) && !string.IsNullOrEmpty(settings.McpConfigToken))
+            {
+                IEnumerable<string> files = Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories);
+                foreach (string file in files)
+                {
+                    if (file.EndsWith(".txt") || file.EndsWith(".pdf") || file.EndsWith(".docx"))
+                    {
+                        // check for duplicate
+                        if (histories.Exists(x => string.Equals(x.FullPath, file, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            continue;
+                        }
+
+                        // upload
+                        DateTime time = DateTime.Now;
+                        byte[] buffer = await File.ReadAllBytesAsync(file);
+                        DocumentDto dto = new DocumentDto
+                        {
+                            Name = Path.GetFileName(file),
+                            CreatedTime = time,
+                            Data = buffer,
+                            ChatId = null
+                        };
+                        bool succss = await service.UploadDocument(dto);
+
+                        // save in history
+                        histories.Add(new DocumentHistory
+                        {
+                            FullPath = file,
+                            UploadTime = time
+                        });
+                    }
+                }
+            }
+
+            // wait 1 minutes
+            await Task.Delay(TimeSpan.FromMinutes(1));
+        } while (!ragWorker.CancellationPending);
+
+        await SettingsManager.Local.SaveDocumentHistoriesAsync(histories);
     }
 
     private static async Task<bool> IsMcpConfigTokenValid(string token)
