@@ -148,4 +148,10 @@ public partial class TaskMcpToolList : UserControl
     //    RunLocalMcpWindow runTaskWindow = new RunLocalMcpWindow(e, _nexusService);
     //    await runTaskWindow.ShowDialog(parent);
     //}
+
+    public void ClearMcpList()
+    {
+        if (viewModel != null)
+            viewModel.McpServers.Clear();
+    }
 }

@@ -87,6 +87,19 @@ public partial class TaskView : UserControl
         HideProgress();
     }
 
+    public async Task RefreshMcpTools()
+    {
+        if (Tabs.SelectedIndex == 2)
+        {
+            await RefreshCurrentTab(true);
+        }
+        else
+        {
+            // Just clear the list, will refresh on next focus
+            McpToolList.ClearMcpList();
+        }
+    }
+
     private void ShowProgress()
     {
         ProgressRing.IsVisible = true;

@@ -24,7 +24,7 @@
 			<ItemsControl ItemsSource="{Binding McpServers}" x:Name="MsItems">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<StackPanel Orientation="Vertical" Margin="0,0,0,8" IsEnabled="{Binding !IsBusy}">
+						<StackPanel Orientation="Vertical" Margin="0,0,0,12" IsEnabled="{Binding !IsBusy}">
 							<!-- name, enabled, active -->
                             <DockPanel>
                                 <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold" FontSize="16"/>

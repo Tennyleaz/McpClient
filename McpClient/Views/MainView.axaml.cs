@@ -106,6 +106,7 @@ public partial class MainView : UserControl
             {
                 return;
             }
+            await TaskView.RefreshMcpTools();
         }
 
         MainPanel.IsVisible = true;
