@@ -67,7 +67,8 @@ public partial class McpSetting : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot get MCP list server.",
                 ButtonEnum.Ok,
                 Icon.Error);
-            var result = await box.ShowAsync();
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            await box.ShowWindowDialogAsync(owner);
         }
     }
 
@@ -93,7 +94,8 @@ public partial class McpSetting : UserControl
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot update MCP config to server.",
                     ButtonEnum.Ok,
                     Icon.Error);
-                var result = await box.ShowAsync();
+                Window owner = TopLevel.GetTopLevel(this) as Window;
+                await box.ShowWindowDialogAsync(owner);
                 return false;
             }
         }
@@ -126,7 +128,8 @@ public partial class McpSetting : UserControl
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add new MCP config to server.",
                     ButtonEnum.Ok,
                     Icon.Error);
-                await box.ShowAsync();
+                Window owner = TopLevel.GetTopLevel(this) as Window;
+                await box.ShowWindowDialogAsync(owner);
             }
         }
     }
@@ -212,7 +215,8 @@ public partial class McpSetting : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Info", $"Are you sure to delete \"{vm.ServerName}\"?",
                 ButtonEnum.OkCancel,
                 Icon.Question);
-            var result = await box.ShowAsync();
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            var result = await box.ShowWindowDialogAsync(owner);
             if (result != ButtonResult.Ok)
                 return;
 

@@ -66,7 +66,8 @@ public partial class TaskGroupList : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot get group list.",
                 ButtonEnum.Ok,
                 Icon.Error);
-            var result = await box.ShowAsync();
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            await box.ShowWindowDialogAsync(owner);
         }
 
         LbEmptyList.IsVisible = groupListViewModel == null || groupListViewModel.Groups.Count == 0;

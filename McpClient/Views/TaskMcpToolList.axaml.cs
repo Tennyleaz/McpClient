@@ -56,7 +56,8 @@ public partial class TaskMcpToolList : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot get MCP list server.",
                 ButtonEnum.Ok,
                 Icon.Error);
-            var result = await box.ShowAsync();
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            await box.ShowWindowDialogAsync(owner);
         }
 
         LbEmptyList.IsVisible = viewModel == null || viewModel.McpServers.Count == 0;
@@ -88,6 +89,7 @@ public partial class TaskMcpToolList : UserControl
             added = true;
         }
 
+        Window owner = TopLevel.GetTopLevel(this) as Window;
         if (added)
         {
             // Update to server
@@ -98,7 +100,7 @@ public partial class TaskMcpToolList : UserControl
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add agents to MCP tools!",
                     ButtonEnum.Ok,
                     Icon.Error);
-                await box.ShowAsync();
+                await box.ShowWindowDialogAsync(owner);
                 TaskList.IsEnabled = true;
                 return;
             }
@@ -112,7 +114,7 @@ public partial class TaskMcpToolList : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "You've already downlowd all the MCP tools.",
                 ButtonEnum.Ok,
                 Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(owner);
         }
     }
 

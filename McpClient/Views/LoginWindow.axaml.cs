@@ -68,7 +68,7 @@ public partial class LoginWindow : Window
             var box = MessageBoxManager.GetMessageBoxStandard("Login", "Please fill in username and password.",
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
-             await box.ShowAsync();
+             await box.ShowWindowDialogAsync(this);
             return;
         }
 
@@ -79,7 +79,7 @@ public partial class LoginWindow : Window
             var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.",
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             return;
         }
 
@@ -91,7 +91,7 @@ public partial class LoginWindow : Window
             var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.",
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             BtnLogin.IsEnabled = true;
             return;
         }

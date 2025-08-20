@@ -131,7 +131,7 @@ public partial class AddServerWindow : Window
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please input your server name.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             return false;
         }
 
@@ -139,7 +139,7 @@ public partial class AddServerWindow : Window
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please input your command.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             return false;
         }
 
@@ -147,7 +147,7 @@ public partial class AddServerWindow : Window
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please select a server type.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             return false;
         }
 
@@ -155,7 +155,7 @@ public partial class AddServerWindow : Window
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please input a valid URL.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
-            await box.ShowAsync();
+            await box.ShowWindowDialogAsync(this);
             return false;
         }
 
