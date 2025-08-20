@@ -341,8 +341,8 @@ internal class AiNexusService
                         break;
                     }
 
-                    Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
-                    Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
+                    //Console.WriteLine($"EVENT: {sseEvent ?? "data"}");
+                    //Console.WriteLine($"Type={autogenResponse.Type}, From={autogenResponse.From}, Response={autogenResponse.Response}, IsTerminated={autogenResponse.IsTerminated}");
 
                     yield return autogenResponse;
 
