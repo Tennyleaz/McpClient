@@ -100,4 +100,14 @@ public partial class TaskView : UserControl
         BtnRefresh.IsEnabled = true;
         Tabs.IsEnabled = true;
     }
+
+    internal async void GroupList_OnDownloadGroup(object sender, Group e)
+    {
+        // Switch to MCP tool tab
+        Tabs.SelectedIndex = 2;
+        // Tell MCP tool list to add those groups
+        ShowProgress();
+        await McpToolList.AddMcpFromGroup(e);
+        HideProgress();
+    }
 }

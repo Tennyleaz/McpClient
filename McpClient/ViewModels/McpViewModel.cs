@@ -31,6 +31,7 @@ internal class McpViewModel : ReactiveObject
         {
             _env.Add(new KeyValuePair<string, string>(kv.Key, kv.Value));
         }
+        _source = model.source;
     }
 
     private bool _enabled;
@@ -44,6 +45,7 @@ internal class McpViewModel : ReactiveObject
     private ObservableCollection<string> _args;
     private ObservableCollection<KeyValuePair<string, string>> _env;
     private bool _isBusy;
+    private string _source;
 
     public bool Enabled
     {
@@ -117,6 +119,8 @@ internal class McpViewModel : ReactiveObject
 
     public bool IsShowStreamablUrl => _type == "streamableHttp";
 
+    public bool IsCloud => _source == "cloud";
+
     public string SseUrl
     {
         get => _sseUrl;
@@ -185,7 +189,8 @@ internal class McpViewModel : ReactiveObject
             streamable_http_url = StreamableHttpUrl,
             command = Command,
             args = new List<string>(Args),
-            env = new Dictionary<string, string>(Env)
+            env = new Dictionary<string, string>(Env),
+            source = _source
         };
     }
 }

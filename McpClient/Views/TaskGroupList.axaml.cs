@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
@@ -16,6 +17,8 @@ public partial class TaskGroupList : UserControl
 {
     private AiNexusService _service;
     private GroupListViewModel groupListViewModel;
+
+    internal event EventHandler<Group> DownloadGroup;
 
     public TaskGroupList()
     {
@@ -48,7 +51,8 @@ public partial class TaskGroupList : UserControl
             if (groupListViewModel == null)
             {
                 groupListViewModel = new GroupListViewModel();
-                groupListViewModel.RunServer += ViewModel_RunServer;
+                groupListViewModel.RunServer += GroupListViewModel_RunServer;
+                groupListViewModel.Download += GroupListViewModel_Download;
             }
             else
             {
@@ -69,7 +73,13 @@ public partial class TaskGroupList : UserControl
         //HideProgress();
     }
 
-    private async void ViewModel_RunServer(object sender, Group e)
+    private void GroupListViewModel_Download(object sender, Group e)
+    {
+        // Tell parent view to switch to MCP tool page and download
+        DownloadGroup?.Invoke(this, e);
+    }
+
+    private async void GroupListViewModel_RunServer(object sender, Group e)
     {
         Window parent = TopLevel.GetTopLevel(this) as Window;
         RunStaticTaskWindow runStaticTaskWindow = new RunStaticTaskWindow(e, _service);

@@ -22,13 +22,15 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0" IsEnabled="{Binding !IsBusy}">
-                        <Panel>
+                        <Panel ClipToBounds="True">
                             <TextBlock Text="{Binding ServerName}" Margin="4,4,4,0" TextWrapping="Wrap"/>
 							<!--<Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
                                     Command="{Binding ElementName=McpList, Path=DataContext.RunCommand}"
                                     CommandParameter="{Binding .}">Run ▶</Button>-->
 							<Label Foreground="Green" VerticalAlignment="Bottom" IsVisible="{Binding Active}">Active ●</Label>
                             <Label Foreground="Red" VerticalAlignment="Bottom" IsVisible="{Binding !Active}">Inactive ■</Label>
+							<TextBlock IsVisible="{Binding IsCloud}" FontFamily="{DynamicResource FontAwesome}" Text="&#x2601;"
+                                       HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="70,0,-6,-8" Padding="0,8,0,0" FontSize="70" Foreground="{DynamicResource SystemBaseMediumColor}"/>
                             <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
                                     Command="{Binding ElementName=McpList, Path=DataContext.RestartCommand}"
                                     CommandParameter="{Binding .}">↻</Button>

@@ -31,6 +31,7 @@
 								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Margin="8,0,0,0">Active ●</TextBlock>
 								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Margin="8,0,0,0">Inactive ■</TextBlock>
 								<Button DockPanel.Dock="Right" Name="BtnRestart" HorizontalAlignment="Right" Margin="0,0,20,0" Click="BtnRestart_OnClick">Restart ↻</Button>
+                                <Button DockPanel.Dock="Right" Name="BtnDelete" HorizontalAlignment="Right" Margin="0,0,10,0" Click="BtnDelete_OnClick">Delete ╳</Button>
                             </DockPanel>
                             <!-- type, owner -->
 							<Label Content="{Binding ByType}"></Label>

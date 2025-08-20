@@ -23,7 +23,7 @@
             </TabItem>
         </TabStrip>
         <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Refresh ↻" Margin="0,0,10,0"/>
-		<local:TaskGroupList Name="GroupList"/>
+		<local:TaskGroupList Name="GroupList" DownloadGroup="GroupList_OnDownloadGroup"/>
         <local:TaskOfflineWorkflowList Name="OfflineWorkflowList" IsVisible="False"/>
         <local:TaskMcpToolList Name="McpToolList" IsVisible="False"/>
         <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"

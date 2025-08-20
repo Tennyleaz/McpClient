@@ -17,7 +17,8 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
             type = "stdio",
             server_name = "edgeone-pages-mcp-server",
             command = "npx",
-            args = new List<string> { "edgeone-pages-mcp" }
+            args = new List<string> { "edgeone-pages-mcp" },
+            source = ""
         };
         McpServers.Add(new McpViewModel(config1, false));
 
@@ -27,9 +28,21 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
             type = "sse",
             server_name = "Text2Image",
             sse_url = "http://localhost:9000/sse",
-            owner = "statham_li"
+            owner = "statham_li",
+            source = ""
         };
         McpServers.Add(new McpViewModel(config2, true));
+
+        McpServer config3 = new McpServer
+        {
+            enabled = true,
+            type = "sse",
+            server_name = "RAGServer",
+            sse_url = "http://192.168.41.60:8012/sse",
+            owner = "statham_li",
+            source = "cloud",
+        };
+        McpServers.Add(new McpViewModel(config3, true));
     }
 }
 

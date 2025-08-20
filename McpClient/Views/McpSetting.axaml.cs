@@ -204,4 +204,34 @@ public partial class McpSetting : UserControl
             vm.IsBusy = false;
         }
     }
+
+    private async void BtnDelete_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is McpViewModel vm)
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Info", $"Are you sure to delete \"{vm.ServerName}\"?",
+                ButtonEnum.OkCancel,
+                Icon.Question);
+            var result = await box.ShowAsync();
+            if (result != ButtonResult.Ok)
+                return;
+
+            TryCreateService();
+
+            // Remove from view model
+            var configVm = DataContext as McpServerConfigViewModel;
+            configVm.McpServers.Remove(vm);
+
+            //// Update to server
+            //McpServerConfig config = configVm.ToModel();
+            //bool success = await _service.SetConfig(config);
+            //if (!success)
+            //{
+            //    box = MessageBoxManager.GetMessageBoxStandard("Error","Failed to delete!",
+            //        ButtonEnum.Ok,
+            //        Icon.Error);
+            //    await box.ShowAsync();
+            //}
+        }
+    }
 }
