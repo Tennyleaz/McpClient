@@ -212,7 +212,7 @@ public partial class McpSetting : UserControl
     {
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
-            var box = MessageBoxManager.GetMessageBoxStandard("Info", $"Are you sure to delete \"{vm.ServerName}\"?",
+            var box = MessageBoxManager.GetMessageBoxStandard("Delete Agent", $"Are you sure to delete \"{vm.ServerName}\"?",
                 ButtonEnum.OkCancel,
                 Icon.Question);
             Window owner = TopLevel.GetTopLevel(this) as Window;

@@ -21,7 +21,7 @@
         </Style>
     </Window.Styles>
     <Panel>
-        <TextBlock Text="Add New Server" FontWeight="Bold" Margin="20,20,0,0" FontSize="16"/>
+        <TextBlock Text="Add New Agent" FontWeight="Bold" Margin="20,20,0,0" FontSize="16"/>
         <Grid Margin="20,48,20,40" Name="MainGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -39,7 +39,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Name:</TextBlock>
-            <TextBox Grid.Column="1" Grid.Row="0" Classes="input" Name="TbServerName" Watermark="Name of the server"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Classes="input" Name="TbServerName" Watermark="Name of the agent"/>
 
             <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Owner:</TextBlock>
             <TextBox Grid.Column="1" Grid.Row="1" Classes="input" Name="TbOwner" Watermark="Who created this"/>

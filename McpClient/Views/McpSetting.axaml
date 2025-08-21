@@ -16,7 +16,7 @@
 		<vm:DesignMcpServerConfigViewModel />
 	</Design.DataContext>
 	<Grid Margin="20">
-		<Label FontSize="20" Name="LbHeader" Content="{Binding McpServers.Count, StringFormat='My MCP Hosts ({0})'}"/>
+		<Label FontSize="20" Name="LbHeader" Content="{Binding McpServers.Count, StringFormat='My Agents ({0})'}"/>
 		<Button Name="BtnAdd" Click="BtnAdd_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top">Add</Button>
 
 		<Separator VerticalAlignment="Top" Margin="0,36,0,0"></Separator>
