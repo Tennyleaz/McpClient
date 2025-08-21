@@ -58,7 +58,18 @@ public partial class StoreItemWindow : Window
                 if (parsedMcpServer != null)
                 {
                     TbMcpType.Text = "Type: " + parsedMcpServer.type;
-                    BtnInstall.IsEnabled = true;
+
+                    // Check if already installed
+                    if (_mcpServer.IsInstalled)
+                    {
+                        BtnInstall.Content = "Installed";
+                        BtnInstall.IsEnabled = false;
+                    }
+                    else
+                    {
+                        BtnInstall.IsEnabled = true;
+                    }
+
                     return;
                 }
             }

@@ -36,7 +36,8 @@ internal class DesignStoreMcpViewModel : StoreMcpViewModel
             {
                 Src = "https://mcp.so/logo.svg",
                 Alt = "@reactuses"
-            }
+            },
+            IsInstalled = true
         });
         Servers.Add(new StoreMcpServer
         {

@@ -21,6 +21,9 @@ internal class StoreMcpServer
     public string Timestamp { get; set; }
     public string Url { get; set; }
     public Logo Logo { get; set; }
+
+    [JsonIgnore]
+    public bool IsInstalled { get; set; }
 }
 
 internal class Logo

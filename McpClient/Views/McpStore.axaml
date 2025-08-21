@@ -44,7 +44,10 @@
                                 <TextBlock Text="&#xF0EB;" Margin="12,12,0,0" FontSize="20" FontFamily="{DynamicResource FontAwesome}" Foreground="{DynamicResource SystemAccentColor}"/>
                                 <TextBlock Text="{Binding Name}" Margin="32,12,10,0" FontSize="16" FontWeight="DemiBold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
 							</Panel>
-							<TextBlock DockPanel.Dock="Bottom" Text="{Binding Author}" Margin="12,0,12,8" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                            <Panel DockPanel.Dock="Bottom" >
+                                <TextBlock Text="Installed" IsVisible="{Binding IsInstalled}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,12,8" FontSize="12" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                                <TextBlock Text="{Binding Author}" Margin="12,0,12,8" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                            </Panel>
                             <TextBlock Text="{Binding Description}" Margin="12,6,10,6" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
                         </DockPanel>
                     </Border>
@@ -57,11 +60,11 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="{DynamicResource SystemAccentColor}"
                            Margin="0"/>
-		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
+		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="0,0,20,4" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
         
         <StackPanel Name="PageControlPanel" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="32" Orientation="Horizontal" Background="Transparent">
             <Button Name="BtnPrev" Click="BtnPrev_OnClick">←</Button>
-            <Label Name="TbPageNumber" VerticalAlignment="Center" FontSize="16" Margin="4,0,4,0">1/1</Label>
+            <Label Name="TbPageNumber" HorizontalContentAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="4,0,4,0" MinWidth="60">1/1</Label>
             <Button Name="BtnNext" Click="BtnNext_OnClick">→</Button>
         </StackPanel>
 	</Panel>

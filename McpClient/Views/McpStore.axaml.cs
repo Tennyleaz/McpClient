@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -17,10 +19,12 @@ namespace McpClient.Views;
 public partial class McpStore : UserControl
 {
     private AiNexusService _service;
+    private McpConfigService _configService;
     private StoreMcpViewModel storeMcpViewModel;
     private Pagination pagination;
     private int currentPage = 1;
     private string currentTag, currentQuery, currentCategory;
+    private List<string> installedMcpServers;
 
     public bool IsUpdateNeeded { get; private set; }
 
@@ -40,7 +44,17 @@ public partial class McpStore : UserControl
     internal void SetService()
     {
         Settings settings = SettingsManager.Local.Load();
+        _configService = new McpConfigService(settings.McpConfigToken);
         _service = new AiNexusService(settings.AiNexusToken);
+    }
+
+    private async Task GetInstalledList()
+    {
+        var response = await _configService.GetConfig();
+        if (response != null)
+        {
+            installedMcpServers = response.mcp_servers.Where(x => x.source == "cloud").Select(x => x.server_name).ToList();
+        }
     }
 
     private async void TabTypes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -48,6 +62,7 @@ public partial class McpStore : UserControl
         if (TabTypes == null)
             return;
 
+        currentPage = 1;
         if (TabTypes.SelectedIndex == 0)
         {
             await LoadStoreItems("latest", null, null, currentPage);
@@ -75,6 +90,7 @@ public partial class McpStore : UserControl
         }
         TabTypes.SelectedIndex = 0;
         IsUpdateNeeded = false;
+        await GetInstalledList();
     }
 
     private async Task LoadStoreItems(string tag, string category, string query, int page)
@@ -106,11 +122,13 @@ public partial class McpStore : UserControl
             return;
         }
 
+        currentTag = tag;
+        currentCategory = category;
+        currentQuery = query;
         pagination = response.Pagination;
         TbPageNumber.Content = $"{currentPage}/{pagination.TotalPages}";
 
-        storeMcpViewModel = new StoreMcpViewModel();
-        storeMcpViewModel.Servers.AddRange(response.Servers);
+        storeMcpViewModel = new StoreMcpViewModel(response.Servers, installedMcpServers);
         DataContext = storeMcpViewModel;
 
         ProgressRing.IsVisible = false;
