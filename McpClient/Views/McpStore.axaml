@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:McpClient.ViewModels"
+             xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             Loaded="Control_OnLoaded"
+             x:Name="McpStoreView"
+             x:DataType="vm:StoreMcpViewModel"
+             x:Class="McpClient.Views.McpStore">
+    <Design.DataContext>
+        <vm:DesignStoreMcpViewModel/>
+    </Design.DataContext>
+	<Panel>
+        <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="20,20,0,0">
+            <TabItem Header="Latest"></TabItem>
+            <TabItem Header="Hosting"></TabItem>
+            <TabItem Header="Official"></TabItem>
+            <TabItem Header="Featured"></TabItem>
+        </TabStrip>
+        <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="24,30,220,0">
+            <Button Name="BtnLeaveSearch" DockPanel.Dock="Right" Click="BtnLeaveSearch_OnClick">❌</Button>
+            <TextBlock Name="TbQueryTitle" FontSize="24" FontWeight="Bold" KeyDown="TbQueryTitle_OnKeyDown"
+                       TextTrimming="CharacterEllipsis">Search: "MCP tool name"</TextBlock>
+        </DockPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,16,0">
+            <TextBox Name="TbSearch" Watermark="Search here" MinWidth="160"></TextBox>
+            <Button Name="BtnSearch" Click="BtnSearch_OnClick">🔍</Button>
+        </StackPanel>
+        
+        <ListBox Name="McpListBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="20,72,20,32" ItemsSource="{Binding Servers}"
+                 SelectionChanged="McpListBox_OnSelectionChanged">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="8" BorderBrush="Gray" BorderThickness="1" Width="240" Height="120">
+                        <DockPanel>
+                            <Panel DockPanel.Dock="Top">
+                                <TextBlock Text="&#xF0EB;" Margin="12,12,0,0" FontSize="20" FontFamily="{DynamicResource FontAwesome}" Foreground="{DynamicResource SystemAccentColor}"/>
+                                <TextBlock Text="{Binding Name}" Margin="32,12,10,0" FontSize="16" FontWeight="DemiBold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
+							</Panel>
+							<TextBlock DockPanel.Dock="Bottom" Text="{Binding Author}" Margin="12,0,12,8" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                            <TextBlock Text="{Binding Description}" Margin="12,6,10,6" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,100,0,0" IsVisible="False">Nothing here</Label>
+        <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemAccentColor}"
+                           Margin="0"/>
+		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
+        
+        <StackPanel Name="PageControlPanel" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="32" Orientation="Horizontal" Background="Transparent">
+            <Button Name="BtnPrev" Click="BtnPrev_OnClick">←</Button>
+            <Label Name="TbPageNumber" VerticalAlignment="Center" FontSize="16" Margin="4,0,4,0">1/1</Label>
+            <Button Name="BtnNext" Click="BtnNext_OnClick">→</Button>
+        </StackPanel>
+	</Panel>
+</UserControl>

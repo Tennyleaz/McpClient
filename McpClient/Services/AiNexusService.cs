@@ -428,4 +428,83 @@ internal class AiNexusService
     }
 
     #endregion
+
+    #region MCP store
+
+    public async Task<StoreMcpResponse> GetStoreMcpServers(string tag, string category, int page)
+    {
+        string url = "/api/v1/mcpServer";
+        if (!string.IsNullOrEmpty(tag))
+            url += $"?tag={tag}";
+        else
+            url += $"?tag={category}";
+        url += $"&page={page}&debug=false";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                StoreMcpResponse result = JsonSerializer.Deserialize<StoreMcpResponse>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    public async Task<StoreMcpResponse> SearchMcpServers(string query, int page)
+    {
+        string url = "http://192.168.41.17:5155/api/v1/mcpServer";
+        url += $"?query={Uri.EscapeDataString(query)}";
+        url += $"&page={page}&debug=false";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                StoreMcpResponse result = JsonSerializer.Deserialize<StoreMcpResponse>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    public async Task<StoreMcpServerDetailBase> GetStoreMcpServerDetail(string serverUrl)
+    {
+        string url = $"http://192.168.41.17:5155/api/v1/mcpServerDetail?url={Uri.EscapeDataString(serverUrl)}";
+
+        HttpResponseMessage response = await _httpClient.GetAsync(url);
+        if (response.IsSuccessStatusCode)
+        {
+            string json = await response.Content.ReadAsStringAsync();
+            try
+            {
+                StoreMcpServerDetail result = JsonSerializer.Deserialize<StoreMcpServerDetail>(json, _options);
+                return result;
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine(ex);
+                StoreMcpServerDetailBase baseResult = JsonSerializer.Deserialize<StoreMcpServerDetailBase>(json, _options);
+                return baseResult;
+            }
+        }
+
+        return null;
+    }
+
+    #endregion
 }

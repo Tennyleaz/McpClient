@@ -59,6 +59,8 @@ public partial class MainView : UserControl
         McpSetting.IsVisible = true;
         Chat.IsVisible = false;
         McpService.IsVisible = false;
+        McpStore.IsVisible = false;
+
         BtnBack.IsVisible = true;
         BtnSave.IsVisible = true;
         BtnRefresh.IsVisible = false;
@@ -76,6 +78,8 @@ public partial class MainView : UserControl
         McpSetting.IsVisible = false;
         Chat.IsVisible = true;
         McpService.IsVisible = false;
+        McpStore.IsVisible = false;
+
         BtnBack.IsVisible = true;
         BtnSave.IsVisible = false;
         BtnRefresh.IsVisible = true;
@@ -89,11 +93,30 @@ public partial class MainView : UserControl
         McpSetting.IsVisible = false;
         Chat.IsVisible = false;
         McpService.IsVisible = true;
+        McpStore.IsVisible = false;
+
         BtnBack.IsVisible = true;
         BtnSave.IsVisible = false;
         BtnRefresh.IsVisible = false;
 
         McpService.LoadFromSettings();
+    }
+
+    private async Task ShowStore()
+    {
+        BtnBack.Content = "Go Back";
+
+        MainPanel.IsVisible = false;
+        McpSetting.IsVisible = false;
+        Chat.IsVisible = false;
+        McpService.IsVisible = false;
+        McpStore.IsVisible = true;
+
+        BtnBack.IsVisible = true;
+        BtnSave.IsVisible = false;
+        BtnRefresh.IsVisible = false;
+
+        await McpStore.LoadDefault();
     }
 
     private async Task ShowMain(bool isSave)
@@ -113,6 +136,8 @@ public partial class MainView : UserControl
         McpSetting.IsVisible = false;
         Chat.IsVisible = false;
         McpService.IsVisible = false;
+        McpStore.IsVisible = false;
+
         BtnBack.IsVisible = false;
         BtnSave.IsVisible = false;
         BtnRefresh.IsVisible = false;
@@ -128,10 +153,11 @@ public partial class MainView : UserControl
         await TaskView.RefreshCurrentTab(true);
     }
 
-    private void BtnStore_OnClick(object sender, RoutedEventArgs e)
+    private async void BtnStore_OnClick(object sender, RoutedEventArgs e)
     {
-        Uri uri = new Uri("https://www.google.com");
-        var launcher = TopLevel.GetTopLevel(this).Launcher;
-        launcher.LaunchUriAsync(uri);
+        await ShowStore();
+        //Uri uri = new Uri("https://www.google.com");
+        //var launcher = TopLevel.GetTopLevel(this).Launcher;
+        //launcher.LaunchUriAsync(uri);
     }
 }
