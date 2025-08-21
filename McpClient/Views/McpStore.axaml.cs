@@ -22,6 +22,8 @@ public partial class McpStore : UserControl
     private int currentPage = 1;
     private string currentTag, currentQuery, currentCategory;
 
+    public bool IsUpdateNeeded { get; private set; }
+
     public McpStore()
     {
         InitializeComponent();
@@ -72,6 +74,7 @@ public partial class McpStore : UserControl
             await LoadStoreItems("latest", null, null, currentPage);
         }
         TabTypes.SelectedIndex = 0;
+        IsUpdateNeeded = false;
     }
 
     private async Task LoadStoreItems(string tag, string category, string query, int page)
@@ -120,7 +123,8 @@ public partial class McpStore : UserControl
         {
             StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service);
             await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
-
+            
+            IsUpdateNeeded = window.IsInstalled;
             McpListBox.SelectedIndex = -1;
         }
     }

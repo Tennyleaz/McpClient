@@ -131,6 +131,10 @@ public partial class MainView : UserControl
             }
             await TaskView.RefreshMcpTools();
         }
+        else if (McpStore.IsVisible && McpStore.IsUpdateNeeded)
+        {
+            await TaskView.RefreshMcpTools();
+        }
 
         MainPanel.IsVisible = true;
         McpSetting.IsVisible = false;

@@ -21,6 +21,8 @@ public partial class StoreItemWindow : Window
     private StoreMcpServerDetail detail;
     private McpServer parsedMcpServer;
 
+    public bool IsInstalled { get; private set; }
+
     public StoreItemWindow()
     {
         InitializeComponent();
@@ -97,6 +99,7 @@ public partial class StoreItemWindow : Window
 
             BtnInstall.Content = "Installed";
             BtnInstall.IsEnabled = false;
+            IsInstalled = true;
         }
         else
         {
