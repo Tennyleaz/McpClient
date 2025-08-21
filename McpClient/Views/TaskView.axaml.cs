@@ -39,6 +39,7 @@ public partial class TaskView : UserControl
     {
         if (Design.IsDesignMode)
             return;
+        GroupList.DownloadGroup += GroupList_OnDownloadGroup;
     }
 
     private async void BtnRefresh_OnClick(object sender, RoutedEventArgs e)

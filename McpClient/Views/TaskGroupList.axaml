@@ -27,7 +27,7 @@
                             <TextBlock Text="{Binding Description}" Margin="4,24,4,0" TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
                             <Button Name="BtnDownload" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,68,4"
                                     Command="{Binding ElementName=GroupList, Path=DataContext.DownloadCommand}"
-                                    CommandParameter="{Binding .}">Download ↓</Button>
+                                    CommandParameter="{Binding .}">Clone Agent ↓</Button>
                             <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
                                     Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
                                     CommandParameter="{Binding .}">Run ▶</Button>

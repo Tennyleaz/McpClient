@@ -15,15 +15,12 @@
     </Design.DataContext>
     <Panel>
 		<TabStrip Name="Tabs" SelectionChanged="Tabs_OnSelectionChanged">
-            <TabItem Header="My Groups">
-            </TabItem>
-			<TabItem Header="Local Workflows">
-            </TabItem>
-            <TabItem Header="MCP Tools">
-            </TabItem>
+            <TabItem Header="My Apps"/>
+			<TabItem Header="Local Workflows"/>
+            <TabItem Header="Agents"/>
         </TabStrip>
         <Button Name="BtnRefresh" Click="BtnRefresh_OnClick" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Refresh ↻" Margin="0,0,10,0"/>
-		<local:TaskGroupList Name="GroupList" DownloadGroup="GroupList_OnDownloadGroup"/>
+		<local:TaskGroupList Name="GroupList"/>
         <local:TaskOfflineWorkflowList Name="OfflineWorkflowList" IsVisible="False"/>
         <local:TaskMcpToolList Name="McpToolList" IsVisible="False"/>
         <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"
