@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace McpClient.Services;
 internal class AiNexusService
 {
-    private const string BASE_URL = "http://192.168.41.208:5155";
+    private const string BASE_URL = "http://192.168.41.208:8299";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _options;
 
@@ -508,6 +508,30 @@ internal class AiNexusService
         catch (Exception ex)
         {
             Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region Chat
+
+    public async Task<TranscriptResponse> PostTranscriptAsync(string fileName)
+    {
+        MultipartFormDataContent content = new MultipartFormDataContent();
+
+        byte[] buffer = await File.ReadAllBytesAsync(fileName);
+        ByteArrayContent fileContent = new ByteArrayContent(buffer);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/wav");
+        content.Add(fileContent, "audioFile", Path.GetFileName(fileName));
+
+        string url = $"api/v1/chat/transcript";
+        using HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+        if (response.IsSuccessStatusCode)
+        {
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<TranscriptResponse>(json, _options);
         }
 
         return null;

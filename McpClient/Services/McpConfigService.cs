@@ -99,7 +99,16 @@ internal class McpConfigService
             account = username,
             password = password
         };
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(BASE_URL + "/user/login", body);
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.PostAsJsonAsync(BASE_URL + "/user/login", body);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+
         if (response.StatusCode != HttpStatusCode.OK)
         {
             return null;
@@ -129,15 +138,22 @@ internal class McpConfigService
         //        { "Authorization", $"Bearer {token}" }
         //    }
         //};
-        HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/user/isLogin");
-        if (response.StatusCode != HttpStatusCode.OK)
+        try
         {
-            return false;
+            HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/user/isLogin");
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                bool.TryParse(json, out bool result);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+
         }
 
-        string json = await response.Content.ReadAsStringAsync();
-        bool.TryParse(json, out bool result);
-        return result;
+        return false;
     }
 }
 

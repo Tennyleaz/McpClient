@@ -29,10 +29,17 @@ internal class RagService
 
     public async Task<bool> UploadDocument(DocumentDto request)
     {
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/v1/Documents", request, _options);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            return true;
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/v1/Documents", request, _options);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
 
         return false;
