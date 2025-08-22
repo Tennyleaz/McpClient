@@ -51,6 +51,7 @@
                         <TextBlock Classes="MainFontSolid" Text="&#xE4CF;"/>
                     </Panel>
                 </Button>
+				<Button Name="BtnShowMonitor" Margin="0,20,0,0" Click="BtnShowMonitor_OnClick">Monitor</Button>
 		    </StackPanel>
             <Panel Name="RightPanel" DockPanel.Dock="Right">
                 <ToggleSwitch Content="Dark Mode" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" IsChecked="{Binding IsNightMode}"></ToggleSwitch>

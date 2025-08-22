@@ -1,17 +1,23 @@
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using LibreHardwareMonitor.Hardware;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
+using LiveChartsCore.SkiaSharpView;
+using McpClient.ViewModels;
 
 namespace McpClient.Views;
 
 public partial class MonitorWindow : Window
 {
     private BackgroundWorker worker;
+    private MonitorViewModel viewModel = new MonitorViewModel();
     private readonly PlatformID _platform;
+    private const int INTERVAL_MS = 1500;
 
     public MonitorWindow()
     {
@@ -21,6 +27,23 @@ public partial class MonitorWindow : Window
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+
+        viewModel.Series.Add(new ColumnSeries<int>
+        {
+            //Name = "CPU",
+            Values = [0, 0],
+        });
+        //viewModel.Series.Add(new ColumnSeries<int>
+        //{
+        //    Name = "GPU",
+        //    Values = [0]
+        //});
+        DataContext = viewModel;
+
         worker = new BackgroundWorker();
         worker.WorkerSupportsCancellation = true;
         worker.WorkerReportsProgress = true;
@@ -37,25 +60,65 @@ public partial class MonitorWindow : Window
 
     private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
     {
+        HardwareType type = (HardwareType)e.ProgressPercentage;
+        if (type == HardwareType.Cpu)
+        {
 
+        }
+        else if (type == HardwareType.GpuNvidia || type == HardwareType.GpuAmd)
+        {
+
+        }
     }
 
     private void Worker_DoWork(object sender, DoWorkEventArgs e)
     {
+        Computer computer = new Computer
+        {
+            IsCpuEnabled = true,
+            IsGpuEnabled = true,
+            IsMemoryEnabled = false,
+            IsMotherboardEnabled = false,
+            IsControllerEnabled = false,
+            IsNetworkEnabled = false,
+            IsStorageEnabled = false,
+            IsBatteryEnabled = false,
+            IsPsuEnabled = false,
+        };
+        computer.Open();
+
         while (!worker.CancellationPending)
         {
-            int cpuUsage = 0;
-            if (_platform == PlatformID.Win32NT)
+            computer.Accept(new UpdateVisitor());
+            int cpu = 0, gpu = 0;
+            foreach (IHardware hardware in computer.Hardware)
             {
-                cpuUsage = GetCpuUsageLinux();
+                foreach (ISensor sensor in hardware.Sensors)
+                {
+                    if (hardware.HardwareType == HardwareType.Cpu)
+                    {
+                        if (sensor.Name == "CPU Total" && sensor.Value.HasValue)
+                        {
+                            cpu = (int)sensor.Value;
+                            break;
+                        }
+                    }
+                    else if (hardware.HardwareType == HardwareType.GpuAmd || /*hardware.HardwareType == HardwareType.GpuIntel ||*/ hardware.HardwareType == HardwareType.GpuNvidia)
+                    {
+                        if (sensor.Name == "D3D 3D" && sensor.Value.HasValue)
+                        {
+                            gpu = (int)sensor.Value;
+                            break;
+                        }
+                    }
+                }
             }
-            else if (_platform == PlatformID.Unix)
-            {
 
-            }
-
-            worker.ReportProgress(cpuUsage);
+            viewModel.Series[0].Values = [cpu, gpu];
+            Thread.Sleep(INTERVAL_MS);
         }
+
+        computer.Close();
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
@@ -87,5 +150,23 @@ public partial class MonitorWindow : Window
         p.Start();
         p.WaitForExit();
         return p.StandardOutput.ReadToEnd();
+    }
+
+    private class UpdateVisitor : IVisitor
+    {
+        public void VisitComputer(IComputer computer)
+        {
+            computer.Traverse(this);
+        }
+        public void VisitHardware(IHardware hardware)
+        {
+            hardware.Update();
+            //foreach (IHardware subHardware in hardware.SubHardware)
+            //{
+            //    subHardware.Accept(this);
+            //}
+        }
+        public void VisitSensor(ISensor sensor) { }
+        public void VisitParameter(IParameter parameter) { }
     }
 }

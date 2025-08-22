@@ -2,19 +2,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="150"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
         x:Class="McpClient.Views.MonitorWindow"
-        Width="150" Height="150"
+        Width="200" Height="300"
         Topmost="True"
-        SystemDecorations="BorderOnly"
+        CanResize="False" CanMinimize="False"
         Loaded="Control_OnLoaded" Closing="Window_OnClosing"
+        x:DataType="vm:MonitorViewModel"
         Title="Monitor">
-    <Grid ColumnDefinitions="*,*" RowDefinitions="*,Auto,*">
-		<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">30%</Label>
-        <Label Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center">100%</Label>
-        <Rectangle Grid.Column="0" Grid.Row="1" Name="RectCpu" Height="30" Width="40" Fill="{DynamicResource SystemAccentColor}" VerticalAlignment="Bottom"/>
-        <Rectangle Grid.Column="1" Grid.Row="1" Name="RectGpu" Height="100" Width="40" Fill="{DynamicResource SystemAccentColor}" VerticalAlignment="Bottom"/>
-        <Label Grid.Column="0" Grid.Row="2" FontSize="16" HorizontalAlignment="Center">CPU</Label>
-        <Label Grid.Column="1" Grid.Row="2" FontSize="16" HorizontalAlignment="Center">GPU</Label>
+    <Grid ColumnDefinitions="*" RowDefinitions="*">
+        <lvc:CartesianChart Width="200" Height="300"
+            Series="{Binding Series}" XAxes="{Binding XAxes}" YAxes="{Binding YAxes}">
+        </lvc:CartesianChart>
     </Grid>
 </Window>

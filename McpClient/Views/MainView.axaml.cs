@@ -164,4 +164,10 @@ public partial class MainView : UserControl
         //var launcher = TopLevel.GetTopLevel(this).Launcher;
         //launcher.LaunchUriAsync(uri);
     }
+
+    private void BtnShowMonitor_OnClick(object sender, RoutedEventArgs e)
+    {
+        MonitorWindow monitorWindow = new MonitorWindow();
+        monitorWindow.Show(TopLevel.GetTopLevel(this) as Window);
+    }
 }
