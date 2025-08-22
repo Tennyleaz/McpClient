@@ -7,10 +7,10 @@
              x:Class="McpClient.Views.Chat"
              Loaded="Control_OnLoaded">
     <Grid RowDefinitions="*,Auto">
-        <webview:WebView Grid.Row="0" x:Name="ChatWebView" Address="http://192.168.41.60" BeforeNavigate="ChatWebView_OnBeforeNavigate"/>
-        <!--<StackPanel Orientation="Horizontal" Grid.Row="1">
+        <webview:WebView Grid.Row="0" x:Name="ChatWebView" BeforeNavigate="ChatWebView_OnBeforeNavigate"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
             <Button Name="BtnDebug" Click="BtnDebug_OnClick" VerticalAlignment="Bottom">Debug</Button>
             <Button Name="BtnF12" Click="BtnF12_OnClick" VerticalAlignment="Bottom">Console</Button>
-		</StackPanel>-->
+		</StackPanel>
     </Grid>
 </UserControl>
