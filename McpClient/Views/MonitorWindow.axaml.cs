@@ -87,6 +87,21 @@ public partial class MonitorWindow : Window
         };
         computer.Open();
 
+        // detect GPU number first
+        computer.Accept(new UpdateVisitor());
+        bool isGpuDetectd = false;
+        foreach (IHardware hardware in computer.Hardware)
+        {
+            if (hardware.HardwareType == HardwareType.GpuAmd || hardware.HardwareType == HardwareType.GpuIntel || hardware.HardwareType == HardwareType.GpuNvidia)
+            {
+                isGpuDetectd = true;
+            }
+        }
+        if (!isGpuDetectd)
+        {
+            viewModel.XAxes[0].Labels[1] = "GPU X";
+        }
+
         while (!worker.CancellationPending)
         {
             computer.Accept(new UpdateVisitor());

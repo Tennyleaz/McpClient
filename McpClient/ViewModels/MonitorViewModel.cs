@@ -16,6 +16,13 @@ internal class MonitorViewModel : ReactiveObject
 {
     public ObservableCollection<ColumnSeries<int>> Series { get; set; } = new();
 
+    public MonitorViewModel()
+    {
+        // see:
+        // https://livecharts.dev/docs/avalonia/2.0.0-rc5.4/samples.axes.labelsFormat2
+        LiveCharts.Configure(config => config.HasGlobalSKTypeface(SKFontManager.Default.MatchCharacter('汉')));
+    }
+
     public Axis[] XAxes { get; set; } =
     [
         new Axis
