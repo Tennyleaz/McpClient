@@ -28,6 +28,7 @@ public partial class Chat : UserControl
     public Chat()
     {
         InitializeComponent();
+        WebView.Settings.PersistCache = true;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -217,7 +218,7 @@ public partial class Chat : UserControl
             var box = MessageBoxManager.GetMessageBoxStandard("Error", "Failed to save file: " + ex.Message,
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Error);
-            box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
+            await box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
         }
     }
 
