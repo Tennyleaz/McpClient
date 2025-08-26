@@ -36,6 +36,9 @@ internal class StoreMcpServerDetailBase
 
     [JsonPropertyName("url")]
     public string Url { get; set; }
+
+    [JsonPropertyName("timestamp_text")]
+    public string TimestampText { get; set; }
 }
 
 internal class StoreMcpServerDetail : StoreMcpServerDetailBase

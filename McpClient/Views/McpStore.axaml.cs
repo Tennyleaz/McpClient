@@ -73,7 +73,7 @@ public partial class McpStore : UserControl
         }
         else if (TabTypes.SelectedIndex == 2)
         {
-            await LoadStoreItems("official", null, null, currentPage);
+            await LoadStoreItems(null, "official-servers", null, currentPage);
         }
         else if (TabTypes.SelectedIndex == 3)
         {

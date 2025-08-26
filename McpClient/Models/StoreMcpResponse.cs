@@ -18,7 +18,8 @@ internal class StoreMcpServer
     public string Name { get; set; }
     public string Author { get; set; }
     public string Description { get; set; }
-    public string Timestamp { get; set; }
+    [JsonPropertyName("timestamp_text")]
+    public string TimestampText { get; set; }
     public string Url { get; set; }
     public Logo Logo { get; set; }
 

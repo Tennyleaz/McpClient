@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using McpClient.Models;
@@ -45,6 +46,16 @@ public partial class StoreItemWindow : Window
         StoreMcpServerDetailBase detailBase = await _service.GetStoreMcpServerDetail(_mcpServer.Url);
         if (detailBase != null)
         {
+            // Set url
+            if (!string.IsNullOrEmpty(detailBase.GithubUrl))
+            {
+                BtnGithub.IsVisible = true;
+            }
+            else
+            {
+                BtnGithub.IsVisible = false;
+            }
+
             // Check if detail is real or not
             if (detailBase is StoreMcpServerDetail detailReal && detailReal.ServerConfig?.McpServers != null)
             {
@@ -195,5 +206,11 @@ public partial class StoreItemWindow : Window
         }
 
         return mcpServer;
+    }
+
+    private void BtnGithub_OnPointerPressed(object sender, PointerPressedEventArgs e)
+    {
+        string url = detail.GithubUrl ?? detail.Url;
+        Launcher.LaunchUriAsync(new Uri(url));
     }
 }
