@@ -23,11 +23,18 @@ namespace McpClient.Views;
 public partial class Chat : UserControl
 {
     private TennyObject tennyObject;
-    private WebView ChatWebView;
     private string _token;
+    private const string SERVER_URL = "http://192.168.41.60";
 
     public Chat()
     {
+        // Create cache
+        string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string cacheDir = Path.Combine(appdata, "McpClient", "Webview");
+        if (!Directory.Exists(cacheDir))
+            Directory.CreateDirectory(cacheDir);
+        WebView.Settings.CachePath = cacheDir;
+        WebView.Settings.PersistCache = true;  // must set before webview created
         InitializeComponent();
     }
 
@@ -36,15 +43,30 @@ public partial class Chat : UserControl
         if (Design.IsDesignMode)
             return;
 
-        //WebView.Settings.PersistCache = true;  // must set before webview created
-        ChatWebView = new WebView();
-        Grid.Children.Add(ChatWebView);
         ChatWebView.IsSecurityDisabled = true;
         ChatWebView.IgnoreCertificateErrors = true;
         ChatWebView.BeforeNavigate += ChatWebView_OnBeforeNavigate;
         ChatWebView.DisableBuiltinContextMenus = true;
-        
-        ChatWebView.Address = "http://192.168.41.60";
+
+        // see
+        // https://github.com/chromiumembedded/cef/issues/3739
+        var value = CefValue.Create();
+        value.SetBool(true);
+        var context = CefRequestContext.GetGlobalContext();
+        string name = "plugins.always_open_pdf_externally";
+        if (context.CanSetPreference(name))
+        {
+            bool success = context.SetPreference(name, value, out string errr);
+            Debug.WriteLine(errr);
+        }
+    }
+
+    public void LoadChatServer()
+    {
+        if (tennyObject != null)
+            return;
+
+        ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://localhost:5174/";
         //string file = @"D:\workspace\McpClient\McpClient.Desktop\bin\Debug\net8.0\html\test.html";
         //ChatWebView.LoadUrl(file);
@@ -68,18 +90,6 @@ public partial class Chat : UserControl
                 await OnDownloadFile(args);
             });
         };
-
-        // see
-        // https://github.com/chromiumembedded/cef/issues/3739
-        var value = CefValue.Create();
-        value.SetBool(true);
-        var context = CefRequestContext.GetGlobalContext();
-        string name = "plugins.always_open_pdf_externally";
-        if (context.CanSetPreference(name))
-        {
-            bool success = context.SetPreference(name, value, out string errr);
-            Debug.WriteLine(errr);
-        }
     }
 
     public void ReloadWebview()
@@ -110,12 +120,20 @@ public partial class Chat : UserControl
             object result = await ChatWebView.EvaluateScript<object>(script);
             Debug.WriteLine(result);
 
+            script = $"window.localStorage.setItem('test-item', 'test');";
+            result = await ChatWebView.EvaluateScript<object>(script);
+            Debug.WriteLine(result);
+
             ChatWebView.Reload();
             _token = token;
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
+            var box = MessageBoxManager.GetMessageBoxStandard("Webview", ex.ToString(),
+                ButtonEnum.Ok,
+                MsBox.Avalonia.Enums.Icon.Info);
+            box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
         }
     }
 
@@ -152,7 +170,6 @@ public partial class Chat : UserControl
         //    request.Cancel();
         //    return;
         //}
-
         Settings settings = SettingsManager.Local.Load();
         await SetToken(settings.UserName, settings.McpConfigToken);
 
