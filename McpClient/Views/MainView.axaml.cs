@@ -83,6 +83,8 @@ public partial class MainView : UserControl
         BtnBack.IsVisible = true;
         BtnSave.IsVisible = false;
         BtnRefresh.IsVisible = true;
+
+        Chat.LoadChatServer();
     }
 
     private void ShowServices()

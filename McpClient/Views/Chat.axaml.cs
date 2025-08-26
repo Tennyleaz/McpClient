@@ -130,10 +130,6 @@ public partial class Chat : UserControl
         catch (Exception ex)
         {
             Debug.WriteLine(ex);
-            var box = MessageBoxManager.GetMessageBoxStandard("Webview", ex.ToString(),
-                ButtonEnum.Ok,
-                MsBox.Avalonia.Enums.Icon.Info);
-            box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
         }
     }
 
