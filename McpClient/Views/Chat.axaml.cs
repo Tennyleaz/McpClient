@@ -23,21 +23,29 @@ namespace McpClient.Views;
 public partial class Chat : UserControl
 {
     private TennyObject tennyObject;
+    private WebView ChatWebView;
     private string _token;
 
     public Chat()
     {
         InitializeComponent();
-        WebView.Settings.PersistCache = true;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
+
+        //WebView.Settings.PersistCache = true;  // must set before webview created
+        ChatWebView = new WebView();
+        Grid.Children.Add(ChatWebView);
+        ChatWebView.IsSecurityDisabled = true;
+        ChatWebView.IgnoreCertificateErrors = true;
         ChatWebView.BeforeNavigate += ChatWebView_OnBeforeNavigate;
         ChatWebView.DisableBuiltinContextMenus = true;
         
-        //ChatWebView.Address = "http://192.168.41.60";
-        ChatWebView.Address = "http://localhost:5174/";
+        ChatWebView.Address = "http://192.168.41.60";
+        //ChatWebView.Address = "http://localhost:5174/";
         //string file = @"D:\workspace\McpClient\McpClient.Desktop\bin\Debug\net8.0\html\test.html";
         //ChatWebView.LoadUrl(file);
 
@@ -139,17 +147,17 @@ public partial class Chat : UserControl
 
     private async void ChatWebView_OnBeforeNavigate(Request request)
     {
-        if (request.Url.EndsWith(".pdf"))
-        {
-            request.Cancel();
-            return;
-        }
+        //if (request.Url.EndsWith(".pdf"))
+        //{
+        //    request.Cancel();
+        //    return;
+        //}
 
         Settings settings = SettingsManager.Local.Load();
         await SetToken(settings.UserName, settings.McpConfigToken);
 
         // Remove event handler beacause we only need to set token once
-        ChatWebView.BeforeNavigate -= ChatWebView_OnBeforeNavigate;
+        //ChatWebView.BeforeNavigate -= ChatWebView_OnBeforeNavigate;
     }
 
     internal class TennyObject
