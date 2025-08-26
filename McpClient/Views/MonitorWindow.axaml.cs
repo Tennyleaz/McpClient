@@ -105,7 +105,7 @@ public partial class MonitorWindow : Window
         while (!worker.CancellationPending)
         {
             computer.Accept(new UpdateVisitor());
-            int cpu = 0, gpu = 0;
+            int cpu = 0, gpu = 0, compute = 0;
             foreach (IHardware hardware in computer.Hardware)
             {
                 foreach (ISensor sensor in hardware.Sensors)
@@ -120,15 +120,21 @@ public partial class MonitorWindow : Window
                     }
                     else if (hardware.HardwareType == HardwareType.GpuAmd || /*hardware.HardwareType == HardwareType.GpuIntel ||*/ hardware.HardwareType == HardwareType.GpuNvidia)
                     {
+                        Debug.WriteLine(sensor.Name);
                         if (sensor.Name == "D3D 3D" && sensor.Value.HasValue)
                         {
                             gpu = (int)sensor.Value;
-                            break;
+                            //break;
+                        }
+                        else if (compute == 0 && sensor.Name.StartsWith("D3D Compute") && sensor.Value.HasValue)
+                        {
+                            compute = (int)sensor.Value;
                         }
                     }
                 }
             }
 
+            gpu = Math.Max(gpu, compute);
             viewModel.Series[0].Values = [cpu, gpu];
             Thread.Sleep(INTERVAL_MS);
         }
