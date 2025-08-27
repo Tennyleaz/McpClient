@@ -64,10 +64,13 @@ internal class DeviceDetect
             // lspci -nnD | grep -E 'VGA|Display'
             // 0000:03:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Device [1002:7550] (rev c3)
             // 0000:00:02.0 Display controller[0380]: Intel Corporation CoffeeLake - S GT2[UHD Graphics 630][8086:3e92]
-            string outputLines = RunCommand("lspci", "-nnD | grep -E 'VGA|Display'");
+            string outputLines = RunCommand("lspci", "-nnD");
             string[] lines = outputLines.Split('\n');
             foreach (string line in lines)
             {
+                if (!line.Contains("VGA") && !line.Contains("Display"))
+                    continue;
+
                 var match = Regex.Match(line, @"^(?<addr>[0-9a-f:.]+).*\[(?<vendor>[0-9a-fA-F]{4}):(?<device>[0-9a-fA-F]{4})\]");
                 if (match.Success)
                 {
@@ -75,7 +78,7 @@ internal class DeviceDetect
                     string vendorId = match.Groups["vendor"].Value.ToLower();
                     string deviceId = match.Groups["device"].Value.ToLower();
                     string gpuName = LookupGpu(dict, vendorId, deviceId);
-                    if (vendorId == "1002") 
+                    if (vendorId == "1002")
                     {
                         // Find in /sys/bus/pci/devices/PCI_ADDR/mem_info_vram_total
                         string path = $"/sys/bus/pci/devices/{address}/mem_info_vram_total";
@@ -87,9 +90,13 @@ internal class DeviceDetect
                                 gpus.Add(new GpuInfoLinux
                                 {
                                     Name = gpuName,
-                                    MemoryMiB = (int)(bytes / 1024)
+                                    MemoryMiB = (int)(bytes / 1024 / 1024)
                                 });
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine("path does not exist: " + path);
                         }
                     }
                     else if (vendorId == "8086")
@@ -185,9 +192,9 @@ internal class DeviceDetect
                 {
                     string key = $"{subvendor}:{subdevice}";
                     if (dEntry.Subsystems.TryGetValue(key, out var subName))
-                        return $"{vEntry.VendorName} {subName}";
+                        return subName;
                 }
-                return $"{vEntry.VendorName} {dEntry.DeviceName}";
+                return dEntry.DeviceName;
             }
             return vEntry.VendorName;
         }
@@ -252,7 +259,8 @@ internal class DeviceDetect
         }
         catch (Exception ex)
         {
-            return ex.Message;
+            Console.WriteLine(ex.Message);
+            return string.Empty;
         }
     }
 }
