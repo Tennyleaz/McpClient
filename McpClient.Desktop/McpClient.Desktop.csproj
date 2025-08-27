@@ -16,4 +16,10 @@
   <ItemGroup>
     <ProjectReference Include="..\McpClient\McpClient.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="pci.ids">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
