@@ -7,7 +7,7 @@
              x:Class="McpClient.Views.McpService">
 	<Panel>
 		<Label FontSize="20" Margin="20,20,0,0">Services</Label>
-		<Grid Margin="24,60,20,20" RowDefinitions="60,60,60,60,*" ColumnDefinitions="Auto,Auto,*">
+		<Grid Margin="24,60,20,20" RowDefinitions="60,60,60,60,*" ColumnDefinitions="Auto,Auto,*,Auto">
             <TextBlock Grid.Column="0" Grid.Row="0" FontSize="14" Margin="0,6,20,0">NodeJS server</TextBlock>
             <TextBlock Grid.Column="1" Grid.Row="0" FontSize="14" Margin="0,6,20,0">Running</TextBlock>
             <Button Grid.Column="2" Grid.Row="0" Name="BtnRestartNodeJs" VerticalAlignment="Top">Restart</Button>
@@ -25,7 +25,19 @@
             <Button Grid.Column="2" Grid.Row="3" Name="BtnChangeRag" VerticalAlignment="Top" Click="BtnChangeRag_OnClick">Change Folder</Button>
             <Panel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3">
                 <TextBlock Name="TbRagFolder">RAG Folder: C://users/tenny/documents/RAG</TextBlock>
+                <Button Name="BtnStartRecord" Click="BtnStartRecord_OnClick">Start Record</Button>
+                <Button Name="BtnStopRecord" Click="BtnStopRecord_OnClick" Margin="120,0,0,0">Stop Record</Button>
             </Panel>
+
+            <Grid Grid.Column="3" Grid.Row="0" Grid.RowSpan="5" Margin="0,0,20,0" Grid.RowDefinitions="Auto,Auto,Auto,Auto" Grid.ColumnDefinitions="Auto,Auto">
+				<TextBlock Grid.Column="0" Grid.Row="0">GPU:</TextBlock>
+                <TextBlock Grid.Column="1" Grid.Row="0" Name="TbGpuName">Unknown Model</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="1">VRAM:</TextBlock>
+				<TextBlock Grid.Column="1" Grid.Row="1" Name="TbGpuVram">0 MB</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,10,0">Recommend model size:</TextBlock>
+				<TextBlock Grid.Column="1" Grid.Row="2" Name="TbRecommend">Unknown size</TextBlock>
+                <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0" Name="BtnSearchHg" Click="BtnSearchHg_OnClick">Go seach huggingface: 0B</Button>
+            </Grid>
         </Grid>
         <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
 	</Panel>

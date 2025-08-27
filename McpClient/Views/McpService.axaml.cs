@@ -1,17 +1,24 @@
-using System.IO;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Dialogs;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using McpClient.Services;
+using McpClient.Utils;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace McpClient.Views;
 
 public partial class McpService : UserControl
 {
     private Settings settings;
+    private int hgRecommendSize = 0;
 
     public McpService()
     {
@@ -22,6 +29,8 @@ public partial class McpService : UserControl
     {
         if (Design.IsDesignMode)
             return;
+
+        LoadGpuStatus();
     }
 
     internal void LoadFromSettings()
@@ -58,5 +67,95 @@ public partial class McpService : UserControl
             TbRagFolder.Text = "RAG Folder: " + settings.RagFolder;
             TbRagStatus.Text = "Running";
         }
+    }
+
+    private AudioService audioService;
+
+    private void BtnStartRecord_OnClick(object sender, RoutedEventArgs e)
+    {
+        audioService = new AudioService();
+        var (deviceName, deviceId) = audioService.GetFirstDevice();
+        if (deviceId >= 0)
+        {
+            Console.WriteLine("Recording: " + deviceName);
+            audioService.StartRecord(deviceId);
+        }
+    }
+
+    private async void BtnStopRecord_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (audioService != null)
+        {
+            audioService.StopRecord();
+            audioService.Dispose();
+            audioService = null;
+        }
+
+        string file = $"chunk_0.wav";
+        if (File.Exists(file))
+        {
+            AiNexusService service = new AiNexusService(settings.AiNexusToken);
+            var response = await service.PostTranscriptAsync(file);
+            if (response != null)
+            {
+                foreach (var t in response.Transcript)
+                {
+                    Debug.WriteLine(t.Text);
+                }
+            }
+        }
+    }
+
+    private void LoadGpuStatus()
+    {
+        int maxVram = 0;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            List<GpuInfoWindows> gpus = DeviceDetect.GetGpuInfoWindows();
+            if (gpus.Count > 0)
+            {
+                GpuInfoWindows max = gpus.OrderByDescending(x => x.AdapterRAM).First();
+                TbGpuName.Text = max.Name;
+                maxVram = (int)(max.AdapterRAM / 1024 / 1024);
+                TbGpuVram.Text = maxVram + " MB";
+            }
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            List<GpuInfoLinux> gpus = DeviceDetect.GetGpuInfoLinux();
+            if (gpus.Count > 0)
+            {
+                GpuInfoLinux max = gpus.OrderByDescending(x => x.MemoryMiB).First();
+                TbGpuName.Text = max.Name;
+                maxVram = max.MemoryMiB;
+                TbGpuVram.Text = maxVram + " MB";
+            }
+        }
+
+        LlmRecommendation recommended = LlmLookup.GetRecommendation(maxVram);
+        TbRecommend.Text = recommended.MaxModel;
+        hgRecommendSize = recommended.hugginFaceSize;
+        if (hgRecommendSize > 0)
+        {
+            BtnSearchHg.Content = $"Go seach huggingface: >{recommended.hugginFaceSize}B";
+        }
+    }
+
+    private void GoSeachHuggingFace(int size)
+    {
+        // https://huggingface.co/models?pipeline_tag=text-generation&num_parameters=min:0,max:6B&library=transformers&sort=trending
+        string url = "https://huggingface.co/models?pipeline_tag=text-generation&library=transformers&sort=trending";
+        if (size > 0)
+        {
+            url = $"https://huggingface.co/models?pipeline_tag=text-generation&num_parameters=min:0,max:{size}B&library=transformers&sort=trending";
+        }
+
+        var launcher = TopLevel.GetTopLevel(this).Launcher;
+        launcher.LaunchUriAsync(new Uri(url));
+    }
+
+    private void BtnSearchHg_OnClick(object sender, RoutedEventArgs e)
+    {
+        GoSeachHuggingFace(hgRecommendSize);
     }
 }
