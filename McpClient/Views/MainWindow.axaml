@@ -8,6 +8,6 @@
         x:Class="McpClient.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         MinWidth="960" MinHeight="400"
-        Title="McpClient" Loaded="Control_OnLoaded" Closing="Window_OnClosing">
+        Title="AI Nexus Client" Loaded="Control_OnLoaded" Closing="Window_OnClosing">
         <views:MainView Name="MainView" LogoutClick="MainView_OnLogoutClick"/>
 </Window>
