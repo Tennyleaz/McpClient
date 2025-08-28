@@ -12,32 +12,7 @@ namespace McpClient.Utils;
 
 internal class DeviceDetect
 {
-    //public static List<GpuInfo> GetGpuInfo()
-    //{
-    //    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    //    {
-    //        // Try via wmic
-    //        // powershell -c "Get-CimInstance -ClassName win32_VideoController | Select-Object Name, AdapterRAM | ConvertTo-Json"
-    //        string json = RunCommand("powershell", "-c \"Get-CimInstance -ClassName win32_VideoController | Select-Object Name, AdapterRAM | ConvertTo-Json\"");
-    //        return ParseGpuWindows(json);
-    //    }
-    //    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    //    {
-    //        // Try lspci (general), or nvidia-smi (NVIDIA)
-    //        //string nvidia = RunCommand("nvidia-smi", "--query-gpu=name,memory.total --format=csv,noheader");
-    //        //if (!string.IsNullOrWhiteSpace(nvidia) && !nvidia.Contains("not found"))
-    //         //   return nvidia.Trim();
-
-    //        // fallback: lspci (less precise)
-    //        //return RunCommand("lspci", "-mm | grep VGA");
-    //    }
-    //    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-    //    {
-    //        // macOS, use system_profiler
-    //        //return RunCommand("system_profiler", "SPDisplaysDataType");
-    //    }
-    //    return new List<GpuInfo>();
-    //}
+    #region Linux
 
     public static List<GpuInfoLinux> GetGpuInfoLinux()
     {
@@ -102,6 +77,11 @@ internal class DeviceDetect
                     else if (vendorId == "8086")
                     {
                         // TODO: intel arc vram?
+                        gpus.Add(new GpuInfoLinux
+                        {
+                            Name = gpuName,
+                            MemoryMiB = 0
+                        });
                     }
                 }
                 else
@@ -200,6 +180,8 @@ internal class DeviceDetect
         }
         return $"{vendor}:{device}";
     }
+
+    #endregion
 
     #region Windows
 
