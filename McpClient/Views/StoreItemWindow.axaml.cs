@@ -19,6 +19,7 @@ public partial class StoreItemWindow : Window
 {
     private readonly StoreMcpServer _mcpServer;
     private readonly AiNexusService _service;
+    private readonly List<string> _installedNames;
     private StoreMcpServerDetail detail;
     private McpServer parsedMcpServer;
 
@@ -29,12 +30,13 @@ public partial class StoreItemWindow : Window
         InitializeComponent();
     }
 
-    internal StoreItemWindow(StoreMcpServer server, AiNexusService service)
+    internal StoreItemWindow(StoreMcpServer server, AiNexusService service, List<string> installedNames)
     {
         InitializeComponent();
 
         _mcpServer = server;
         _service = service;
+        _installedNames = installedNames;
         DataContext = _mcpServer;
     }
 
@@ -47,14 +49,8 @@ public partial class StoreItemWindow : Window
         if (detailBase != null)
         {
             // Set url
-            if (!string.IsNullOrEmpty(detailBase.GithubUrl))
-            {
-                BtnGithub.IsVisible = true;
-            }
-            else
-            {
-                BtnGithub.IsVisible = false;
-            }
+            BtnGithub.IsVisible = !string.IsNullOrEmpty(detailBase.GithubUrl);
+            BtnMcpSo.IsVisible = !string.IsNullOrEmpty(detailBase.Url);
 
             // Check if detail is real or not
             if (detailBase is StoreMcpServerDetail detailReal && detailReal.ServerConfig?.McpServers != null)
@@ -71,7 +67,7 @@ public partial class StoreItemWindow : Window
                     TbMcpType.Text = "Type: " + parsedMcpServer.type;
 
                     // Check if already installed
-                    if (_mcpServer.IsInstalled)
+                    if (_mcpServer.IsInstalled || _installedNames.Contains(parsedMcpServer.server_name))
                     {
                         BtnInstall.Content = "Installed";
                         BtnInstall.IsEnabled = false;
@@ -210,7 +206,11 @@ public partial class StoreItemWindow : Window
 
     private void BtnGithub_OnPointerPressed(object sender, PointerPressedEventArgs e)
     {
-        string url = detail.GithubUrl ?? detail.Url;
-        Launcher.LaunchUriAsync(new Uri(url));
+        Launcher.LaunchUriAsync(new Uri(detail.GithubUrl));
+    }
+
+    private void BtnMcpSo_OnPointerPressed(object sender, PointerPressedEventArgs e)
+    {
+        Launcher.LaunchUriAsync(new Uri(detail.Url));
     }
 }

@@ -437,7 +437,7 @@ internal class AiNexusService
         if (!string.IsNullOrEmpty(tag))
             url += $"?tag={tag}";
         else
-            url += $"?tag={category}";
+            url += $"?category={category}";
         url += $"&page={page}&debug=false";
 
         try

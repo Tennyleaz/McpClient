@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:McpClient.ViewModels"
+             xmlns:local="clr-namespace:McpClient.Views"
              xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              Loaded="Control_OnLoaded"
@@ -15,9 +16,8 @@
 	<Panel>
         <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="20,20,0,0">
             <TabItem Header="Latest"></TabItem>
-            <TabItem Header="Hosting"></TabItem>
-            <TabItem Header="Official"></TabItem>
             <TabItem Header="Featured"></TabItem>
+            <TabItem Header="Category"></TabItem>
         </TabStrip>
         <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="24,30,220,0">
             <Button Name="BtnLeaveSearch" DockPanel.Dock="Right" Click="BtnLeaveSearch_OnClick">❌</Button>
@@ -60,6 +60,9 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="{DynamicResource SystemAccentColor}"
                            Margin="0"/>
+
+        <local:StoreCategory Name="StoreCategory" IsVisible="False" Margin="20,72,20,32" VerticalAlignment="Top"/>
+
 		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="0,0,20,4" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
         
         <StackPanel Name="PageControlPanel" HorizontalAlignment="Center" VerticalAlignment="Bottom" Height="32" Orientation="Horizontal" Background="Transparent">

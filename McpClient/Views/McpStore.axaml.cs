@@ -24,7 +24,7 @@ public partial class McpStore : UserControl
     private Pagination pagination;
     private int currentPage = 1;
     private string currentTag, currentQuery, currentCategory;
-    private List<string> installedMcpServers;
+    private List<string> installedMcpServers = new ();
 
     public bool IsUpdateNeeded { get; private set; }
 
@@ -46,6 +46,9 @@ public partial class McpStore : UserControl
         Settings settings = SettingsManager.Local.Load();
         _configService = new McpConfigService(settings.McpConfigToken);
         _service = new AiNexusService(settings.AiNexusToken);
+
+        StoreCategory.StoreCategoryList.ItemsSource = Constants.STORE_CATEGORIES;
+        StoreCategory.StoreCategoryList.SelectionChanged += StoreCategoryList_SelectionChanged;
     }
 
     private async Task GetInstalledList()
@@ -57,27 +60,41 @@ public partial class McpStore : UserControl
         }
     }
 
+    private async void StoreCategoryList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (StoreCategory.StoreCategoryList.SelectedItem is StoreCategoryItem item)
+        {
+            ShowCatrgory(item.Name);
+            await LoadStoreItems(null, item.Value, null, currentPage);
+        }
+    }
+
     private async void TabTypes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (TabTypes == null)
+        if (TabTypes == null || Design.IsDesignMode)
             return;
 
         currentPage = 1;
         if (TabTypes.SelectedIndex == 0)
         {
+            // Latest
+            StoreCategory.IsVisible = false;
+            McpListBox.IsVisible = true;
             await LoadStoreItems("latest", null, null, currentPage);
         }
         else if (TabTypes.SelectedIndex == 1)
         {
-            await LoadStoreItems("hosting", null, null, currentPage);
+            // Featured
+            StoreCategory.IsVisible = false;
+            McpListBox.IsVisible = true;
+            await LoadStoreItems("featured", null, null, currentPage);
         }
         else if (TabTypes.SelectedIndex == 2)
         {
-            await LoadStoreItems(null, "official-servers", null, currentPage);
-        }
-        else if (TabTypes.SelectedIndex == 3)
-        {
-            await LoadStoreItems("featured", null, null, currentPage);
+            // Show category list
+            StoreCategory.IsVisible = true;
+            StoreCategory.StoreCategoryList.SelectedIndex = -1;
+            McpListBox.IsVisible = false;
         }
     }
 
@@ -127,6 +144,8 @@ public partial class McpStore : UserControl
         currentQuery = query;
         pagination = response.Pagination;
         TbPageNumber.Content = $"{currentPage}/{pagination.TotalPages}";
+        BtnPrev.IsEnabled = currentPage > 1;
+        BtnNext.IsEnabled = currentPage < pagination.TotalPages;
 
         storeMcpViewModel = new StoreMcpViewModel(response.Servers, installedMcpServers);
         DataContext = storeMcpViewModel;
@@ -139,7 +158,7 @@ public partial class McpStore : UserControl
     {
         if (McpListBox.SelectedItem is StoreMcpServer storeMcpServer)
         {
-            StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service);
+            StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
             await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
             
             IsUpdateNeeded = window.IsInstalled;
@@ -175,7 +194,18 @@ public partial class McpStore : UserControl
     {
         TabTypes.IsVisible = false;
         SearchPanel.IsVisible = true;
+        StoreCategory.IsVisible = false;
+        McpListBox.IsVisible = true;
         TbQueryTitle.Text = "Search: " + query;
+    }
+
+    private void ShowCatrgory(string category)
+    {
+        TabTypes.IsVisible = false;
+        SearchPanel.IsVisible = true;
+        StoreCategory.IsVisible = false;
+        McpListBox.IsVisible = true;
+        TbQueryTitle.Text = "Category: " + category;
     }
 
     private void HideSearch()
@@ -188,6 +218,8 @@ public partial class McpStore : UserControl
     private void BtnLeaveSearch_OnClick(object sender, RoutedEventArgs e)
     {
         HideSearch();
+        // Go back to "Featured" or "Category"
+        TabTypes_OnSelectionChanged(null, null);
     }
 
     private async void BtnPrev_OnClick(object sender, RoutedEventArgs e)
@@ -203,7 +235,7 @@ public partial class McpStore : UserControl
 
     private async void BtnNext_OnClick(object sender, RoutedEventArgs e)
     {
-        if (pagination == null || currentPage > pagination.TotalPages)
+        if (pagination == null || currentPage >= pagination.TotalPages)
         {
             return;
         }

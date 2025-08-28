@@ -28,7 +28,11 @@
 				<StackPanel>
 					<TextBlock Name="TbMcpType" Text="Type: unknown"/>
                     <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,10,0,0"/>
-					<TextBlock Name="BtnGithub" Text="GitHub URL" PointerPressed="BtnGithub_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand" Margin="0,10,0,0"/>
+					<!-- URLs here -->
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+					    <TextBlock Name="BtnGithub" Text="GitHub URL" PointerPressed="BtnGithub_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand" Margin="0,0,10,0"/>
+                        <TextBlock Name="BtnMcpSo" Text="MCP.so URL" PointerPressed="BtnMcpSo_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
             <TextBlock Grid.Row="0"  Grid.Column="1" FontSize="16" Margin="10,0,0,0">Tool Configuration</TextBlock>
