@@ -101,6 +101,19 @@ public partial class TaskView : UserControl
         }
     }
 
+    public async Task RefreshOfflineWorkflows()
+    {
+        if (Tabs.SelectedIndex == 1)
+        {
+            await RefreshCurrentTab(true);
+        }
+        else
+        {
+            // Just clear the list, will refresh on next focus
+            OfflineWorkflowList.ClearWorkflowList();
+        }
+    }
+
     private void ShowProgress()
     {
         ProgressRing.IsVisible = true;

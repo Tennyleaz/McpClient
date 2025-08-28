@@ -137,6 +137,10 @@ public partial class MainView : UserControl
         {
             await TaskView.RefreshMcpTools();
         }
+        else if (Chat.IsVisible && Chat.IsNeedRefreshWorkflow)
+        {
+            await TaskView.RefreshOfflineWorkflows();
+        }
 
         MainPanel.IsVisible = true;
         McpSetting.IsVisible = false;

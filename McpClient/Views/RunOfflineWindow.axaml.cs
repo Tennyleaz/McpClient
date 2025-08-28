@@ -58,6 +58,7 @@ public partial class RunOfflineWindow : Window
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 //TbPayload.Text = _workflow.Payload;
             }
         }

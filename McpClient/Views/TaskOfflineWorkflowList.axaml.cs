@@ -72,4 +72,10 @@ public partial class TaskOfflineWorkflowList : UserControl
         RunOfflineWindow runOfflineWindow = new RunOfflineWindow(e, _nexusService);
         await runOfflineWindow.ShowDialog(parent);
     }
+
+    public void ClearWorkflowList()
+    {
+        if (groupListViewModel != null)
+            groupListViewModel.OfflineWorkflows.Clear();
+    }
 }

@@ -106,6 +106,7 @@ internal class McpConfigService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return null;
         }
 
@@ -150,7 +151,7 @@ internal class McpConfigService
         }
         catch (Exception ex)
         {
-
+            Console.WriteLine(ex);
         }
 
         return false;

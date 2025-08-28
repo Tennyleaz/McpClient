@@ -26,6 +26,8 @@ public partial class Chat : UserControl
     private string _token;
     private const string SERVER_URL = "http://192.168.41.60";
 
+    public bool IsNeedRefreshWorkflow { get; private set; }
+
     public Chat()
     {
         // Create cache
@@ -63,6 +65,10 @@ public partial class Chat : UserControl
 
     public void LoadChatServer()
     {
+        // Reset every time chat is visible
+        IsNeedRefreshWorkflow = false;
+
+        // Only inject object once
         if (tennyObject != null)
             return;
 
@@ -75,13 +81,14 @@ public partial class Chat : UserControl
         bool b = ChatWebView.RegisterJavascriptObject("injectedObject", tennyObject);
         tennyObject.OnRefresh += (o, args) =>
         {
-            Dispatcher.UIThread.Invoke(() =>
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Test", "Refresh method is called",
-                    ButtonEnum.Ok,
-                    MsBox.Avalonia.Enums.Icon.Info);
-                box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
-            });
+            //Dispatcher.UIThread.Invoke(() =>
+            //{
+            //    var box = MessageBoxManager.GetMessageBoxStandard("Test", "Refresh method is called",
+            //        ButtonEnum.Ok,
+            //        MsBox.Avalonia.Enums.Icon.Info);
+            //    box.ShowWindowDialogAsync(TopLevel.GetTopLevel(this) as Window);
+            //});
+            IsNeedRefreshWorkflow = true;
         };
         tennyObject.OnDownload += (o, args) =>
         {
@@ -211,11 +218,13 @@ public partial class Chat : UserControl
                 //byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
                 using FileStream fs = new FileStream(tempFile, FileMode.Create);
                 await response.Content.CopyToAsync(fs);
+                await fs.FlushAsync();
+                fs.Close();
 
                 // ask user where to save
                 IStorageProvider storage = TopLevel.GetTopLevel(this).StorageProvider;
                 IStorageFolder documentsFolder = await storage.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-                var selectedFiles = await storage.SaveFilePickerAsync(new FilePickerSaveOptions()
+                var selectedFiles = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
                     ShowOverwritePrompt = true,
                     SuggestedStartLocation = documentsFolder,
