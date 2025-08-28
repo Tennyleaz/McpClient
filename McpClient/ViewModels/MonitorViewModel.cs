@@ -27,7 +27,7 @@ internal class MonitorViewModel : ReactiveObject
     [
         new Axis
         {
-            Labels = ["CPU", "GPU"],
+            Labels = ["CPU", "3D", "Compute"],
             LabelsRotation = 0,
             //SeparatorsPaint = new SolidColorPaint(new SKColor(200, 200, 200)),
             SeparatorsAtCenter = false,

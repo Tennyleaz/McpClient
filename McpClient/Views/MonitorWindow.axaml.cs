@@ -35,7 +35,7 @@ public partial class MonitorWindow : Window
         viewModel.Series.Add(new ColumnSeries<int>
         {
             //Name = "CPU",
-            Values = [0, 0],
+            Values = [0, 0, 0],
         });
         //viewModel.Series.Add(new ColumnSeries<int>
         //{
@@ -99,7 +99,7 @@ public partial class MonitorWindow : Window
         }
         if (!isGpuDetectd)
         {
-            viewModel.XAxes[0].Labels[1] = "GPU X";
+            //viewModel.XAxes[0].Labels[1] = "GPU X";
         }
 
         while (!worker.CancellationPending)
@@ -134,8 +134,7 @@ public partial class MonitorWindow : Window
                 }
             }
 
-            gpu = Math.Max(gpu, compute);
-            viewModel.Series[0].Values = [cpu, gpu];
+            viewModel.Series[0].Values = [cpu, gpu, compute];
             Thread.Sleep(INTERVAL_MS);
         }
 
