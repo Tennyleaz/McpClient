@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using McpClient.Services;
 
 namespace McpClient.Views;
@@ -21,6 +22,7 @@ public partial class LlmConfigWindow : Window
     private List<GpuInfoViewModel> gpuList = new ();
     private Settings settings;
     private int hgRecommendSize;
+    private DispatcherTimer checkServerTimer;
 
     public LlmConfigWindow()
     {
@@ -71,16 +73,7 @@ public partial class LlmConfigWindow : Window
             LbModelName.Content = "";
             LoadModelMetadata(settings.LlmModelFile);
             // Check the service
-            if (GlobalService.LlamaService == null)
-            {
-                LbServiceStatus.Content = "Stopped";
-                LbServiceStatus.Foreground = Brushes.Red;
-            }
-            else
-            {
-                LbServiceStatus.Content = GlobalService.LlamaService.State;
-                LbServiceStatus.Foreground = Brushes.GreenYellow;
-            }
+            StartCheckServerStatus();
         }
         else
         {
@@ -273,7 +266,65 @@ public partial class LlmConfigWindow : Window
             GlobalService.LlamaService.Dispose();
         }
 
-        GlobalService.LlamaService = new LlamaService(GlobalService.LlamaServerBin, CbDevice.SelectedIndex,
+        GlobalService.LlamaService = new LlamaService(settings.LlmModelFile, CbDevice.SelectedIndex,
             isOffload, contentSize);
+        GlobalService.LlamaService.Start();
+    }
+
+    private void StartCheckServerStatus()
+    {
+        if (checkServerTimer != null)
+            return;
+
+        checkServerTimer = new DispatcherTimer();
+        checkServerTimer.Interval = TimeSpan.FromSeconds(1);
+        checkServerTimer.Tick += CheckServerTimer_Tick;
+        checkServerTimer.Start();
+    }
+
+    private void CheckServerTimer_Tick(object sender, EventArgs e)
+    {
+        if (GlobalService.LlamaService == null)
+        {
+            LbServiceStatus.Content = "Stopped";
+            LbServiceStatus.Foreground = Brushes.Red;
+        }
+        else
+        {
+            LbServiceStatus.Content = GlobalService.LlamaService.State;
+            switch (GlobalService.LlamaService.State)
+            {
+                case LlamaServerState.Running:
+                    LbServiceStatus.Foreground = Brushes.Green;
+                    break;
+                case LlamaServerState.Starting:
+                    LbServiceStatus.Foreground = Brushes.GreenYellow;
+                    break;
+                case LlamaServerState.Stopping:
+                    LbServiceStatus.Foreground = Brushes.Orange;
+                    break;
+                default:
+                    LbServiceStatus.Foreground = Brushes.Red;
+                    break;
+            }
+            
+        }
+    }
+
+    private void StopCheckServerStatus()
+    {
+        checkServerTimer?.Stop();
+        checkServerTimer = null;
+    }
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        StopCheckServerStatus();
+    }
+
+    private void BtnStopLlama_OnClick(object sender, RoutedEventArgs e)
+    {
+        GlobalService.LlamaService?.Stop();
+        GlobalService.LlamaService?.Dispose();
     }
 }

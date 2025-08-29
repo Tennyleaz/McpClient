@@ -5,7 +5,8 @@
         xmlns:vm="clr-namespace:McpClient.ViewModels"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="550"
         x:Class="McpClient.Views.LlmConfigWindow"
-        Loaded="Control_OnLoaded" WindowStartupLocation="CenterOwner" Width="1000" MinWidth="800" MinHeight="540"
+        Loaded="Control_OnLoaded" Closing="Window_OnClosing"
+        WindowStartupLocation="CenterOwner" Width="1000" MinWidth="800" MinHeight="540"
         Title="LLM Config">
     <Panel>
         <Label FontSize="20" Margin="20,20,0,0">LLM Config</Label>
@@ -58,6 +59,7 @@
                 <Label Grid.Row="3" Grid.Column="0"  VerticalAlignment="Center" Height="24">Status:</Label>
                 <Label Grid.Row="3" Grid.Column="1" Name="LbServiceStatus"  VerticalAlignment="Center" Height="24" Foreground="Red">Stopped</Label>
                 <Button Grid.Row="3" Grid.Column="1" Name="BtnStartLlama" Margin="80,0,0,0" Click="BtnStartLlama_OnClick">Start</Button>
+                <Button Grid.Row="3" Grid.Column="1" Name="BtnStopLlama" Margin="140,0,0,0" Click="BtnStopLlama_OnClick">Stop</Button>
 
 				<!-- GPU info here -->
 				<Grid Grid.Row="0" Grid.Column="2"  Grid.RowSpan="4" Margin="20,0,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" HorizontalAlignment="Right">

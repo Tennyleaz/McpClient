@@ -58,15 +58,10 @@ internal class LlamaService : IDisposable
             Directory.CreateDirectory(dir);
 
         // server binary
-        string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        string binDir = Path.Combine(appdata, "McpClient", "Llama");
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            _binaryPath = Path.Combine(binDir, "llama-server.exe");
-        else
-            _binaryPath = Path.Combine(binDir, "llama-server");
+        _binaryPath = GlobalService.LlamaServerBin;
 
         // arguments
-        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex}";
+        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {PORT}";
         if (!isOffloadKvCache)
             arguments += " --no-kv-offload";
         _arguments = arguments;
@@ -142,7 +137,7 @@ internal class LlamaService : IDisposable
                 _process.BeginErrorReadLine();
 
                 _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
-                SetState(LlamaServerState.Running);
+                SetState(LlamaServerState.Starting);
                 return true;
             }
             catch (Exception ex)
@@ -199,8 +194,11 @@ internal class LlamaService : IDisposable
 
     private void HandleOutput(ConcurrentQueue<string> queue, string data)
     {
-        if (data == null)
+        if (string.IsNullOrEmpty(data))
             return;
+
+        Debug.WriteLine(data);
+
         queue.Enqueue(data);
         while (queue.Count > _maxLogLines)
             queue.TryDequeue(out _);
@@ -236,6 +234,10 @@ internal class LlamaService : IDisposable
                 {
                     SetState(LlamaServerState.Crashed);
                 }
+                else if (State == LlamaServerState.Starting)
+                {
+                    // Do nothing, wait for start finish
+                }
                 else if (State == LlamaServerState.Stopping || State == LlamaServerState.Stopped)
                 {
                     SetState(LlamaServerState.Stopped);
@@ -245,6 +247,10 @@ internal class LlamaService : IDisposable
                     SetState(LlamaServerState.Crashed);
                 }
                 break;
+            }
+            else
+            {
+                SetState(LlamaServerState.Running);
             }
 
             await Task.Delay(_healthCheckIntervalMs, cancellationToken).ContinueWith(_ => { }, cancellationToken);

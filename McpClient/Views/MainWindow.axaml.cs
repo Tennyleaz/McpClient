@@ -40,6 +40,8 @@ public partial class MainWindow : Window
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
     {
         ragWorker?.CancelAsync();
+        GlobalService.LlamaService?.Stop();
+        GlobalService.LlamaService?.Dispose();
     }
 
     private async void MainView_OnLogoutClick(object sender, EventArgs e)
