@@ -37,6 +37,8 @@ public partial class Chat : UserControl
             Directory.CreateDirectory(cacheDir);
         WebView.Settings.CachePath = cacheDir;
         WebView.Settings.PersistCache = true;  // must set before webview created
+        WebView.Settings.AddCommandLineSwitch("disable-features", "BlockInsecurePrivateNetworkRequests");
+        WebView.Settings.AddCommandLineSwitch("disable-web-security", "true");
         InitializeComponent();
     }
 
@@ -48,6 +50,7 @@ public partial class Chat : UserControl
         ChatWebView.IsSecurityDisabled = true;
         ChatWebView.IgnoreCertificateErrors = true;
         ChatWebView.BeforeNavigate += ChatWebView_OnBeforeNavigate;
+        //ChatWebView.BeforeResourceLoad += ChatWebView_BeforeResourceLoad;
         ChatWebView.DisableBuiltinContextMenus = true;
 
         // see
@@ -72,10 +75,11 @@ public partial class Chat : UserControl
         if (tennyObject != null)
             return;
 
-        ChatWebView.Address = SERVER_URL;
+        //ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://localhost:5174/";
-        //string file = @"D:\workspace\McpClient\McpClient.Desktop\bin\Debug\net8.0\html\test.html";
-        //ChatWebView.LoadUrl(file);
+        string file = @"D:\tenny_lu\Downloads\dist\index.html";
+        ChatWebView.LoadUrl(file);
+        //ChatWebView.Address = "http://myapp/index.html";
 
         tennyObject = new TennyObject();
         bool b = ChatWebView.RegisterJavascriptObject("injectedObject", tennyObject);
@@ -173,11 +177,26 @@ public partial class Chat : UserControl
         //    request.Cancel();
         //    return;
         //}
-        Settings settings = SettingsManager.Local.Load();
-        await SetToken(settings.UserName, settings.McpConfigToken);
+
+        //if (request.Url.StartsWith(SERVER_URL))
+        {
+            Settings settings = SettingsManager.Local.Load();
+            await SetToken(settings.UserName, settings.McpConfigToken);
+        }
 
         // Remove event handler beacause we only need to set token once
         //ChatWebView.BeforeNavigate -= ChatWebView_OnBeforeNavigate;
+    }
+
+    private void ChatWebView_BeforeResourceLoad(ResourceHandler resourceHandler)
+    {
+        // http://myapp/index.html -> file:///D:/tenny_lu/Downloads/dist/index.html
+        Debug.WriteLine(resourceHandler.Url);
+        if (resourceHandler.Url.StartsWith("http://myapp/")) 
+        {
+            string newUrl = resourceHandler.Url.Replace("http://myapp/", "file:///D:/tenny_lu/Downloads/dist/");
+            resourceHandler.Redirect(newUrl);
+        }
     }
 
     internal class TennyObject

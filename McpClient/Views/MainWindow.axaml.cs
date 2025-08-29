@@ -21,7 +21,9 @@ public partial class MainWindow : Window
 
     private async void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
+        IsEnabled = false;
         bool isLogin = await Login();
+        IsEnabled = true;
         if (isLogin)
         {
             await MainView.ReloadMainView();
@@ -50,7 +52,9 @@ public partial class MainWindow : Window
         settings.ExpiredAt = default;
         await SettingsManager.Local.SaveAsync(settings);
         // Login again
+        IsEnabled = false;
         bool isLogin = await Login();
+        IsEnabled = true;
         if (isLogin)
         {
             await MainView.ReloadMainView();
