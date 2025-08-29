@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="550"
+        x:Class="McpClient.Views.LlmConfigWindow"
+        Loaded="Control_OnLoaded" WindowStartupLocation="CenterOwner" Width="1000" MinWidth="800" MinHeight="540"
+        Title="LLM Config">
+    <Panel>
+        <Label FontSize="20" Margin="20,20,0,0">LLM Config</Label>
+        <StackPanel Orientation="Vertical" Margin="20,64,40,0">
+            <RadioButton GroupName="g1" Content="Use external LLM service" Name="RadioExternal" IsCheckedChanged="RadioExternal_OnIsCheckedChanged"/>
+            <Panel Name="ExternalPanel" Margin="25,0,0,0">
+                <Label Margin="0,4,0,0">URL:</Label>
+                <TextBox Name="TbExternalUrl" Margin="40,0,70,0" Height="32">http://192.168.41.212:1234</TextBox>
+                <Button Name="BtnApplyUrl" HorizontalAlignment="Right" Click="BtnApplyUrl_OnClick">Apply</Button>
+            </Panel>
+            <RadioButton GroupName="g1" Content="Run local LLM service" Name="RadioLocal" IsCheckedChanged="RadioLocal_OnIsCheckedChanged" Margin="0,10,0,0"/>
+            <Grid Name="LocalGrid" Margin="25,0,0,0" ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,*,*,*,*">
+                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="32">Engine:</Label>
+                <Label Grid.Row="0" Grid.Column="1" Name="LbLlamaPath" VerticalAlignment="Center" Height="32">C:\Users\xxx\AppData\Local\McpClient\llama-server.exe</Label>
+
+				<Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="32">Model:</Label>
+				<Label Grid.Row="1" Grid.Column="1" Name="LbModelPath" VerticalAlignment="Center" Height="32">C:\Users\xxx\AppData\Local\McpClient\Models\qwen3-4b-instruct-2507.gguf</Label>
+				<Button Grid.Row="1" Grid.Column="2" Name="BtnSelectModel" Click="BtnSelectModel_OnClick">Select Model</Button>
+
+                <Label Grid.Row="2" Grid.Column="0" Height="32">Name:</Label>
+                <Label Grid.Row="2" Grid.Column="1" Name="LbModelName" Height="32">qwen3-4b-instruct-2507</Label>
+
+                <Label Grid.Row="3" Grid.Column="0" Height="32">Type:</Label>
+                <Label Grid.Row="3" Grid.Column="1" Name="LbModelType" Height="32">qwen</Label>
+
+                <Label Grid.Row="4" Grid.Column="0" Height="32">Size:</Label>
+                <Label Grid.Row="4" Grid.Column="1" Name="LbModelSize" Height="32">4B</Label>
+            </Grid>
+            <Grid Name="ModelConfigGrid" Margin="25,4,0,0" ColumnDefinitions="Auto,Auto,*" RowDefinitions="*,40,40,40">
+                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Run on Device:</Label>
+                <ComboBox Grid.Row="0" Grid.Column="1" Name="CbDevice" MinWidth="200" Height="45" SelectionChanged="CbDevice_OnSelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:GpuInfoViewModel">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Index, StringFormat='GPU {0}'}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontWeight="DemiBold"/>
+                                <TextBlock Text="{Binding VRAM}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+				</ComboBox>
+
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Context Length:</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="TbContextLenght" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center">4096</TextBox>
+
+                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Offload KV Cache to VRAM:</Label>
+				<ToggleSwitch Grid.Row="2" Grid.Column="1" Name="ToggleOffloadKvCache"></ToggleSwitch>
+
+
+                <Label Grid.Row="3" Grid.Column="0"  VerticalAlignment="Center" Height="24">Status:</Label>
+                <Label Grid.Row="3" Grid.Column="1" Name="LbServiceStatus"  VerticalAlignment="Center" Height="24" Foreground="Red">Stopped</Label>
+                <Button Grid.Row="3" Grid.Column="1" Name="BtnStartLlama" Margin="80,0,0,0" Click="BtnStartLlama_OnClick">Start</Button>
+
+				<!-- GPU info here -->
+				<Grid Grid.Row="0" Grid.Column="2"  Grid.RowSpan="4" Margin="20,0,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" HorizontalAlignment="Right">
+                    <TextBlock Grid.Column="0" Grid.Row="0" Margin="0,0,10,0">Recommend model size:</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="0" Name="TbRecommend">Unknown</TextBlock>
+                    <Button Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,8,0,0" Name="BtnSearchHg" Click="BtnSearchHg_OnClick">Go seach huggingface: 0B</Button>
+                </Grid>
+            </Grid>
+			<StackPanel Name="LlamaDetectGrid" Margin="28,4,0,0">
+				<TextBlock Name="TbLlamaInstallHint" Text="You don't have llama.cpp backend installed yet."/>
+				<Button Margin="0,4,0,0" Name="BtnOpenLlamaDir" Click="BtnOpenLlamaDir_OnClick">Open This Folder</Button>
+                <Button Margin="0,4,0,0" Name="BtnDownloadLlama" Click="BtnDownloadLlama_OnClick">Download from GitHub</Button>
+                <Button Margin="0,4,0,0" Name="BtnDetectLlama" Click="BtnDetectLlama_OnClick">Detect Again</Button>
+			</StackPanel>
+		</StackPanel>
+	</Panel>
+</Window>

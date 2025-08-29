@@ -95,6 +95,9 @@ internal sealed record Settings
     public string McpConfigToken { get; set; }
     public DateTime ExpiredAt { get; set; }
     public string RagFolder { get; set; }
+    public string LlmModelFile { get; set; }
+    public string LlmRemoteUrl { get; set; }
+    public bool IsUseRemoteLlm { get; set; }
 }
 
 internal sealed record DocumentHistory

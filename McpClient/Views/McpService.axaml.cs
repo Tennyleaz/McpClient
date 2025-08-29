@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Avalonia.Media;
 
 namespace McpClient.Views;
 
@@ -30,7 +31,7 @@ public partial class McpService : UserControl
         if (Design.IsDesignMode)
             return;
 
-        LoadGpuStatus();
+        //LoadGpuStatus();
     }
 
     internal void LoadFromSettings()
@@ -40,11 +41,16 @@ public partial class McpService : UserControl
         if (Directory.Exists(settings.RagFolder))
         {
             TbRagStatus.Text = "Running";
+            TbRagStatus.Foreground = Brushes.Green;
         }
         else
         {
             TbRagStatus.Text = "Stopped";
+            TbRagStatus.Foreground = Brushes.Red;
         }
+
+        // llama service status
+        UpdateLlmStatus();
     }
 
     private async void BtnChangeRag_OnClick(object sender, RoutedEventArgs e)
@@ -66,6 +72,7 @@ public partial class McpService : UserControl
 
             TbRagFolder.Text = "RAG Folder: " + settings.RagFolder;
             TbRagStatus.Text = "Running";
+            TbRagStatus.Foreground = Brushes.Green;
         }
     }
 
@@ -106,40 +113,40 @@ public partial class McpService : UserControl
         }
     }
 
-    private void LoadGpuStatus()
-    {
-        int maxVram = 0;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            List<GpuInfoWindows> gpus = DeviceDetect.GetGpuInfoWindows();
-            if (gpus.Count > 0)
-            {
-                GpuInfoWindows max = gpus.OrderByDescending(x => x.AdapterRAM).First();
-                TbGpuName.Text = max.Name;
-                maxVram = (int)(max.AdapterRAM / 1024 / 1024);
-                TbGpuVram.Text = maxVram + " MB";
-            }
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            List<GpuInfoLinux> gpus = DeviceDetect.GetGpuInfoLinux();
-            if (gpus.Count > 0)
-            {
-                GpuInfoLinux max = gpus.OrderByDescending(x => x.MemoryMiB).First();
-                TbGpuName.Text = max.Name;
-                maxVram = max.MemoryMiB;
-                TbGpuVram.Text = maxVram + " MB";
-            }
-        }
+    //private void LoadGpuStatus()
+    //{
+    //    int maxVram = 0;
+    //    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    //    {
+    //        List<GpuInfoWindows> gpus = DeviceDetect.GetGpuInfoWindows();
+    //        if (gpus.Count > 0)
+    //        {
+    //            GpuInfoWindows max = gpus.OrderByDescending(x => x.AdapterRAM).First();
+    //            TbGpuName.Text = max.Name;
+    //            maxVram = (int)(max.AdapterRAM / 1024 / 1024);
+    //            TbGpuVram.Text = maxVram + " MB";
+    //        }
+    //    }
+    //    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+    //    {
+    //        List<GpuInfoLinux> gpus = DeviceDetect.GetGpuInfoLinux();
+    //        if (gpus.Count > 0)
+    //        {
+    //            GpuInfoLinux max = gpus.OrderByDescending(x => x.MemoryMiB).First();
+    //            TbGpuName.Text = max.Name;
+    //            maxVram = max.MemoryMiB;
+    //            TbGpuVram.Text = maxVram + " MB";
+    //        }
+    //    }
 
-        LlmRecommendation recommended = LlmLookup.GetRecommendation(maxVram);
-        TbRecommend.Text = recommended.MaxModel;
-        hgRecommendSize = recommended.hugginFaceSize;
-        if (hgRecommendSize > 0)
-        {
-            BtnSearchHg.Content = $"Go seach huggingface: >{recommended.hugginFaceSize}B";
-        }
-    }
+    //    LlmRecommendation recommended = LlmLookup.GetRecommendation(maxVram);
+    //    TbRecommend.Text = recommended.MaxModel;
+    //    hgRecommendSize = recommended.hugginFaceSize;
+    //    if (hgRecommendSize > 0)
+    //    {
+    //        BtnSearchHg.Content = $"Go seach huggingface: >{recommended.hugginFaceSize}B";
+    //    }
+    //}
 
     private void GoSeachHuggingFace(int size)
     {
@@ -157,5 +164,26 @@ public partial class McpService : UserControl
     private void BtnSearchHg_OnClick(object sender, RoutedEventArgs e)
     {
         GoSeachHuggingFace(hgRecommendSize);
+    }
+
+    private void UpdateLlmStatus()
+    {
+        if (GlobalService.LlamaService?.State == LlamaServerState.Running)
+        {
+            TbllmStatus.Text = "Running";
+            TbllmStatus.Foreground = Brushes.Green;
+        }
+        else
+        {
+            TbllmStatus.Text = "Stopped";
+            TbllmStatus.Foreground = Brushes.Red;
+        }
+    }
+
+    private async void BtnLlmConfig_OnClick(object sender, RoutedEventArgs e)
+    {
+        LlmConfigWindow window = new LlmConfigWindow();
+        await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+        UpdateLlmStatus();
     }
 }

@@ -13,9 +13,9 @@ namespace McpClient.Services;
 internal class AudioService : IDisposable
 {
     private PortAudioSharp.Stream stream;
-    private const int CHANNEL_COUNT = 1, CHUNK_SECONDS = 5;
+    private const int CHANNEL_COUNT = 1, CHUNK_SECONDS = 30;
     private BlockingCollection<short[]> sampleQueue; // default is a ConcurrentQueue
-    private int sampleRate = 44100;
+    private int sampleRate = 16000;
 
     public AudioService()
     {
@@ -59,7 +59,7 @@ internal class AudioService : IDisposable
         sampleRate = (int)deviceInfo.defaultSampleRate;
 
         stream = new PortAudioSharp.Stream(inParams: param, outParams: null, sampleRate: sampleRate,
-            framesPerBuffer: 0,
+            framesPerBuffer: 1024,
             streamFlags: StreamFlags.ClipOff,
             callback: StreamCallback,
             userData: IntPtr.Zero
