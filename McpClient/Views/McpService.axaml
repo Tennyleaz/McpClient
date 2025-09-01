@@ -2,32 +2,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              Loaded="Control_OnLoaded"
              x:Class="McpClient.Views.McpService">
-	<Panel>
-		<Label FontSize="20" Margin="20,20,0,0">Services</Label>
-		<Grid Margin="24,60,20,20" RowDefinitions="60,60,60,60,*" ColumnDefinitions="Auto,Auto,*,Auto">
-            <TextBlock Grid.Column="0" Grid.Row="0" FontSize="14" Margin="0,6,20,0">NodeJS server</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="0" FontSize="14" Margin="0,6,20,0">Running</TextBlock>
-            <Button Grid.Column="2" Grid.Row="0" Name="BtnRestartNodeJs" VerticalAlignment="Top">Restart</Button>
+	<Panel Margin="20,20,0,0">
+        <TextBlock Text="服務狀態" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="監控系統服務和資源使用情況" Margin="0,40,0,0"/>
+        <DockPanel Margin="0,80,0,0">
+            <Border Classes="CardFix" DockPanel.Dock="Top" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="40,40,40,40">
+                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">系統服務</TextBlock>
 
-            <TextBlock Grid.Column="0" Grid.Row="1" FontSize="14" Margin="0,6,20,0">.Net server</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="1" FontSize="14" Margin="0,6,20,0">Running</TextBlock>
-            <Button Grid.Column="2" Grid.Row="1" Name="BtnRestartDotNet" VerticalAlignment="Top">Restart</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">NodeJS server</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="1" Name="BtnRestartNodeJs" VerticalAlignment="Center">Restart</Button>
 
-            <TextBlock Grid.Column="0" Grid.Row="2" FontSize="14" Margin="0,6,20,0">LLM server</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="2" FontSize="14" Margin="0,6,20,0" Name="TbllmStatus">Running</TextBlock>
-            <Button Grid.Column="2" Grid.Row="2" Name="BtnLlmConfig" Click="BtnLlmConfig_OnClick" VerticalAlignment="Top">Configure</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center">.Net server</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="2" Name="BtnRestartDotNet" VerticalAlignment="Center">Restart</Button>
 
-            <TextBlock Grid.Column="0" Grid.Row="3" FontSize="14" Margin="0,6,20,0">Local Document</TextBlock>
-            <TextBlock Grid.Column="1" Grid.Row="3" FontSize="14" Margin="0,6,20,0" Name="TbRagStatus">Running</TextBlock>
-            <Button Grid.Column="2" Grid.Row="3" Name="BtnChangeRag" VerticalAlignment="Top" Click="BtnChangeRag_OnClick">Change Folder</Button>
-            <Panel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3">
-                <TextBlock Name="TbRagFolder">RAG Folder: C://users/tenny/documents/RAG</TextBlock>
-                <Button Name="BtnStartRecord" Click="BtnStartRecord_OnClick">Start Record</Button>
-                <Button Name="BtnStopRecord" Click="BtnStopRecord_OnClick" Margin="120,0,0,0">Stop Record</Button>
-            </Panel>
+                    <TextBlock Grid.Column="0" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center">LLM server</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbllmStatus" Foreground="Green">Running</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="3" Name="BtnLlmConfig" Click="BtnLlmConfig_OnClick" VerticalAlignment="Center">Configure</Button>
+                </Grid>
+            </Border>
+            <Border Classes="CardFix" DockPanel.Dock="Top" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,40,40">
+                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">RAG 設定</TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">Local Document</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbRagStatus" Foreground="Green">Running</TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" >RAG Folder:</TextBlock>
+                    <Button Grid.Column="1" Grid.Row="2" Name="BtnChangeRag" VerticalAlignment="Center" Click="BtnChangeRag_OnClick">Change Folder</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Name="TbRagFolder" VerticalAlignment="Center">C:\\users\tenny\documents\RAG\documents</TextBlock>
+                    <!--<Panel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
+                        <Button Name="BtnStartRecord" Click="BtnStartRecord_OnClick">Start Record</Button>
+                        <Button Name="BtnStopRecord" Click="BtnStopRecord_OnClick" Margin="120,0,0,0">Stop Record</Button>
+                    </Panel>-->
+                </Grid>
+            </Border>
+        </DockPanel>
+
+		<Grid Margin="24,60,20,20" RowDefinitions="60,60,60,60,*" ColumnDefinitions="Auto,Auto,*,Auto" IsVisible="False">
+            
+
+
 
             <!--<Grid Grid.Column="3" Grid.Row="0" Grid.RowSpan="5" Margin="0,0,20,0" Grid.RowDefinitions="Auto,Auto,Auto,Auto" Grid.ColumnDefinitions="Auto,Auto">
 				<TextBlock Grid.Column="0" Grid.Row="0">GPU:</TextBlock>

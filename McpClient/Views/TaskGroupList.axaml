@@ -10,8 +10,10 @@
     <Design.DataContext>
         <vm:DesignGroupList/>
     </Design.DataContext>
-    <Panel>
-        <ItemsControl Name="TaskList" ItemsSource="{Binding Groups}" Margin="0,44,0,0">
+    <Panel Margin="20,20,0,0">
+        <TextBlock Text="My Apps" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="管理您的智慧代理群組和工作流程" Margin="0,40,0,0"/>
+        <ItemsControl Name="TaskList" ItemsSource="{Binding Groups}" Margin="0,60,0,0">
             <!-- use wrappanel as the template-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -21,14 +23,14 @@
             <!-- data here -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Classes="Task" BorderThickness="1" Height="100" Width="200" Margin="0,10,10,0">
+                    <Border Classes="Card" BorderThickness="1" Height="160" Width="300" Margin="0,10,10,0">
                         <Panel>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Text="{Binding Description}" Margin="4,24,4,0" TextWrapping="Wrap" Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
-                            <Button Name="BtnDownload" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,68,4"
+                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMedium}" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Description}" Margin="4,32,4,0" TextWrapping="Wrap"/>
+                            <Button Name="BtnDownload" Classes="Secondary" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,0,0,4"
                                     Command="{Binding ElementName=GroupList, Path=DataContext.DownloadCommand}"
                                     CommandParameter="{Binding .}">Clone Agent ↓</Button>
-                            <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
+                            <Button Name="BtnRun" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
                                     Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
                                     CommandParameter="{Binding .}">Run ▶</Button>
                         </Panel>

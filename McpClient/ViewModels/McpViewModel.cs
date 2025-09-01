@@ -87,11 +87,11 @@ internal class McpViewModel : ReactiveObject
 
     public bool Active => _active;
 
-    public string ByOwner => "By: " + _owner;
+    public string Owner => _owner;
 
     public bool HasOwner => !string.IsNullOrEmpty(_owner);
 
-    public string ByType => "Type: " + _type;
+    public string Type => _type;
 
     public string DisplayArgs
     {
@@ -120,6 +120,16 @@ internal class McpViewModel : ReactiveObject
     public bool IsShowStreamablUrl => _type == "streamableHttp";
 
     public bool IsCloud => _source == "cloud";
+
+    public string CloudIcon
+    {
+        get
+        {
+            if (_source == "cloud")
+                return "☁";
+            return null;
+        }
+    }
 
     public string SseUrl
     {

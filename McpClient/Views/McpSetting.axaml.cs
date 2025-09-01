@@ -10,6 +10,7 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -19,7 +20,8 @@ namespace McpClient.Views;
 
 public partial class McpSetting : UserControl
 {
-    private McpConfigService _service;
+    private McpConfigService _mcpService;
+    private AiNexusService _nexusService;
 
     public McpSetting()
     {
@@ -32,19 +34,16 @@ public partial class McpSetting : UserControl
             return;
     }
 
-    private void TryCreateService()
+    internal void SetServices(AiNexusService aiNexusService, McpConfigService mcpConfigService)
     {
-        if (_service != null)
-            return;
-        Settings settings = SettingsManager.Local.Load();
-        _service = new McpConfigService(settings.McpConfigToken);
+        _nexusService = aiNexusService;
+        _mcpService = mcpConfigService;
     }
 
     public async Task LoadConfig()
     {
         if (Design.IsDesignMode)
             return;
-        TryCreateService();
 
         // Show progress
         ProgressRing.IsVisible = true;
@@ -53,7 +52,7 @@ public partial class McpSetting : UserControl
         // Scroll back to top
         ScrollViewer.ScrollToHome();
         // Load server config and status at once
-        McpServerConfigViewModel viewModel = await _service.GetAllConfigAndStatus();
+        McpServerConfigViewModel viewModel = await _mcpService.GetAllConfigAndStatus();
         if (viewModel != null)
         {
             DataContext = viewModel;
@@ -76,7 +75,6 @@ public partial class McpSetting : UserControl
     {
         if (Design.IsDesignMode)
             return true;
-        TryCreateService();
 
         if (DataContext is McpServerConfigViewModel vm)
         {
@@ -85,7 +83,7 @@ public partial class McpSetting : UserControl
             BtnAdd.IsVisible = false;
             McpServerConfig config = vm.ToModel();
             // Send back to server
-            bool success = await _service.SetConfig(config);
+            bool success = await _mcpService.SetConfig(config);
             ProgressRing.IsVisible = false;
             ScrollViewer.IsVisible = false;
             BtnAdd.IsVisible = false;
@@ -104,8 +102,6 @@ public partial class McpSetting : UserControl
 
     private async void BtnAdd_OnClick(object sender, RoutedEventArgs e)
     {
-        TryCreateService();
-
         Window parent = TopLevel.GetTopLevel(this) as Window;
         AddServerWindow addWindow = new AddServerWindow();
         await addWindow.ShowDialog(parent);
@@ -115,7 +111,7 @@ public partial class McpSetting : UserControl
             // Add to server
             McpServerConfig config = vm.ToModel();
             config.mcp_servers.Add(newServer);
-            bool success = await _service.SetConfig(config);
+            bool success = await _mcpService.SetConfig(config);
             if (success)
             {
                 // Add to UI
@@ -136,8 +132,6 @@ public partial class McpSetting : UserControl
 
     private async void BtnEditArgs_OnClick(object sender, RoutedEventArgs e)
     {
-        TryCreateService();
-
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             ArgsEditorViewModel argsEditorViewModel = new ArgsEditorViewModel();
@@ -158,8 +152,6 @@ public partial class McpSetting : UserControl
 
     private async void BtnEditEnv_OnClick(object sender, RoutedEventArgs e)
     {
-        TryCreateService();
-
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             EnvEditorViewModel envEditorViewModel = new EnvEditorViewModel();
@@ -187,8 +179,6 @@ public partial class McpSetting : UserControl
         if (Design.IsDesignMode)
             return;
 
-        TryCreateService();
-
         if (sender is Button btn && btn.DataContext is McpViewModel vm)
         {
             vm.IsBusy = true;
@@ -196,12 +186,12 @@ public partial class McpSetting : UserControl
             vm.Enabled = false;
             var configVm = DataContext as McpServerConfigViewModel;
             McpServerConfig config = configVm.ToModel();
-            bool success = await _service.SetConfig(config);
+            bool success = await _mcpService.SetConfig(config);
             if (success)
             {
                 vm.Enabled = true;
                 config = configVm.ToModel();
-                success = await _service.SetConfig(config);
+                success = await _mcpService.SetConfig(config);
             }
 
             vm.IsBusy = false;
@@ -220,15 +210,13 @@ public partial class McpSetting : UserControl
             if (result != ButtonResult.Ok)
                 return;
 
-            TryCreateService();
-
             // Remove from view model
             var configVm = DataContext as McpServerConfigViewModel;
             configVm.McpServers.Remove(vm);
 
             //// Update to server
             //McpServerConfig config = configVm.ToModel();
-            //bool success = await _service.SetConfig(config);
+            //bool success = await _mcpService.SetConfig(config);
             //if (!success)
             //{
             //    box = MessageBoxManager.GetMessageBoxStandard("Error","Failed to delete!",
@@ -236,6 +224,62 @@ public partial class McpSetting : UserControl
             //        Icon.Error);
             //    await box.ShowAsync();
             //}
+        }
+    }
+
+    private async void BtnEdit_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is McpViewModel mcpViewModel)
+        {
+            AddServerWindow editWindow = new AddServerWindow(mcpViewModel);
+            Window parent = TopLevel.GetTopLevel(this) as Window;
+            await editWindow.ShowDialog(parent);
+            McpServer editServer = editWindow.Result;
+            if (editServer != null && DataContext is McpServerConfigViewModel vm)
+            {
+                // Modify current viewmodel
+                if (editServer.type == "stdio")
+                {
+                    // Command
+                    mcpViewModel.Command = editServer.command;
+                    // Args
+                    mcpViewModel.Args = new ObservableCollection<string>(editServer.args);
+                    // Env
+                    ObservableCollection<KeyValuePair<string, string>> collection = new ObservableCollection<KeyValuePair<string, string>>();
+                    foreach (var pair in editServer.env)
+                    {
+                        if (!string.IsNullOrWhiteSpace(pair.Key) && !string.IsNullOrWhiteSpace(pair.Value))
+                        {
+                            collection.Add(new KeyValuePair<string, string>(pair.Key, pair.Value));
+                        }
+                    }
+                    mcpViewModel.Env = collection;
+                }
+                else if (editServer.type == "sse")
+                {
+                    mcpViewModel.SseUrl = editServer.sse_url;
+                }
+                else if (editServer.type == "streamableHttp")
+                {
+                    mcpViewModel.StreamableHttpUrl = editServer.streamable_http_url;
+                }
+
+                // Apply the change to server
+                McpServerConfig config = vm.ToModel();
+                bool success = await _mcpService.SetConfig(config);
+                if (success)
+                {
+
+                }
+                else
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add new MCP config to server.",
+                        ButtonEnum.Ok,
+                        Icon.Error);
+                    Window owner = TopLevel.GetTopLevel(this) as Window;
+                    await box.ShowWindowDialogAsync(owner);
+                }
+            }
         }
     }
 }

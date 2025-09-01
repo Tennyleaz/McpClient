@@ -43,6 +43,17 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
             source = "cloud",
         };
         McpServers.Add(new McpViewModel(config3, true));
+
+        McpServer config4 = new McpServer
+        {
+            enabled = true,
+            type = "streamableHttp",
+            server_name = "AwesomeStreamableHttpServer",
+            sse_url = "http://192.168.41.60:8012/streamableHttp",
+            owner = "statham_li",
+            source = "cloud",
+        };
+        McpServers.Add(new McpViewModel(config4, true));
     }
 }
 

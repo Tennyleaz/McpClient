@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:Class="McpClient.Views.McpSetting"
              xmlns:vm="clr-namespace:McpClient.ViewModels"
              xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
@@ -16,50 +16,42 @@
 		<vm:DesignMcpServerConfigViewModel />
 	</Design.DataContext>
 	<Grid Margin="20">
-		<Label FontSize="20" Name="LbHeader" Content="{Binding McpServers.Count, StringFormat='My Agents ({0})'}"/>
-		<Button Name="BtnAdd" Click="BtnAdd_OnClick" HorizontalAlignment="Right" VerticalAlignment="Top">Add</Button>
+        <TextBlock Text="My Agents" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="管理您的智能代理配置" Margin="0,40,0,0"/>
+        <Button Name="BtnAdd" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,90,0" Click="BtnAdd_OnClick">Add+</Button>
 
-		<Separator VerticalAlignment="Top" Margin="0,36,0,0"></Separator>
-		<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,38,0,0" Name="ScrollViewer" IsVisible="True">
-			<ItemsControl ItemsSource="{Binding McpServers}" x:Name="MsItems">
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<StackPanel Orientation="Vertical" Margin="0,0,0,12" IsEnabled="{Binding !IsBusy}">
-							<!-- name, enabled, active -->
-                            <DockPanel>
-                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold" FontSize="16"/>
-								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Margin="8,0,0,0">Active ●</TextBlock>
-								<TextBlock DockPanel.Dock="Left" IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Margin="8,0,0,0">Inactive ■</TextBlock>
-								<Button DockPanel.Dock="Right" Name="BtnRestart" HorizontalAlignment="Right" Margin="0,0,20,0" Click="BtnRestart_OnClick">Restart ↻</Button>
-                                <Button DockPanel.Dock="Right" Name="BtnDelete" HorizontalAlignment="Right" Margin="0,0,10,0" Click="BtnDelete_OnClick">Delete ╳</Button>
-                            </DockPanel>
-                            <!-- type, owner -->
-							<Label Content="{Binding ByType}"></Label>
-							<Label Content="{Binding ByOwner}" IsVisible="{Binding HasOwner}"></Label>
-							<!-- other properties that could edit -->
-							<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,*,*,*,*" Margin="0,0,20,0">
-								<Label Grid.Column="0" Grid.Row="0" IsVisible="{Binding IsShowCommand}" VerticalAlignment="Center">Command:</Label>
-								<TextBox Grid.Column="1" Grid.Row="0" Height="12" IsVisible="{Binding IsShowCommand}" Text="{Binding Command}" Margin="4,0,8,0"/>
-								
-                                <Label Grid.Column="0" Grid.Row="1" IsVisible="{Binding IsShowSseUrl}" VerticalAlignment="Center">SSE URL:</Label>
-								<TextBox Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsShowSseUrl}" Height="12" Text="{Binding SseUrl}" Margin="4,0,8,0"/>
-								
-                                <Label Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsShowStreamablUrl}" VerticalAlignment="Center">Streamble HTTP URL:</Label>
-								<TextBox Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsShowStreamablUrl}" Height="12" Text="{Binding StreamableHttpUrl}" Margin="4,0,8,0"/>
-
-                                <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Center">Arguments:</Label>
-								<Label Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Content="{Binding DisplayArgs}"></Label>
-								<Button Grid.Column="2" Grid.Row="3" Name="BtnEditArgs" Width="80" Click="BtnEditArgs_OnClick">Edit Args</Button>
-
-                                <Label Grid.Column="0" Grid.Row="4" VerticalAlignment="Center">Enviroment:</Label>
-                                <Label Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Content="{Binding DisplayEnv}"></Label>
-                                <Button Grid.Column="2" Grid.Row="4" Name="BtnEditEnv" Width="80" Click="BtnEditEnv_OnClick">Edit ENV</Button>
-							</Grid>
-						</StackPanel>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</ScrollViewer>
+        <Border Classes="LoginCard" Margin="0,80,0,0" Padding="0" ClipToBounds="True">
+            <Panel>
+                <StackPanel Orientation="Horizontal" Background="{DynamicResource SystemListMediumColor}" VerticalAlignment="Top">
+                    <TextBlock FontWeight="Bold" Margin="48,16,0,12" Width="210">名稱</TextBlock>
+					<TextBlock FontWeight="Bold" Margin="0,16,0,0" Width="120">類型</TextBlock>
+					<TextBlock FontWeight="Bold" Margin="0,16,0,0" Width="120">建立者</TextBlock>
+                    <TextBlock FontWeight="Bold" Margin="0,16,0,0" Width="48">來源</TextBlock>
+					<TextBlock FontWeight="Bold" Margin="0,16,0,0" Width="80">狀態</TextBlock>
+					<TextBlock FontWeight="Bold" Margin="0,16,0,0">操作</TextBlock>
+                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Name="ScrollViewer" IsVisible="True" Margin="20,52,0,0">
+			        <ItemsControl ItemsSource="{Binding McpServers}" x:Name="MsItems">
+				        <ItemsControl.ItemTemplate>
+					        <DataTemplate>
+						        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" IsEnabled="{Binding !IsBusy}">
+							        <!-- name, enabled, active -->
+                                    <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold"  Width="240"/>
+							        <TextBlock Text="{Binding Type}" Width="120" VerticalAlignment="Center"/>
+							        <TextBlock Text="{Binding Owner}" Width="120" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding CloudIcon}" Width="48" FontFamily="{StaticResource FontAwesome}" VerticalAlignment="Center"/>
+                                    <TextBlock IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Width="80">● Active</TextBlock>
+                                    <TextBlock IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Width="80">■ Inactive</TextBlock>
+                                    <Button Name="BtnDelete" Margin="0,0,10,0" Click="BtnDelete_OnClick">Delete ╳</Button>
+                                    <Button Name="BtnRestart" Margin="0,0,10,0" Click="BtnRestart_OnClick">Restart ↻</Button>
+                                    <Button Name="BtnEdit" Margin="0,0,10,0" Click="BtnEdit_OnClick">Edit 🖋️</Button>
+						        </StackPanel>
+					        </DataTemplate>
+				        </ItemsControl.ItemTemplate>
+			        </ItemsControl>
+		        </ScrollViewer>
+            </Panel>
+        </Border>
         <ring:ProgressRing Name="ProgressRing" Width="80" Height="80" IsActive="True" IsVisible="False"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="{DynamicResource SystemAccentColor}"

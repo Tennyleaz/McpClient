@@ -106,6 +106,8 @@ public partial class McpStore : UserControl
             await LoadStoreItems("latest", null, null, currentPage);
         }
         TabTypes.SelectedIndex = 0;
+        TabTypes.IsVisible = true;
+        SearchPanel.IsVisible = false;
         IsUpdateNeeded = false;
         await GetInstalledList();
     }
@@ -156,14 +158,14 @@ public partial class McpStore : UserControl
 
     private async void McpListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (McpListBox.SelectedItem is StoreMcpServer storeMcpServer)
-        {
-            StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
-            await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+        //if (McpListBox.SelectedItem is StoreMcpServer storeMcpServer)
+        //{
+        //    StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
+        //    await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
             
-            IsUpdateNeeded = window.IsInstalled;
-            McpListBox.SelectedIndex = -1;
-        }
+        //    IsUpdateNeeded = window.IsInstalled;
+        //    McpListBox.SelectedIndex = -1;
+        //}
     }
 
     private async void BtnSearch_OnClick(object sender, RoutedEventArgs e)
@@ -247,5 +249,15 @@ public partial class McpStore : UserControl
     private async Task UpdatePages()
     {
         await LoadStoreItems(currentTag, currentCategory, currentQuery, currentPage);
+    }
+
+    private async void BtnInstall_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is StoreMcpServer storeMcpServer)
+        {
+            StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
+            await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+            IsUpdateNeeded = window.IsInstalled;
+        }
     }
 }

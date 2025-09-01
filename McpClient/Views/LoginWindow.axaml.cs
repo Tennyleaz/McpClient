@@ -26,7 +26,7 @@ public partial class LoginWindow : Window
         InitializeComponent();
         _service = new McpConfigService(null);  // no token if login
         _aiNexusService = new AiNexusService(null);  // no token if login
-        DataContext = new MainViewModel();
+        DataContext = GlobalService.MainViewModel;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)

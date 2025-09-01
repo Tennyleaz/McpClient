@@ -1,14 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using McpClient.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace McpClient.Views;
 
 public partial class MainView : UserControl
 {
     public event EventHandler LogoutClick;
+    private McpConfigService _mcpService;
+    private AiNexusService _nexusService;
 
     public MainView()
     {
@@ -16,34 +19,18 @@ public partial class MainView : UserControl
 
         if (Design.IsDesignMode)
             return;
-        BtnBack.IsVisible = false;
-        BtnSave.IsVisible = false;
-        BtnRefresh.IsVisible = false;
-    }
+        //BtnBack.IsVisible = false;
+        //BtnSave.IsVisible = false;
+        //BtnRefresh.IsVisible = false;
 
-    private async void BtnSetting_OnClick(object sender, RoutedEventArgs e)
-    {
-        await ShowSettings();
-    }
-
-    private void BtnChat_OnClick(object sender, RoutedEventArgs e)
-    {
-        ShowChat();
-    }
-
-    private void BtnService_OnClick(object sender, RoutedEventArgs e)
-    {
-        ShowServices();
-    }
-
-    private async void BtnBack_OnClick(object sender, RoutedEventArgs e)
-    {
-        await ShowMain(false);
-    }
-
-    private async void BtnSave_OnClick(object sender, RoutedEventArgs e)
-    {
-        await ShowMain(true);
+        Settings settings = SettingsManager.Local.Load();
+        _mcpService = new McpConfigService(settings.McpConfigToken);
+        _nexusService = new AiNexusService(settings.AiNexusToken);
+        MyAppList.SetService(_nexusService);
+        OfflineWorkflowList.SetServices(_nexusService);
+        AgentList.SetServices(_nexusService, _mcpService);
+        MainListbox.SelectedIndex = 0;
+        DataContext = GlobalService.MainViewModel;
     }
 
     private void BtnRefresh_OnClick(object sender, RoutedEventArgs e)
@@ -51,107 +38,25 @@ public partial class MainView : UserControl
         Chat.ReloadWebview();
     }
 
-    private async Task ShowSettings()
-    {
-        BtnBack.Content = "Cancel";
+    //private async Task ShowSettings()
+    //{
+    //    BtnBack.Content = "Cancel";
 
-        MainPanel.IsVisible = false;
-        McpSetting.IsVisible = true;
-        Chat.IsVisible = false;
-        McpService.IsVisible = false;
-        McpStore.IsVisible = false;
+    //    MainPanel.IsVisible = false;
+    //    McpSetting.IsVisible = true;
+    //    Chat.IsVisible = false;
+    //    McpService.IsVisible = false;
+    //    McpStore.IsVisible = false;
 
-        BtnBack.IsVisible = true;
-        BtnSave.IsVisible = true;
-        BtnRefresh.IsVisible = false;
+    //    BtnBack.IsVisible = true;
+    //    BtnSave.IsVisible = true;
+    //    BtnRefresh.IsVisible = false;
 
-        BtnBack.IsEnabled = BtnSave.IsEnabled = false;
-        await McpSetting.LoadConfig();
-        BtnBack.IsEnabled = BtnSave.IsEnabled = true;
-    }
+    //    BtnBack.IsEnabled = BtnSave.IsEnabled = false;
+    //    await McpSetting.LoadConfig();
+    //    BtnBack.IsEnabled = BtnSave.IsEnabled = true;
+    //}
 
-    private void ShowChat()
-    {
-        BtnBack.Content = "Go Back";
-
-        MainPanel.IsVisible = false;
-        McpSetting.IsVisible = false;
-        Chat.IsVisible = true;
-        McpService.IsVisible = false;
-        McpStore.IsVisible = false;
-
-        BtnBack.IsVisible = true;
-        BtnSave.IsVisible = false;
-        BtnRefresh.IsVisible = true;
-
-        Chat.LoadChatServer();
-    }
-
-    private void ShowServices()
-    {
-        BtnBack.Content = "Go Back";
-
-        MainPanel.IsVisible = false;
-        McpSetting.IsVisible = false;
-        Chat.IsVisible = false;
-        McpService.IsVisible = true;
-        McpStore.IsVisible = false;
-
-        BtnBack.IsVisible = true;
-        BtnSave.IsVisible = false;
-        BtnRefresh.IsVisible = false;
-
-        McpService.LoadFromSettings();
-    }
-
-    private async Task ShowStore()
-    {
-        BtnBack.Content = "Go Back";
-
-        MainPanel.IsVisible = false;
-        McpSetting.IsVisible = false;
-        Chat.IsVisible = false;
-        McpService.IsVisible = false;
-        McpStore.IsVisible = true;
-
-        BtnBack.IsVisible = true;
-        BtnSave.IsVisible = false;
-        BtnRefresh.IsVisible = false;
-
-        await McpStore.LoadDefault();
-    }
-
-    private async Task ShowMain(bool isSave)
-    {
-        // save each settings if was visible
-        if (isSave && McpSetting.IsVisible)
-        {
-            bool success = await McpSetting.SaveConfig();
-            if (!success)
-            {
-                return;
-            }
-            await TaskView.RefreshMcpTools();
-        }
-        else if (McpStore.IsVisible && McpStore.IsUpdateNeeded)
-        {
-            await TaskView.RefreshMcpTools();
-        }
-        else if (Chat.IsVisible && Chat.IsNeedRefreshWorkflow)
-        {
-            await TaskView.RefreshOfflineWorkflows();
-        }
-
-        MainPanel.IsVisible = true;
-        McpSetting.IsVisible = false;
-        Chat.IsVisible = false;
-        McpService.IsVisible = false;
-        McpStore.IsVisible = false;
-
-        BtnBack.IsVisible = false;
-        BtnSave.IsVisible = false;
-        BtnRefresh.IsVisible = false;
-    }
 
     private void BtnLogout_OnClick(object sender, RoutedEventArgs e)
     {
@@ -160,20 +65,93 @@ public partial class MainView : UserControl
 
     public async Task ReloadMainView()
     {
-        await TaskView.RefreshCurrentTab(true);
-    }
-
-    private async void BtnStore_OnClick(object sender, RoutedEventArgs e)
-    {
-        await ShowStore();
-        //Uri uri = new Uri("https://www.google.com");
-        //var launcher = TopLevel.GetTopLevel(this).Launcher;
-        //launcher.LaunchUriAsync(uri);
+        await RefreshCurrentTab(MainListbox.SelectedIndex);
     }
 
     private void BtnShowMonitor_OnClick(object sender, RoutedEventArgs e)
     {
         MonitorWindow monitorWindow = new MonitorWindow();
         monitorWindow.Show(TopLevel.GetTopLevel(this) as Window);
+    }
+
+    private async void MainListbox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (Design.IsDesignMode || MainListbox == null)
+            return;
+
+        await RefreshCurrentTab(MainListbox.SelectedIndex);
+    }
+
+    private async Task RefreshCurrentTab(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                // My Apps
+                MyAppList.IsVisible = true;
+                OfflineWorkflowList.IsVisible = false;
+                AgentList.IsVisible = false;
+                Chat.IsVisible = false;
+                McpStore.IsVisible = false;
+                McpService.IsVisible = false;
+
+                await MyAppList.LoadGroupList(true);
+                break;
+            case 1:
+                // Local Workflows
+                MyAppList.IsVisible = false;
+                OfflineWorkflowList.IsVisible = true;
+                AgentList.IsVisible = false;
+                Chat.IsVisible = false;
+                McpStore.IsVisible = false;
+                McpService.IsVisible = false;
+
+                await OfflineWorkflowList.LoadOfflineList(true);
+                break;
+            case 2:
+                // Agents
+                MyAppList.IsVisible = false;
+                OfflineWorkflowList.IsVisible = false;
+                AgentList.IsVisible = true;
+                Chat.IsVisible = false;
+                McpStore.IsVisible = false;
+                McpService.IsVisible = false;
+
+                await AgentList.LoadConfig();
+                break;
+            case 3:
+                // Chat
+                MyAppList.IsVisible = false;
+                OfflineWorkflowList.IsVisible = false;
+                AgentList.IsVisible = false;
+                Chat.IsVisible = true;
+                McpStore.IsVisible = false;
+                McpService.IsVisible = false;
+
+                Chat.LoadChatServer();
+                break;
+            case 4:
+                // Store
+                MyAppList.IsVisible = false;
+                OfflineWorkflowList.IsVisible = false;
+                AgentList.IsVisible = false;
+                Chat.IsVisible = false;
+                McpStore.IsVisible = true;
+                McpService.IsVisible = false;
+
+                await McpStore.LoadDefault();
+                break;
+            case 5:
+                // Services
+                MyAppList.IsVisible = false;
+                OfflineWorkflowList.IsVisible = false;
+                AgentList.IsVisible = false;
+                Chat.IsVisible = false;
+                McpStore.IsVisible = false;
+                McpService.IsVisible = true;
+
+                McpService.LoadFromSettings();
+                break;
+        }
     }
 }

@@ -37,7 +37,7 @@ public partial class McpService : UserControl
     internal void LoadFromSettings()
     {
         settings = SettingsManager.Local.Load();
-        TbRagFolder.Text = "RAG Folder: " + settings.RagFolder;
+        TbRagFolder.Text = settings.RagFolder;
         if (Directory.Exists(settings.RagFolder))
         {
             TbRagStatus.Text = "Running";
@@ -47,6 +47,7 @@ public partial class McpService : UserControl
         {
             TbRagStatus.Text = "Stopped";
             TbRagStatus.Foreground = Brushes.Red;
+            TbRagFolder.Text = "RAG folder not set.";
         }
 
         // llama service status
@@ -70,7 +71,7 @@ public partial class McpService : UserControl
             settings.RagFolder = folder;
             await SettingsManager.Local.SaveAsync(settings);
 
-            TbRagFolder.Text = "RAG Folder: " + settings.RagFolder;
+            TbRagFolder.Text = settings.RagFolder;
             TbRagStatus.Text = "Running";
             TbRagStatus.Foreground = Brushes.Green;
         }

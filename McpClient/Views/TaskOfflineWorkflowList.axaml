@@ -10,28 +10,32 @@
     <Design.DataContext>
 		<vm:DesignWorkflowListViewModel/>
     </Design.DataContext>
-    <Panel>
-        <ItemsControl Name="TaskList" ItemsSource="{Binding OfflineWorkflows}" Margin="0,44,0,0">
-            <!-- use wrappanel as the template-->
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <!-- data here -->
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Classes="Task" BorderThickness="1" Height="60" Width="200" Margin="0,10,10,0">
-                        <Panel>
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                            <Button Name="BtnRun" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
-                                    Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
-                                    CommandParameter="{Binding .}">Run ▶</Button>
-                        </Panel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+    <Panel Margin="20,20,0,0">
+        <TextBlock Text="My Local Workflows" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="管理您的本地工作流程和模板" Margin="0,40,0,0"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,60,0,0">
+            <ItemsControl Name="TaskList" ItemsSource="{Binding OfflineWorkflows}">
+                <!-- use wrappanel as the template-->
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <!-- data here -->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Classes="Card" BorderThickness="1" Height="160" Width="200" Margin="0,10,10,0">
+                            <Panel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                <Button Name="BtnRun" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
+                                        Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
+                                        CommandParameter="{Binding .}">Run ▶</Button>
+                            </Panel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
         <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" IsVisible="False">Nothing here</Label>
     </Panel>
 

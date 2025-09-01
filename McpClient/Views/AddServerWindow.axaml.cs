@@ -14,21 +14,69 @@ namespace McpClient.Views;
 
 public partial class AddServerWindow : Window
 {
+    private readonly bool _isEdit = false;
     private List<string> args = new();
     private Dictionary<string, string> env = new();
+    private readonly McpViewModel _mcpViewModel;
 
     internal McpServer Result { get; private set; }
 
     public AddServerWindow()
     {
         InitializeComponent();
+        _isEdit = false;
     }
 
+    internal AddServerWindow(McpViewModel mcpViewModel)
+    {
+        InitializeComponent();
+        _isEdit = true;
+        _mcpViewModel = mcpViewModel;
+    }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
-        CbTypes.SelectedIndex = -1;
-        CbTypes_OnSelectionChanged(null, null);
+        if (_isEdit)
+        {
+            TbHeader.Text = Title = "Edit Agent";
+            TbServerName.IsVisible = false;
+            EditAgentName.Text = _mcpViewModel.ServerName;
+            EditAgentName.IsVisible = true;
+
+            if (!string.IsNullOrEmpty(_mcpViewModel.Owner))
+            {
+                TbOwner.IsEnabled = false;
+                TbOwner.Text = _mcpViewModel.Owner;
+            }
+
+            CbTypes.IsEnabled = false;
+            if (_mcpViewModel.Type == "stdio")
+            {
+                CbTypes.SelectedIndex = 0;
+                TbCommand.Text = _mcpViewModel.Command;
+            }
+            else if (_mcpViewModel.Type == "sse")
+            {
+                CbTypes.SelectedIndex = 1;
+                TbUrl.Text = _mcpViewModel.SseUrl;
+            }
+            else if (_mcpViewModel.Type == "streamableHttp")
+            {
+                CbTypes.SelectedIndex = 2;
+                TbUrl.Text = _mcpViewModel.StreamableHttpUrl;
+            }
+
+            env = _mcpViewModel.Env.ToDictionary();
+            TbEnv.Text = string.Join(", ", env);
+
+            args = _mcpViewModel.Args.ToList();
+            TbArgs.Text = string.Join(", ", args);
+        }
+        else
+        {
+            CbTypes.SelectedIndex = -1;
+            CbTypes_OnSelectionChanged(null, null);
+        }
     }
 
     private async void ButtonApply_OnClick(object sender, RoutedEventArgs e)
@@ -113,6 +161,10 @@ public partial class AddServerWindow : Window
 
             TbCommandHeader.IsVisible = TbCommand.IsVisible = true;
             MainGrid.RowDefinitions[3].Height = GridLength.Parse("40");
+
+            // Show env/args
+            TbArgsHeader.IsVisible = TbArgs.IsVisible = BtnEditArgs.IsVisible = true;
+            TbEnvHeader.IsVisible = TbEnv.IsVisible = BtnEditEnv.IsVisible = true;
         }
         else
         {
@@ -122,6 +174,10 @@ public partial class AddServerWindow : Window
 
             TbCommandHeader.IsVisible = TbCommand.IsVisible = false;
             MainGrid.RowDefinitions[3].Height = GridLength.Parse("0");
+
+            // Hide env/args
+            TbArgsHeader.IsVisible = TbArgs.IsVisible = BtnEditArgs.IsVisible = false;
+            TbEnvHeader.IsVisible = TbEnv.IsVisible = BtnEditEnv.IsVisible = false;
         }
     }
 

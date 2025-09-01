@@ -10,8 +10,10 @@
     <Design.DataContext>
         <vm:DesignMcpServerConfigViewModel/>
     </Design.DataContext>
-    <Panel>
-        <ItemsControl Name="TaskList" ItemsSource="{Binding McpServers}" Margin="0,44,0,0">
+    <Panel Margin="20,20,0,0">
+        <TextBlock Text="My Agents" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="管理您的智能代理配置" Margin="0,40,0,0"/>
+        <ItemsControl Name="TaskList" ItemsSource="{Binding McpServers}" Margin="0,60,0,0">
             <!-- use wrappanel as the template-->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

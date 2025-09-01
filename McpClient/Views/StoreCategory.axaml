@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="McpClient.Views.StoreCategory">
 
-    <ListBox Name="StoreCategoryList" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+    <ListBox Name="StoreCategoryList" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="Transparent">
         <ListBox.ItemsPanel>
             <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal"/>
@@ -15,7 +15,7 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
             <DataTemplate x:DataType="md:StoreCategoryItem">
-                <Border CornerRadius="8" BorderBrush="Gray" BorderThickness="1" Width="200" Height="32">
+                <Border Classes="Card" Width="200" Height="32" Padding="0" Margin="0">
                     <TextBlock Text="{Binding Name}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
             </DataTemplate>
