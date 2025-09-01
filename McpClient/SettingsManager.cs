@@ -37,6 +37,19 @@ internal sealed class SettingsManager
         }
     }
 
+    public void Save(Settings settings)
+    {
+        if (!Directory.Exists(_settingDir))
+        {
+            Directory.CreateDirectory(_settingDir);
+        }
+
+        using (var fs = new FileStream(_settingsPath, FileMode.Create))
+        {
+            JsonSerializer.Serialize(fs, settings);
+        }
+    }
+
     public Settings Load()
     {
         if (!File.Exists(_settingsPath))
@@ -98,6 +111,7 @@ internal sealed record Settings
     public string LlmModelFile { get; set; }
     public string LlmRemoteUrl { get; set; }
     public bool IsUseRemoteLlm { get; set; }
+    public bool IsDarkMode { get; set; }
 }
 
 internal sealed record DocumentHistory

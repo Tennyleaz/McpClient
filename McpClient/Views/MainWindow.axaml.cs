@@ -1,12 +1,13 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
+using McpClient.Models;
 using McpClient.Services;
+using McpClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
-using McpClient.Models;
 
 namespace McpClient.Views;
 
@@ -42,6 +43,15 @@ public partial class MainWindow : Window
         ragWorker?.CancelAsync();
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
+
+        // Save current darkmode state also
+        bool isDark = GlobalService.MainViewModel.IsNightMode;
+        Settings settings = SettingsManager.Local.Load();
+        if (settings.IsDarkMode != isDark)
+        {
+            settings.IsDarkMode = isDark;
+            SettingsManager.Local.Save(settings);
+        }
     }
 
     private async void MainView_OnLogoutClick(object sender, EventArgs e)
@@ -65,8 +75,11 @@ public partial class MainWindow : Window
 
     private async Task<bool> Login()
     {
-        // Test saved token
+        // Load darkmode
         Settings settings = SettingsManager.Local.Load();
+        GlobalService.MainViewModel.IsNightMode = settings.IsDarkMode;
+
+        // Test saved token
         if (!string.IsNullOrWhiteSpace(settings.McpConfigToken))
         {
             bool success = await IsMcpConfigTokenValid(settings.McpConfigToken) &&
