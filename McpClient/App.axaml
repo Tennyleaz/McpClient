@@ -267,12 +267,12 @@
             <Setter Property="BoxShadow" Value="0 2 8 0 #10000000" />
         </Style>
 
-        <Style Selector="Border.LoginCard:pointerover">
-            <!--<Setter Property="Background" Value="Transparent" />-->
+        <!--<Style Selector="Border.LoginCard:pointerover">
+            --><!--<Setter Property="Background" Value="Transparent" />--><!--
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BoxShadow" Value="0 4 16 0 #18000000" />
             <Setter Property="RenderTransform" Value="translateY(-2px)" />
-        </Style>
+        </Style>-->
 
 		<Style Selector="Border.Card">
 			<Setter Property="Background" Value="{DynamicResource SystemListMediumColor}" />
