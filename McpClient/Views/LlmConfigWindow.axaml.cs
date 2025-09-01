@@ -106,7 +106,7 @@ public partial class LlmConfigWindow : Window
             List<GpuInfoLinux> gpus = DeviceDetect.GetGpuInfoLinux();
             for (int i = 0; i < gpus.Count; i++)
             {
-                gpuList.Add(new GpuInfoViewModel(i, gpus[i].Name, (int)(gpus[i].MemoryMiB / 1024 / 1024)));
+                gpuList.Add(new GpuInfoViewModel(i, gpus[i].Name, (int)(gpus[i].MemoryMiB / 1024)));
                 // Selecte the max vram
                 if (gpus[i].MemoryMiB > maxVram)
                 {

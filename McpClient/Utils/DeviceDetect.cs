@@ -65,7 +65,7 @@ internal class DeviceDetect
                                 gpus.Add(new GpuInfoLinux
                                 {
                                     Name = gpuName,
-                                    MemoryMiB = (int)(bytes / 1024 / 1024)
+                                    MemoryMiB = (int)(bytes / 1024)
                                 });
                             }
                         }
