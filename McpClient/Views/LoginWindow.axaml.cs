@@ -1,14 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using McpClient.Models;
+using McpClient.Services;
+using McpClient.ViewModels;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
-using Avalonia.Input;
-using McpClient.Services;
-using McpClient.Models;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 
 namespace McpClient.Views;
 
@@ -25,6 +26,7 @@ public partial class LoginWindow : Window
         InitializeComponent();
         _service = new McpConfigService(null);  // no token if login
         _aiNexusService = new AiNexusService(null);  // no token if login
+        DataContext = new MainViewModel();
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -73,6 +75,7 @@ public partial class LoginWindow : Window
         }
 
         // generate JWT and login
+        IsEnabled = false;
         LoginResponse resposne = await _service.Login(TbUserName.Text, TbPassword.Text);
         if (resposne == null)
         {
@@ -80,11 +83,11 @@ public partial class LoginWindow : Window
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
             await box.ShowWindowDialogAsync(this);
+            IsEnabled = true;
             return;
         }
 
         // Also login to AI Nexus
-        BtnLogin.IsEnabled = false;
         LoginResponse aiResponse = await _aiNexusService.Login(TbUserName.Text, TbPassword.Text);
         if (aiResponse == null)
         {
@@ -92,7 +95,7 @@ public partial class LoginWindow : Window
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
             await box.ShowWindowDialogAsync(this);
-            BtnLogin.IsEnabled = true;
+            IsEnabled = true;
             return;
         }
 

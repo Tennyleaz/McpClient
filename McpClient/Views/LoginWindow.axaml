@@ -2,13 +2,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
         mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
         x:Class="McpClient.Views.LoginWindow"
         Width="450" Height="450" CanResize="False"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         Loaded="Control_OnLoaded" KeyDown="InputElement_OnKeyDown"
-        Title="Login">
-    <DockPanel LastChildFill="False">
+        Title="Login"
+        x:DataType="vm:MainViewModel">
+    <!--<DockPanel LastChildFill="False">
         <Label DockPanel.Dock="Top" HorizontalAlignment="Center" FontSize="24" Margin="0,40,0,0">Phison AI Nexus</Label>
         <Label DockPanel.Dock="Top" Margin="20,20,0,0">LDAP Accout:</Label>
 		<TextBox DockPanel.Dock="Top" Name="TbUserName" Watermark="Enter your username" Margin="20,10,20,0"></TextBox>
@@ -17,5 +19,25 @@
 		<CheckBox DockPanel.Dock="Top" Name="CheckRememberName" Margin="20,20,20,0">Remember me</CheckBox>
 		<Button DockPanel.Dock="Bottom" Name="BtnLogin" Click="BtnLogin_OnClick" Width="200" Margin="0,0,0,40"
                 HorizontalContentAlignment="Center" HorizontalAlignment="Center">Login</Button>
-    </DockPanel>
+    </DockPanel>-->
+    <Border Classes="LoginCard" Width="400" Height="400" HorizontalAlignment="Center">
+        <StackPanel Spacing="24">
+            <TextBlock Text="Phison AI Nexus"
+                       FontSize="{DynamicResource FontSizeLarge}"
+                       FontWeight="{DynamicResource FontWeightBold}"
+                       HorizontalAlignment="Center" />
+
+            <StackPanel Spacing="16">
+                <TextBox Name="TbUserName" Classes="Modern" Watermark="LDAP 帳號" Height="40" />
+                <TextBox Name="TbPassword" Classes="Modern" Watermark="密碼" PasswordChar="•"  Height="40"/>
+                <CheckBox DockPanel.Dock="Top" Name="CheckRememberName" Margin="0,0,20,0" >Remember me</CheckBox>
+            </StackPanel>
+
+            <Button Name="BtnLogin" Click="BtnLogin_OnClick" Classes="Primary" Height="48">
+                <Label>Login</Label>
+            </Button>
+
+            <ToggleSwitch Content="Dark Mode" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,5,0" IsChecked="{Binding IsNightMode}"></ToggleSwitch>
+        </StackPanel>
+    </Border>
 </Window>
