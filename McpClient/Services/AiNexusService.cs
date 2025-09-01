@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace McpClient.Services;
 internal class AiNexusService
 {
-    private const string BASE_URL = "http://192.168.41.208:8299";
+    private const string BASE_URL = "http://192.168.41.208:5155";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _options;
 
