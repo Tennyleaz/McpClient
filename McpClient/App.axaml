@@ -77,8 +77,7 @@
     </Application.Resources>
 	<Application.Styles>
 		<FluentTheme>
-			<FluentTheme.Palettes>
-				<!-- 亮色主題 - 科技藍配色方案 -->
+			<FluentTheme.Palettes><!-- 亮色主題 - 科技藍配色方案 -->
 				<ColorPaletteResources x:Key="Light"
                     Accent="#ff007acc"
                     AltHigh="White"
@@ -164,6 +163,13 @@
             <Setter Property="Height" Value="80"/>
             <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumColor}"></Setter>
         </Style>
+        <Style Selector="TextBlock.MainFontSmall">
+            <Setter Property="FontFamily" Value="{StaticResource FontAwesome}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeDefault}"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumColor}"></Setter>
+        </Style>
 
 		<!-- 主要按鈕樣式 -->
 		<Style Selector="Button.Primary">
@@ -212,7 +218,7 @@
 		<!-- 次要按鈕樣式 -->
 		<Style Selector="Button.Secondary">
 			<Setter Property="Background" Value="Transparent" />
-			<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimary}" />
+			<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
 			<Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
 			<Setter Property="BorderThickness" Value="1.5" />
 			<Setter Property="Padding" Value="20,12" />
@@ -220,7 +226,7 @@
 			<Setter Property="FontSize" Value="{StaticResource FontSizeDefault}" />
 			<Setter Property="FontWeight" Value="{StaticResource FontWeightMedium}" />
 			<Setter Property="Cursor" Value="Hand" />
-			<Setter Property="MinHeight" Value="44" />
+			<Setter Property="MinHeight" Value="40" />
 		</Style>
 
 		<Style Selector="Button.Secondary:pointerover">
@@ -261,15 +267,15 @@
             <Setter Property="BoxShadow" Value="0 2 8 0 #10000000" />
         </Style>
 
-        <Style Selector="Border.Card:pointerover">
-            <Setter Property="Background" Value="Transparent" />
+        <Style Selector="Border.LoginCard:pointerover">
+            <!--<Setter Property="Background" Value="Transparent" />-->
             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
             <Setter Property="BoxShadow" Value="0 4 16 0 #18000000" />
             <Setter Property="RenderTransform" Value="translateY(-2px)" />
         </Style>
 
 		<Style Selector="Border.Card">
-			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Background" Value="{DynamicResource SystemListMediumColor}" />
 			<Setter Property="BorderBrush" Value="{DynamicResource SystemChromeMediumColor}" />
 			<Setter Property="BorderThickness" Value="1" />
 			<Setter Property="CornerRadius" Value="16" />
@@ -290,11 +296,21 @@
 		</Style>
 
 		<Style Selector="Border.Card:pointerover">
-			<Setter Property="Background" Value="Transparent" />
+			<!--<Setter Property="Background" Value="Transparent" />-->
 			<Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
 			<Setter Property="BoxShadow" Value="0 4 16 0 #18000000" />
 			<Setter Property="RenderTransform" Value="translateY(-2px)" />
 		</Style>
+
+        <Style Selector="Border.CardFix">
+            <Setter Property="Background" Value="{DynamicResource SystemListMediumColor}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemChromeMediumColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="{StaticResource CardPadding}" />
+            <Setter Property="Margin" Value="{StaticResource SpaceSM}" />
+            <Setter Property="BoxShadow" Value="0 2 8 0 #10000000" />
+        </Style>
 
 		<!-- 現代化輸入框樣式 -->
 		<Style Selector="TextBox.Modern">
@@ -310,7 +326,7 @@
 		</Style>
 
 		<Style Selector="TextBox.Modern:focus">
-			<Setter Property="BorderBrush" Value="{DynamicResource AccentStrokeColorDefault}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
 			<Setter Property="Background" Value="{DynamicResource TextControlBackgroundFocused}" />
 		</Style>
 
@@ -318,5 +334,20 @@
 			<Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushPointerOver}" />
 			<Setter Property="Background" Value="{DynamicResource TextControlBackgroundPointerOver}" />
 		</Style>
+
+		<Style Selector="ListBox.MainList">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="Margin" Value="20,0,20,0"/>
+			<Style Selector="^ > ListBoxItem">
+                <Setter Property="Margin" Value="0,4,0,4"/>
+                <Setter Property="CornerRadius" Value="8"/>
+            </Style>
+			<Style Selector="^ > ListBoxItem:selected">
+                <Setter Property="Background" Value="{DynamicResource SystemAccentColor}"/>
+			</Style>
+			<Style Selector="^ > ListBoxItem:selected >> TextBlock">
+				<Setter Property="Foreground" Value="{DynamicResource SystemAltHighColor}"/>
+            </Style>
+        </Style>
 	</Application.Styles>
 </Application>

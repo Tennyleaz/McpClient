@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="80"
+             x:Class="McpClient.Views.Logo">
+    <Border CornerRadius="12" BorderBrush="CornflowerBlue" BorderThickness="1">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="CornflowerBlue" Offset="0.0"/>
+                <GradientStop Color="SkyBlue" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        <DockPanel>
+            <Border DockPanel.Dock="Left" CornerRadius="8" Background="White" Width="32" Height="32" Margin="16,0,16,0">
+                <TextBlock Foreground="CornflowerBlue" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center">PN</TextBlock>
+            </Border>
+            <TextBlock DockPanel.Dock="Top" FontSize="22" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Left" Margin="0,16,0,0">AI Nexus</TextBlock>
+            <TextBlock DockPanel.Dock="Top" Foreground="White" Margin="0,0,0,0">Desktop</TextBlock>
+        </DockPanel>
+    </Border>
+</UserControl>

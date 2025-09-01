@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using McpClient.ViewModels;
 
 namespace McpClient;
 
@@ -24,5 +25,7 @@ internal static class GlobalService
     public static readonly string LlamaServerBin;
 
     public static LlamaService LlamaService { get; set; }
+
+    public static MainViewModel MainViewModel { get; set; }
 }
 
