@@ -154,4 +154,12 @@ public partial class MainView : UserControl
                 break;
         }
     }
+
+    private async void MyAppList_DownloadGroup(object sender, Models.Group e)
+    {
+        // Tell MCP tool list to add those groups
+        await AgentList.AddMcpFromGroup(e);
+        // Switch to MCP tool tab
+        MainListbox.SelectedIndex = 2;
+    }
 }

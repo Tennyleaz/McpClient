@@ -11,6 +11,7 @@ using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -22,6 +23,7 @@ public partial class McpSetting : UserControl
 {
     private McpConfigService _mcpService;
     private AiNexusService _nexusService;
+    private McpServerConfigViewModel viewModel;
 
     public McpSetting()
     {
@@ -52,7 +54,7 @@ public partial class McpSetting : UserControl
         // Scroll back to top
         ScrollViewer.ScrollToHome();
         // Load server config and status at once
-        McpServerConfigViewModel viewModel = await _mcpService.GetAllConfigAndStatus();
+        viewModel = await _mcpService.GetAllConfigAndStatus();
         if (viewModel != null)
         {
             DataContext = viewModel;
@@ -98,6 +100,65 @@ public partial class McpSetting : UserControl
             }
         }
         return true;
+    }
+
+    internal async Task AddMcpFromGroup(Group group)
+    {
+        // If viewModel is null or empty, load it first
+        if (viewModel == null || viewModel.McpServers.Count == 0)
+        {
+            await LoadConfig();
+        }
+
+        McpServerConfig config = viewModel.ToModel();
+        // Check for duplicate name
+        bool added = false;
+        foreach (Agent agent in group.Workflows)
+        {
+            if (config.mcp_servers.Exists(x => x.server_name == agent.Name))
+            {
+                continue;
+            }
+            // Agents are SSE
+            config.mcp_servers.Add(new McpServer
+            {
+                enabled = true,
+                server_name = agent.Name,
+                type = "streamableHttp",
+                streamable_http_url = agent.Url,
+                source = "cloud",
+                //owner = "",
+            });
+            added = true;
+        }
+
+        Window owner = TopLevel.GetTopLevel(this) as Window;
+        if (added)
+        {
+            // Update to server
+            MsItems.IsEnabled = false;
+            bool success = await _mcpService.SetConfig(config);
+            if (!success)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add agents to MCP tools!",
+                    ButtonEnum.Ok,
+                    Icon.Error);
+                await box.ShowWindowDialogAsync(owner);
+                MsItems.IsEnabled = true;
+                return;
+            }
+
+            // Reload the list
+            await LoadConfig();
+            MsItems.IsEnabled = true;
+        }
+        else
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Info", "You've already downlowd all the MCP tools.",
+                ButtonEnum.Ok,
+                Icon.Info);
+            await box.ShowWindowDialogAsync(owner);
+        }
     }
 
     private async void BtnAdd_OnClick(object sender, RoutedEventArgs e)
