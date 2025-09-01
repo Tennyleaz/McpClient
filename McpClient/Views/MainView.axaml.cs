@@ -23,13 +23,7 @@ public partial class MainView : UserControl
         //BtnSave.IsVisible = false;
         //BtnRefresh.IsVisible = false;
 
-        Settings settings = SettingsManager.Local.Load();
-        _mcpService = new McpConfigService(settings.McpConfigToken);
-        _nexusService = new AiNexusService(settings.AiNexusToken);
-        MyAppList.SetService(_nexusService);
-        OfflineWorkflowList.SetServices(_nexusService);
-        AgentList.SetServices(_nexusService, _mcpService);
-        MainListbox.SelectedIndex = 0;
+        MyAppList.DownloadGroup += MyAppList_DownloadGroup;
         DataContext = GlobalService.MainViewModel;
     }
 
@@ -65,7 +59,23 @@ public partial class MainView : UserControl
 
     public async Task ReloadMainView()
     {
-        await RefreshCurrentTab(MainListbox.SelectedIndex);
+        // Called after mainwindow login
+        if (MainListbox.SelectedIndex < 0)
+        {
+            // First login, we have token now
+            Settings settings = SettingsManager.Local.Load();
+            _mcpService = new McpConfigService(settings.McpConfigToken);
+            _nexusService = new AiNexusService(settings.AiNexusToken);
+            MyAppList.SetService(_nexusService);
+            OfflineWorkflowList.SetServices(_nexusService);
+            AgentList.SetServices(_nexusService, _mcpService);
+            // Trigger RefreshCurrentTab()
+            MainListbox.SelectedIndex = 0;
+        }
+        else
+        {
+            await RefreshCurrentTab(MainListbox.SelectedIndex);
+        }
     }
 
     private void BtnShowMonitor_OnClick(object sender, RoutedEventArgs e)

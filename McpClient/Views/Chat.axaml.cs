@@ -81,7 +81,10 @@ public partial class Chat : UserControl
         //ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://localhost:5174/";
         string file = @"D:\tenny_lu\Downloads\dist\index.html";
-        ChatWebView.LoadUrl(file);
+        if (File.Exists(file))
+            ChatWebView.LoadUrl(file);
+        else
+            ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://myapp/index.html";
 
         tennyObject = new TennyObject();
