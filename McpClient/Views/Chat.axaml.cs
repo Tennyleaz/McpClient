@@ -30,6 +30,9 @@ public partial class Chat : UserControl
 
     public Chat()
     {
+        if (Design.IsDesignMode)
+            return;
+
         // Create cache
         string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         string cacheDir = Path.Combine(appdata, "McpClient", "Webview");

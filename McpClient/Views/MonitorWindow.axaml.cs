@@ -120,7 +120,7 @@ public partial class MonitorWindow : Window
                     }
                     else if (hardware.HardwareType == HardwareType.GpuAmd || /*hardware.HardwareType == HardwareType.GpuIntel ||*/ hardware.HardwareType == HardwareType.GpuNvidia)
                     {
-                        Debug.WriteLine(sensor.Name);
+                        //Debug.WriteLine(sensor.Name);
                         if (sensor.Name == "D3D 3D" && sensor.Value.HasValue)
                         {
                             gpu = (int)sensor.Value;

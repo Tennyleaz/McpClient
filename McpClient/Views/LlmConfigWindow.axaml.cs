@@ -208,12 +208,18 @@ public partial class LlmConfigWindow : Window
         if (!File.Exists(file))
             return;
 
-        LbModelPath.Content = file;
-        // TODO: load the model now
-        LoadModelMetadata(file);
+        if (settings.LlmModelFile != file)
+        {
+            LbModelPath.Content = file;
+            LoadModelMetadata(file);
 
-        settings.LlmModelFile = file;
-        await SettingsManager.Local.SaveAsync(settings);
+            // Save the model to setting
+            settings.LlmModelFile = file;
+            await SettingsManager.Local.SaveAsync(settings);
+
+            // Load the model now
+            BtnStartLlama_OnClick(null, null);
+        }
     }
 
     private void LoadModelMetadata(string modelFile)
@@ -269,6 +275,8 @@ public partial class LlmConfigWindow : Window
         GlobalService.LlamaService = new LlamaService(settings.LlmModelFile, CbDevice.SelectedIndex,
             isOffload, contentSize);
         GlobalService.LlamaService.Start();
+
+        StartCheckServerStatus();
     }
 
     private void StartCheckServerStatus()
