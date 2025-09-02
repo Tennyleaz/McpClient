@@ -39,6 +39,7 @@ internal class LlamaService : IDisposable
     public LlamaServerState State { get; private set; } = LlamaServerState.Stopped;
     public string[] LastStdOut => _stdoutQueue.ToArray();
     public string[] LastStdErr => _stderrQueue.ToArray();
+    public string Address => BASE_URL + "/v1";
 
     // CONFIG
     private readonly string _binaryPath;
@@ -233,6 +234,7 @@ internal class LlamaService : IDisposable
                 if (State == LlamaServerState.Running)
                 {
                     SetState(LlamaServerState.Crashed);
+                    break;
                 }
                 else if (State == LlamaServerState.Starting)
                 {
@@ -241,12 +243,13 @@ internal class LlamaService : IDisposable
                 else if (State == LlamaServerState.Stopping || State == LlamaServerState.Stopped)
                 {
                     SetState(LlamaServerState.Stopped);
+                    break;
                 }
                 else
                 {
                     SetState(LlamaServerState.Crashed);
+                    break;
                 }
-                break;
             }
             else
             {

@@ -245,11 +245,11 @@ public partial class LlmConfigWindow : Window
 
     private void ClearLlmData()
     {
-        LbLlamaPath.Content = null;
-        LbModelPath.Content = null;
-        LbModelName.Content = null;
-        LbModelType.Content = null;
-        LbModelSize.Content = null;
+        LbLlamaPath.Content = "---";
+        LbModelPath.Content = "---";
+        LbModelName.Content = "---";
+        LbModelType.Content = "---";
+        LbModelSize.Content = "---";
     }
 
     private void BtnApplyUrl_OnClick(object sender, RoutedEventArgs e)
@@ -297,6 +297,7 @@ public partial class LlmConfigWindow : Window
         {
             LbServiceStatus.Content = "Stopped";
             LbServiceStatus.Foreground = Brushes.Red;
+            LbLocalServerUrl.Content = "---";
         }
         else
         {
@@ -305,15 +306,19 @@ public partial class LlmConfigWindow : Window
             {
                 case LlamaServerState.Running:
                     LbServiceStatus.Foreground = Brushes.Green;
+                    LbLocalServerUrl.Content = GlobalService.LlamaService.Address;
                     break;
                 case LlamaServerState.Starting:
                     LbServiceStatus.Foreground = Brushes.GreenYellow;
+                    LbLocalServerUrl.Content = "---";
                     break;
                 case LlamaServerState.Stopping:
                     LbServiceStatus.Foreground = Brushes.Orange;
+                    LbLocalServerUrl.Content = "---";
                     break;
                 default:
                     LbServiceStatus.Foreground = Brushes.Red;
+                    LbLocalServerUrl.Content = "---";
                     break;
             }
             

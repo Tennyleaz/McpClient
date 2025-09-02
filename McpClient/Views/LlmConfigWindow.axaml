@@ -35,7 +35,7 @@
                 <Label Grid.Row="4" Grid.Column="0" Height="32">Size:</Label>
                 <Label Grid.Row="4" Grid.Column="1" Name="LbModelSize" Height="32">4B</Label>
             </Grid>
-            <Grid Name="ModelConfigGrid" Margin="25,4,0,0" ColumnDefinitions="Auto,Auto,*" RowDefinitions="*,40,40,40">
+            <Grid Name="ModelConfigGrid" Margin="25,4,0,0" ColumnDefinitions="Auto,Auto,*" RowDefinitions="*,40,40,40,40">
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Run on Device:</Label>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="CbDevice" MinWidth="200" Height="45" SelectionChanged="CbDevice_OnSelectionChanged">
                     <ComboBox.ItemTemplate>
@@ -60,6 +60,9 @@
                 <Label Grid.Row="3" Grid.Column="1" Name="LbServiceStatus"  VerticalAlignment="Center" Height="24" Foreground="Red">Stopped</Label>
                 <Button Grid.Row="3" Grid.Column="1" Name="BtnStartLlama" Margin="80,0,0,0" Click="BtnStartLlama_OnClick">Start</Button>
                 <Button Grid.Row="3" Grid.Column="1" Name="BtnStopLlama" Margin="140,0,0,0" Click="BtnStopLlama_OnClick">Stop</Button>
+
+                <Label Grid.Row="4" Grid.Column="0"  VerticalAlignment="Center" Height="24">Local Server Address:</Label>
+                <Label Grid.Row="4" Grid.Column="1"  VerticalAlignment="Center" Height="24" Name="LbLocalServerUrl">---</Label>
 
 				<!-- GPU info here -->
 				<Grid Grid.Row="0" Grid.Column="2"  Grid.RowSpan="4" Margin="20,0,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" HorizontalAlignment="Right">
