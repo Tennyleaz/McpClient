@@ -38,11 +38,13 @@ public partial class LlmConfigWindow : Window
         if (Design.IsDesignMode)
             return;
 
+        IsEnabled = false;
         settings = SettingsManager.Local.Load();
         RadioExternal.IsChecked = settings.IsUseRemoteLlm;
         RadioLocal.IsChecked = !settings.IsUseRemoteLlm;
         DetectLlamaBinary();
         DetectDevice();
+        IsEnabled = true;
     }
 
     private void DetectLlamaBinary()
@@ -87,7 +89,7 @@ public partial class LlmConfigWindow : Window
         gpuList.Clear();
         int selectedIndex = -1;
         long maxVram = 0;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        /*if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             List<GpuInfoWindows> gpus = DeviceDetect.GetGpuInfoWindows();
             for (int i = 0; i < gpus.Count; i++)
@@ -114,6 +116,19 @@ public partial class LlmConfigWindow : Window
                     maxVram = gpus[i].MemoryMiB;
                     selectedIndex = i;
                 }
+            }
+        }*/
+
+        var llamaDevices = LlamaDeviceUtils.ListLlamaCppDevices(GlobalService.LlamaServerBin);
+        for (int i = 0; i < llamaDevices.Count; i++)
+        {
+            int vramMb = llamaDevices[i].TotalMemoryMiB ?? 0;
+            gpuList.Add(new GpuInfoViewModel(llamaDevices[i].Index, llamaDevices[i].Name, vramMb, llamaDevices[i].Backend));
+
+            if (vramMb > maxVram)
+            {
+                maxVram = vramMb;
+                selectedIndex = i;
             }
         }
 

@@ -42,8 +42,9 @@
                         <DataTemplate x:DataType="vm:GpuInfoViewModel">
                             <DockPanel LastChildFill="False">
                                 <TextBlock DockPanel.Dock="Left" Text="{Binding Index, StringFormat='GPU {0}'}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Backend, StringFormat='({0})'}" Margin="8,0,4,0"/>
                                 <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontWeight="DemiBold"/>
-                                <TextBlock Text="{Binding VRAM}"/>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding VRAM}"/>
                             </DockPanel>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
