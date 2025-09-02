@@ -207,13 +207,22 @@ internal class DeviceDetect
             return new List<GpuInfoWindows>();
         }
 
-        if (json.TrimStart().StartsWith("["))
+        try
         {
-            // an array
-            return JsonSerializer.Deserialize<List<GpuInfoWindows>>(json);
+            if (json.TrimStart().StartsWith("["))
+            {
+                // an array
+                return JsonSerializer.Deserialize<List<GpuInfoWindows>>(json);
+            }
+
+            // 0~1 object
+            return new List<GpuInfoWindows> { JsonSerializer.Deserialize<GpuInfoWindows>(json) };
         }
-        // 0~1 object
-        return new List<GpuInfoWindows> { JsonSerializer.Deserialize<GpuInfoWindows>(json) };
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return new List<GpuInfoWindows>();
+        }
     }
 
     #endregion

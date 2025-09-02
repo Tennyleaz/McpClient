@@ -15,7 +15,7 @@ internal class GpuInfoLinux
 internal class GpuInfoWindows
 {
     public string Name { get; set; }
-    public long AdapterRAM { get; set; }
+    public long? AdapterRAM { get; set; }
 }
 
 internal class PciIdsEntry

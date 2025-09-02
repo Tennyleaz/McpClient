@@ -92,11 +92,12 @@ public partial class LlmConfigWindow : Window
             List<GpuInfoWindows> gpus = DeviceDetect.GetGpuInfoWindows();
             for (int i = 0; i < gpus.Count; i++)
             {
-                gpuList.Add(new GpuInfoViewModel(i, gpus[i].Name, (int)(gpus[i].AdapterRAM / 1024 / 1024)));
+                long vram = gpus[i].AdapterRAM ?? 0;
+                gpuList.Add(new GpuInfoViewModel(i, gpus[i].Name, (int)(vram / 1024 / 1024)));
                 // Selecte the max vram
                 if (gpus[i].AdapterRAM > maxVram)
                 {
-                    maxVram = gpus[i].AdapterRAM;
+                    maxVram = vram;
                     selectedIndex = i;
                 }
             }
