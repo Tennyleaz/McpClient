@@ -36,7 +36,8 @@
 					        <DataTemplate>
 						        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" IsEnabled="{Binding !IsBusy}">
 							        <!-- name, enabled, active -->
-                                    <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold"  Width="240"/>
+                                    <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}" Content="{Binding ServerName}" FontWeight="Bold"  Width="240"
+                                              Click="Checkbox_OnClick"/>
 							        <TextBlock Text="{Binding Type}" Width="120" VerticalAlignment="Center"/>
 							        <TextBlock Text="{Binding Owner}" Width="120" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding CloudIcon}" Width="48" FontFamily="{StaticResource FontAwesome}" VerticalAlignment="Center"/>

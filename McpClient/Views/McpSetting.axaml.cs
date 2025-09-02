@@ -343,4 +343,33 @@ public partial class McpSetting : UserControl
             }
         }
     }
+
+    private async void Checkbox_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (Design.IsDesignMode)
+            return;
+
+        if (sender is CheckBox btn && btn.DataContext is McpViewModel mcpViewModel)
+        {
+            mcpViewModel.IsBusy = true;
+            // Set enable status to server
+            mcpViewModel.Enabled = btn.IsChecked ?? false;
+            var configVm = DataContext as McpServerConfigViewModel;
+            McpServerConfig config = configVm.ToModel();
+            bool success = await _mcpService.SetConfig(config);
+            if (!success)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot set status to server!",
+                    ButtonEnum.Ok,
+                    Icon.Error);
+                Window owner = TopLevel.GetTopLevel(this) as Window;
+                await box.ShowWindowDialogAsync(owner);
+            }
+            else
+            {
+                await LoadConfig();
+            }
+            mcpViewModel.IsBusy = false;
+        }
+    }
 }
