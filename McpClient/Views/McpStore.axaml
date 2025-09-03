@@ -15,9 +15,9 @@
     </Design.DataContext>
 	<Panel Margin="0,0,0,8">
         <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="20,20,0,0">
-            <TabItem Header="Latest"></TabItem>
-            <TabItem Header="Featured"></TabItem>
-            <TabItem Header="Category"></TabItem>
+            <TabItem Header="Latest" FontWeight="Medium"></TabItem>
+            <TabItem Header="Featured" FontWeight="Medium"></TabItem>
+            <TabItem Header="Category" FontWeight="Medium"></TabItem>
         </TabStrip>
         <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="24,30,320,0">
             <Button Name="BtnLeaveSearch" DockPanel.Dock="Right" Click="BtnLeaveSearch_OnClick">❌</Button>
@@ -42,7 +42,7 @@
 						    <DockPanel>
                                 <TextBlock DockPanel.Dock="Top" Text="&#xF0EB;" HorizontalAlignment="Center" FontSize="24" FontFamily="{DynamicResource FontAwesome}" Foreground="{DynamicResource SystemAccentColor}"/>
                                 <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" Margin="0,12,10,0" FontSize="16" FontWeight="DemiBold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding Author}" Margin="0,4,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding Author}" Margin="0,4,0,0" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" Foreground="{DynamicResource SystemAccentColor}"/>
                                 <Button DockPanel.Dock="Bottom" Name="BtnInstall" Classes="Primary" Click="BtnInstall_OnClick">Install</Button>
 							    <TextBlock Text="{Binding Description}" Margin="0,6,0,6" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontSize="{StaticResource FontSizeSmall}"/>
 						    </DockPanel>

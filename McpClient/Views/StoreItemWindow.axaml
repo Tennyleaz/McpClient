@@ -36,20 +36,20 @@
 					     Fix for code block: https://github.com/whistyun/Markdown.Avalonia/issues/156
 					-->
 					<md:MarkdownScrollViewer Name="MarkdownViewer" ScrollViewer.VerticalScrollBarVisibility="Hidden" Margin="0,8,0,0">
-						<md:MarkdownScrollViewer.MarkdownStyle>
-							<Style>
-								<Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
-									<Style.Setters>
-										<Setter Property="Foreground" Value="White" />
-									</Style.Setters>
-								</Style>
-								<Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
-									<Style.Setters>
-										<Setter Property="Foreground" Value="White" />
-									</Style.Setters>
-								</Style>
+						<md:MarkdownScrollViewer.Styles>
+							<Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+								<Style.Setters>
+									<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+								</Style.Setters>
 							</Style>
-						</md:MarkdownScrollViewer.MarkdownStyle>
+							<Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
+								<Style.Setters>
+									<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+                                    <Setter Property="Padding" Value="2,0"></Setter>
+                                    <Setter Property="Margin" Value="2,0"></Setter>
+								</Style.Setters>
+							</Style>
+						</md:MarkdownScrollViewer.Styles>
 					</md:MarkdownScrollViewer>
 					<!-- URLs here -->
 					<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
