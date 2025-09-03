@@ -15,6 +15,7 @@ namespace McpClient.Views;
 public partial class TaskOfflineWorkflowList : UserControl
 {
     private AiNexusService _nexusService;
+    private McpConfigService _mcpService;
     private WorkflowListViewModel groupListViewModel;
 
     public TaskOfflineWorkflowList()
@@ -22,9 +23,10 @@ public partial class TaskOfflineWorkflowList : UserControl
         InitializeComponent();
     }
 
-    internal void SetServices(AiNexusService aiNexusService)
+    internal void SetServices(AiNexusService aiNexusService, McpConfigService mcpConfigService)
     {
         _nexusService = aiNexusService;
+        _mcpService = mcpConfigService;
     }
 
     public async Task LoadOfflineList(bool forceRefresh)
@@ -88,7 +90,7 @@ public partial class TaskOfflineWorkflowList : UserControl
     private async void GroupListViewModel_RunServer(object sender, OfflineWorkflow e)
     {
         Window parent = TopLevel.GetTopLevel(this) as Window;
-        RunOfflineWindow runOfflineWindow = new RunOfflineWindow(e, _nexusService);
+        RunOfflineWindow runOfflineWindow = new RunOfflineWindow(e, _nexusService, _mcpService);
         await runOfflineWindow.ShowDialog(parent);
     }
 

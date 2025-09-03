@@ -67,7 +67,7 @@ public partial class MainView : UserControl
             _mcpService = new McpConfigService(settings.McpConfigToken);
             _nexusService = new AiNexusService(settings.AiNexusToken);
             MyAppList.SetService(_nexusService);
-            OfflineWorkflowList.SetServices(_nexusService);
+            OfflineWorkflowList.SetServices(_nexusService, _mcpService);
             AgentList.SetServices(_nexusService, _mcpService);
             // Trigger RefreshCurrentTab()
             MainListbox.SelectedIndex = 0;

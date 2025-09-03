@@ -31,7 +31,7 @@ public partial class TaskView : UserControl
         _mcpService = new McpConfigService(settings.McpConfigToken);
         _nexusService = new AiNexusService(settings.AiNexusToken);
         GroupList.SetService(_nexusService);
-        OfflineWorkflowList.SetServices(_nexusService);
+        OfflineWorkflowList.SetServices(_nexusService, _mcpService);
         McpToolList.SetServices(_nexusService, _mcpService);
     }
 

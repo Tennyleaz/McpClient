@@ -9,8 +9,16 @@ namespace McpClient;
 
 internal static class Constants
 {
-    public static readonly List<string> LOCAL_MODELS = new List<string>() { "Qwen2.5-72B-Instruct-AWQ", "Qwen/Qwen3-14B-AWQ", "qwen3-8b", "qwen3-4b-instruct-2507",  "llama-3.2-3b-instruct",  "gemma-3-4b-it" };
-
+    public static readonly List<ModelItem> LOCAL_MODELS = new()
+    {
+        new ModelItem("QuantTrio/Qwen3-235B-A22B-Instruct-2507-AWQ", "cloud"),
+        new ModelItem("Qwen/Qwen3-30B-A3B-Instruct-2507-FP8", "cloud"),
+        new ModelItem("Qwen/Qwen3-14B-AWQ", "cloud"),
+        new ModelItem("Qwen2.5-72B-Instruct-AWQ", "cloud"),
+        new ModelItem("qwen3-4b-instruct-2507", "local"),
+        new ModelItem("llama-3.2-3b-instruct", "local"),
+        new ModelItem("gemma-3-4b-it", "local")
+    };
     
     public static readonly List<StoreCategoryItem> STORE_CATEGORIES = new List<StoreCategoryItem>
     {

@@ -41,7 +41,7 @@ public partial class RunLocalMcpWindow : Window
         TbOutput.Text = string.Empty;
 
         TbOutput.Text += "Setting offline group...\n";
-        string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex];
+        string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex].ModelName;
         var (success, groupId) = await _service.SetOfflineGroup(_serverName, modelName, "", "");
         string result = string.Empty;
         if (success)

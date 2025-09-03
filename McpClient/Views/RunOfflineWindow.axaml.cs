@@ -11,35 +11,37 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using McpClient.ViewModels;
 
 namespace McpClient.Views;
 
 public partial class RunOfflineWindow : Window
 {
     private readonly OfflineWorkflow _workflow;
-    private readonly AiNexusService _service;
+    private readonly AiNexusService _nexusService;
+    private readonly McpConfigService _mcpService;
     private readonly JsonNode jsonNode;
     private bool isRunning;
     private const int STREAM_CHUNK_SIZE = 10;
+    private List<ModelItem> availableModels;
 
     public RunOfflineWindow()
     {
         InitializeComponent();
     }
 
-    internal RunOfflineWindow(OfflineWorkflow workflow, AiNexusService aiNexusService)
+    internal RunOfflineWindow(OfflineWorkflow workflow, AiNexusService aiNexusService, McpConfigService mcpConfigService)
     {
         InitializeComponent();
         if (Design.IsDesignMode)
             return;
 
         _workflow = workflow;
-        _service = aiNexusService;
+        _nexusService = aiNexusService;
+        _mcpService = mcpConfigService;
         LbHeader.Content += " " + _workflow.Name;
         //TbDescription.Text = _group.Description;
         TbOutput.Text = string.Empty;
-        CbModelName.ItemsSource = Constants.LOCAL_MODELS;
-        CbModelName.SelectedIndex = 0;
 
         // Set custom message
         TbPayload.IsVisible = false;
@@ -64,6 +66,31 @@ public partial class RunOfflineWindow : Window
         }
     }
 
+    private async void Control_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (Design.IsDesignMode)
+            return;
+
+        // Load online model list
+        ModelData data = await _mcpService.ListModels();
+        if (data == null)
+        {
+            availableModels = Constants.LOCAL_MODELS;
+        }
+        else
+        {
+            availableModels = data.Data;
+        }
+
+        List<ModelViewModel> viewModels = new List<ModelViewModel>();
+        foreach (ModelItem modelItem in availableModels)
+        {
+            viewModels.Add(new ModelViewModel(modelItem));
+        }
+        CbModelName.ItemsSource = viewModels;
+        CbModelName.SelectedIndex = availableModels.Count - 1;
+    }
+
     private async void BtnRun_OnClick(object sender, RoutedEventArgs e)
     {
         BtnRun.IsEnabled = false;
@@ -74,7 +101,7 @@ public partial class RunOfflineWindow : Window
         isRunning = true;
         TbOutput.Text += "Running...\n";
 
-        string modelName = Constants.LOCAL_MODELS[CbModelName.SelectedIndex];
+        string modelName = availableModels[CbModelName.SelectedIndex].ModelName;
         string message = TbPayload.Text?.Trim();
 
         await Task.Run(async () =>
@@ -87,7 +114,7 @@ public partial class RunOfflineWindow : Window
     {
         try
         {
-            IAsyncEnumerable<AutogenStreamResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, message);
+            IAsyncEnumerable<AutogenStreamResponse> responses = _nexusService.ExecuteOfflineWorkflow(id, modelName, message);
             string text = string.Empty;
             await foreach (AutogenStreamResponse response in responses)
             {

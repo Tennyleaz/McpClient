@@ -156,5 +156,26 @@ internal class McpConfigService
 
         return false;
     }
+
+    public async Task<ModelData> ListModels()
+    {
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/chat/model/list");
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return null;
+            }
+
+            string json = await response.Content.ReadAsStringAsync();
+            ModelData servers = JsonSerializer.Deserialize<ModelData>(json, _options);
+            return servers;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return null;
+        }
+    }
 }
 
