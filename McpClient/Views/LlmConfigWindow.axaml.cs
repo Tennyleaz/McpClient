@@ -31,6 +31,7 @@ public partial class LlmConfigWindow : Window
         if (Design.IsDesignMode)
             return;
         ClearLlmData();
+        IsEnabled = false;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -38,7 +39,6 @@ public partial class LlmConfigWindow : Window
         if (Design.IsDesignMode)
             return;
 
-        IsEnabled = false;
         settings = SettingsManager.Local.Load();
         RadioExternal.IsChecked = settings.IsUseRemoteLlm;
         RadioLocal.IsChecked = !settings.IsUseRemoteLlm;

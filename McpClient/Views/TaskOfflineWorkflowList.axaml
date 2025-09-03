@@ -10,7 +10,7 @@
     <Design.DataContext>
 		<vm:DesignWorkflowListViewModel/>
     </Design.DataContext>
-    <Panel Margin="20,20,0,0">
+    <Panel Margin="20,20,20,20">
         <TextBlock Text="My Local Workflows" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
         <TextBlock Text="管理您的本地工作流程和模板" Margin="0,40,0,0"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,60,0,0">
