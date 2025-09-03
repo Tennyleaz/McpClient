@@ -3,11 +3,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:webview="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
+             xmlns:ring="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="McpClient.Views.Chat"
              Loaded="Control_OnLoaded">
     <Grid RowDefinitions="*,Auto" Name="Grid">
         <webview:WebView Grid.Row="0" x:Name="ChatWebView" BeforeNavigate="ChatWebView_OnBeforeNavigate"/>
+        <ring:ProgressRing Grid.Row="0" Name="ProgressRing" Width="80" Height="80" IsActive="True" IsVisible="False"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemAccentColor}"
+                           Margin="0"/>
+
 		<StackPanel Orientation="Horizontal" Grid.Row="1">
             <Button Name="BtnDebug" Click="BtnDebug_OnClick" VerticalAlignment="Bottom" IsVisible="False">Debug</Button>
             <Button Name="BtnF12" Click="BtnF12_OnClick" VerticalAlignment="Bottom">Console</Button>

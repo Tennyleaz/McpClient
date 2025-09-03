@@ -53,6 +53,7 @@ public partial class Chat : UserControl
         ChatWebView.IsSecurityDisabled = true;
         ChatWebView.IgnoreCertificateErrors = true;
         ChatWebView.BeforeNavigate += ChatWebView_OnBeforeNavigate;
+        ChatWebView.Navigated += ChatWebView_Navigated;
         //ChatWebView.BeforeResourceLoad += ChatWebView_BeforeResourceLoad;
         ChatWebView.DisableBuiltinContextMenus = true;
 
@@ -69,6 +70,12 @@ public partial class Chat : UserControl
         }
     }
 
+    private void ChatWebView_Navigated(string url, string frameName)
+    {
+        ProgressRing.IsVisible = false;
+        ChatWebView.IsVisible = true;
+    }
+
     public void LoadChatServer()
     {
         // Reset every time chat is visible
@@ -77,6 +84,9 @@ public partial class Chat : UserControl
         // Only inject object once
         if (tennyObject != null)
             return;
+
+        ChatWebView.IsVisible = false;
+        ProgressRing.IsVisible = true;
 
         //ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://localhost:5174/";
