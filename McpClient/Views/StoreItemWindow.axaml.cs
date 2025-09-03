@@ -34,6 +34,7 @@ public partial class StoreItemWindow : Window
     {
         InitializeComponent();
 
+        server.Description = server.Description.Trim();
         _mcpServer = server;
         _service = service;
         _installedNames = installedNames;
@@ -51,6 +52,7 @@ public partial class StoreItemWindow : Window
             // Set url
             BtnGithub.IsVisible = !string.IsNullOrEmpty(detailBase.GithubUrl);
             BtnMcpSo.IsVisible = !string.IsNullOrEmpty(detailBase.Url);
+            MarkdownViewer.Markdown = detailBase.Overview?.Trim() ?? "*No description provided.*";
 
             // Check if detail is real or not
             if (detailBase is StoreMcpServerDetail detailReal && detailReal.ServerConfig?.McpServers != null)

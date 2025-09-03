@@ -4,41 +4,65 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:model="clr-namespace:McpClient.Models"
         xmlns:vm="clr-namespace:McpClient.ViewModels"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="McpClient.Views.StoreItemWindow"
         x:DataType="model:StoreMcpServer"
         WindowStartupLocation="CenterOwner"
         Loaded="Control_OnLoaded" Width="900" Height="450"
         Title="{Binding Name}">
-    <Design.DataContext>
-        <vm:DesignStoreMcpServerViewModel/>
-    </Design.DataContext>
-    <Panel>
-        <Label FontSize="22" Margin="20,20,0,0" Content="{Binding Name}"/>
-        <StackPanel Orientation="Horizontal" Margin="24,56,0,0">
-            <TextBlock Text="{Binding Author, StringFormat='By {0}'}" Foreground="{DynamicResource SystemBaseMediumColor}"/>
-            <TextBlock Text="{Binding TimestampText}" Foreground="{DynamicResource SystemBaseMediumColor}" Margin="10,0,0,0"/>
-        </StackPanel>
-        <Button Name="BtnInstall" Click="BtnInstall_OnClick" FontSize="18" IsEnabled="False"
+	<Design.DataContext>
+		<vm:DesignStoreMcpServerViewModel/>
+	</Design.DataContext>
+	<Panel>
+		<Label FontSize="22" Margin="20,20,0,0" Content="{Binding Name}"/>
+		<StackPanel Orientation="Horizontal" Margin="24,56,0,0">
+			<TextBlock Text="{Binding Author, StringFormat='By {0}'}" Foreground="{DynamicResource SystemBaseMediumColor}"/>
+			<TextBlock Text="{Binding TimestampText}" Foreground="{DynamicResource SystemBaseMediumColor}" Margin="10,0,0,0"/>
+		</StackPanel>
+		<Button Name="BtnInstall" Classes="Primary" Click="BtnInstall_OnClick" FontSize="18" IsEnabled="False"
                 HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,24,24,0">Install ↓</Button>
-        <Separator VerticalAlignment="Top" Margin="20,80,20,0"/>
-        <Grid RowDefinitions="Auto,*" ColumnDefinitions="3*,2*" Margin="20,90,20,20">
-            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="16">Tool Description</TextBlock>
-            <ScrollViewer Grid.Row="1" Grid.Column="0" Margin="0,10,0,0">
-				<StackPanel>
+		<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20,90,20,20" Padding="0,0,8,0">
+			<Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="3*,2*">
+				<!-- Tool description -->
+				<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,20"/>
+				<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
+				<!-- -->
+				<TextBlock Grid.Row="1" Grid.Column="0" FontSize="16">Tool Description</TextBlock>
+				<StackPanel Grid.Row="2" Grid.Column="0" Margin="0,10,0,0">
 					<TextBlock Name="TbMcpType" Text="Type: unknown"/>
-                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+					<!-- Tool markdown
+					     Fix for code block: https://github.com/whistyun/Markdown.Avalonia/issues/156
+					-->
+					<md:MarkdownScrollViewer Name="MarkdownViewer" ScrollViewer.VerticalScrollBarVisibility="Hidden" Margin="0,8,0,0">
+						<md:MarkdownScrollViewer.MarkdownStyle>
+							<Style>
+								<Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+									<Style.Setters>
+										<Setter Property="Foreground" Value="White" />
+									</Style.Setters>
+								</Style>
+								<Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
+									<Style.Setters>
+										<Setter Property="Foreground" Value="White" />
+									</Style.Setters>
+								</Style>
+							</Style>
+						</md:MarkdownScrollViewer.MarkdownStyle>
+					</md:MarkdownScrollViewer>
 					<!-- URLs here -->
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-					    <TextBlock Name="BtnGithub" Text="GitHub URL" PointerPressed="BtnGithub_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand" Margin="0,0,10,0"/>
-                        <TextBlock Name="BtnMcpSo" Text="MCP.so URL" PointerPressed="BtnMcpSo_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand"/>
-                    </StackPanel>
-                </StackPanel>
-            </ScrollViewer>
-            <TextBlock Grid.Row="0"  Grid.Column="1" FontSize="16" Margin="10,0,0,0">Tool Configuration</TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="10,10,0,0" Name="TbMcpSetting" IsReadOnly="True"/>
-            <Label Grid.Row="1" Grid.Column="1" Name="LabelInvalidJson" IsVisible="False"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource SystemAccentColor}">JSON config is not valid.</Label>
-        </Grid>
-    </Panel>
+					<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+						<TextBlock Name="BtnGithub" Text="GitHub URL" PointerPressed="BtnGithub_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand" Margin="0,0,10,0"/>
+						<TextBlock Name="BtnMcpSo" Text="MCP.so URL" PointerPressed="BtnMcpSo_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand"/>
+					</StackPanel>
+				</StackPanel>
+				<!-- Tool config -->
+				<TextBlock Grid.Row="1"  Grid.Column="1" FontSize="16" Margin="10,0,0,0">Tool Configuration</TextBlock>
+				<TextBox Grid.Row="2" Grid.Column="1" Margin="10,10,0,0" Name="TbMcpSetting" IsReadOnly="True"/>
+				<Label Grid.Row="2" Grid.Column="1" Name="LabelInvalidJson" IsVisible="False"
+					   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource SystemAccentColor}">JSON config is not valid.</Label>
+			</Grid>
+		</ScrollViewer>
+	</Panel>
 </Window>
