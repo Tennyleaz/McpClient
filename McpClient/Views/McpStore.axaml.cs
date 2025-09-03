@@ -156,18 +156,6 @@ public partial class McpStore : UserControl
         LbEmptyList.IsVisible = storeMcpViewModel.Servers.Count == 0;
     }
 
-    private async void McpListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        //if (McpListBox.SelectedItem is StoreMcpServer storeMcpServer)
-        //{
-        //    StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
-        //    await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
-            
-        //    IsUpdateNeeded = window.IsInstalled;
-        //    McpListBox.SelectedIndex = -1;
-        //}
-    }
-
     private async void BtnSearch_OnClick(object sender, RoutedEventArgs e)
     {
         await Search();

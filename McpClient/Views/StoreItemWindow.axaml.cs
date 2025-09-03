@@ -141,8 +141,8 @@ public partial class StoreItemWindow : Window
         try
         {
             name = node.AsObject().First().Key;
-            url = node.Root["url"]?.ToJsonString();
-            type = node.Root["type"]?.ToJsonString();
+            url = node[name]?["url"]?.ToString();
+            type = node[name]?["type"]?.ToString();
         }
         catch (JsonException ex)
         {

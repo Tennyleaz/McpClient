@@ -275,16 +275,16 @@ public partial class McpSetting : UserControl
             var configVm = DataContext as McpServerConfigViewModel;
             configVm.McpServers.Remove(vm);
 
-            //// Update to server
-            //McpServerConfig config = configVm.ToModel();
-            //bool success = await _mcpService.SetConfig(config);
-            //if (!success)
-            //{
-            //    box = MessageBoxManager.GetMessageBoxStandard("Error","Failed to delete!",
-            //        ButtonEnum.Ok,
-            //        Icon.Error);
-            //    await box.ShowAsync();
-            //}
+            // Update to server
+            McpServerConfig config = configVm.ToModel();
+            bool success = await _mcpService.SetConfig(config);
+            if (!success)
+            {
+                box = MessageBoxManager.GetMessageBoxStandard("Error", "Failed to delete!",
+                    ButtonEnum.Ok,
+                    Icon.Error);
+                await box.ShowAsync();
+            }
         }
     }
 
