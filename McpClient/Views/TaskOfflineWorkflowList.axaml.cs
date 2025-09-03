@@ -46,6 +46,7 @@ public partial class TaskOfflineWorkflowList : UserControl
             {
                 groupListViewModel = new WorkflowListViewModel();
                 groupListViewModel.RunServer += GroupListViewModel_RunServer;
+                groupListViewModel.Delete += GroupListViewModel_Delete;
             }
             else
             {
@@ -64,6 +65,24 @@ public partial class TaskOfflineWorkflowList : UserControl
         }
 
         LbEmptyList.IsVisible = groupListViewModel == null || groupListViewModel.OfflineWorkflows.Count == 0;
+    }
+
+    private async void GroupListViewModel_Delete(object sender, OfflineWorkflow e)
+    {
+        var box = MessageBoxManager.GetMessageBoxStandard("Delete Workflow", $"Are you sure to delete \"{e.Name}\"?",
+            ButtonEnum.YesNo,
+            Icon.Question);
+        Window owner = TopLevel.GetTopLevel(this) as Window;
+        var result = await box.ShowWindowDialogAsync(owner);
+        if (result == ButtonResult.Yes)
+        {
+            // Delete from server
+            bool success = await _nexusService.DeleteOfflineGroupById(e.Id);
+            if (success)
+            {
+                groupListViewModel.OfflineWorkflows.Remove(e);
+            }
+        }
     }
 
     private async void GroupListViewModel_RunServer(object sender, OfflineWorkflow e)

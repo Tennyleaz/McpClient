@@ -127,7 +127,7 @@ internal class AiNexusService
             content.Add(new StringContent(payload), "payload");
         }
 
-        HttpResponseMessage response = await _httpClient.PostAsync($"/api/v1/Groups/offline", content);
+        HttpResponseMessage response = await _httpClient.PostAsync($"/api/v1/Group/offline", content);
         bool success = response.IsSuccessStatusCode;
         int groupId = -1;
         if (success)
@@ -141,7 +141,7 @@ internal class AiNexusService
 
     public async Task<Group> GetGroupById(int groupId)
     {
-        HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups/{groupId}");
+        HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Group/{groupId}");
         if (response.IsSuccessStatusCode)
         {
             string json = await response.Content.ReadAsStringAsync();
@@ -153,7 +153,7 @@ internal class AiNexusService
 
     public async Task<bool> CreateGroup(Group group)
     {
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"/api/v1/Groups", group, _options);
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"/api/v1/Group", group, _options);
         if (response.IsSuccessStatusCode)
         {
             string json = await response.Content.ReadAsStringAsync();
@@ -165,7 +165,7 @@ internal class AiNexusService
 
     public async Task<bool> SetGroupById(Group group)
     {
-        HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/v1/Groups/{group.Id}", group, _options);
+        HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"/api/v1/Group/{group.Id}", group, _options);
         if (response.IsSuccessStatusCode)
         {
             string json = await response.Content.ReadAsStringAsync();
@@ -177,10 +177,22 @@ internal class AiNexusService
 
     public async Task<bool> DeleteGroupById(int groupId)
     {
-        HttpResponseMessage response = await _httpClient.DeleteAsync($"/api/v1/Groups/{groupId}");
+        HttpResponseMessage response = await _httpClient.DeleteAsync($"/api/v1/Group/{groupId}");
         if (response.IsSuccessStatusCode)
         {
             string json = await response.Content.ReadAsStringAsync();
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> DeleteOfflineGroupById(int groupId)
+    {
+        HttpResponseMessage response = await _httpClient.DeleteAsync($"/api/v1/Group/offline/{groupId}");
+        if (response.IsSuccessStatusCode)
+        {
+            //string json = await response.Content.ReadAsStringAsync();
             return true;
         }
 

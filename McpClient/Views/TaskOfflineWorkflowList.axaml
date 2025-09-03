@@ -24,12 +24,14 @@
                 <!-- data here -->
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Classes="Card" BorderThickness="1" Height="160" Width="200" Margin="0,10,10,0">
+                        <Border Classes="Card" BorderThickness="1" Height="160" Width="240" Margin="0,10,10,0">
                             <Panel>
                                 <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="4,4,4,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                <Button Name="BtnRun" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,4,4"
+                                <Button Name="BtnRun" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,4"
                                         Command="{Binding ElementName=GroupList, Path=DataContext.RunCommand}"
                                         CommandParameter="{Binding .}">Run ▶</Button>
+                                <Button Classes="Secondary" VerticalAlignment="Bottom" Margin="0,0,0,4"
+                                        CommandParameter="{Binding .}" Command="{Binding ElementName=GroupList, Path=DataContext.DeleteCommand}">Delete</Button>
                             </Panel>
                         </Border>
                     </DataTemplate>

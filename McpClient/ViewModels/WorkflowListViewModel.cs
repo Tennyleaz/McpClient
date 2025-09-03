@@ -16,15 +16,23 @@ internal class WorkflowListViewModel
 
     public ReactiveCommand<OfflineWorkflow, Unit> RunCommand { get; }
 
-    public event EventHandler<OfflineWorkflow> RunServer;
+    public ReactiveCommand<OfflineWorkflow, Unit> DeleteCommand { get; }
+
+    public event EventHandler<OfflineWorkflow> RunServer, Delete;
 
     public WorkflowListViewModel()
     {
         RunCommand = ReactiveCommand.Create<OfflineWorkflow>(PerformAction);
+        DeleteCommand = ReactiveCommand.Create<OfflineWorkflow>(PerformDeleteAction);
     }
 
     private void PerformAction(OfflineWorkflow group)
     {
         RunServer?.Invoke(this, group);
+    }
+
+    private void PerformDeleteAction(OfflineWorkflow group)
+    {
+        Delete?.Invoke(this, group);
     }
 }
