@@ -23,6 +23,7 @@ public partial class LlmConfigWindow : Window
     private Settings settings;
     private int hgRecommendSize;
     private DispatcherTimer checkServerTimer;
+    private int maxContextLength = 0, currentContextLength = 4096;
 
     public LlmConfigWindow()
     {
@@ -255,6 +256,12 @@ public partial class LlmConfigWindow : Window
             {
                 LbModelType.Content = metadata.Value.ToString();
             }
+            else if (metadata.Key.EndsWith(".context_length"))
+            {
+                string len = metadata.Value.ToString();
+                int.TryParse(len, out maxContextLength);
+                TbContextLenghtHeader.Content = $"Context Length: (max {len})";
+            }
         }
     }
 
@@ -273,6 +280,15 @@ public partial class LlmConfigWindow : Window
 
     private void BtnStartLlama_OnClick(object sender, RoutedEventArgs e)
     {
+        if (!File.Exists(settings.LlmModelFile))
+        {
+            return;
+        }
+        if (CbDevice.SelectedIndex < 0)
+        {
+            return;
+        }
+
         bool isOffload = ToggleOffloadKvCache.IsChecked == true;
         if (!int.TryParse(TbContextLenght.Text, out int contentSize))
             contentSize = 4096;
@@ -288,7 +304,8 @@ public partial class LlmConfigWindow : Window
             GlobalService.LlamaService.Dispose();
         }
 
-        GlobalService.LlamaService = new LlamaService(settings.LlmModelFile, CbDevice.SelectedIndex,
+        string modelType = LbModelType.Content?.ToString();
+        GlobalService.LlamaService = new LlamaService(settings.LlmModelFile, modelType, CbDevice.SelectedIndex,
             isOffload, contentSize);
         GlobalService.LlamaService.Start();
 
@@ -355,5 +372,26 @@ public partial class LlmConfigWindow : Window
     {
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
+    }
+
+    private void TbContextLenght_OnTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (maxContextLength <= 0)
+        {
+            return;
+        }
+
+        if (int.TryParse(TbContextLenght.Text, out int length))
+        {
+            if (length > 0 && length <= maxContextLength)
+            {
+                currentContextLength = length;
+                return;
+            }
+        }
+
+        TbContextLenght.TextChanged -= TbContextLenght_OnTextChanged;
+        TbContextLenght.Text = currentContextLength.ToString();
+        TbContextLenght.TextChanged += TbContextLenght_OnTextChanged;
     }
 }

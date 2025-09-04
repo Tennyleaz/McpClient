@@ -46,8 +46,9 @@ internal class LlamaService : IDisposable
     private readonly string _arguments;
     private readonly int _maxLogLines;
     private readonly int _healthCheckIntervalMs;
+    private readonly string _modelType;
 
-    public LlamaService(string modelPath, int deviceIndex, bool isOffloadKvCache, int contextSize)
+    public LlamaService(string modelPath, string modelType, int deviceIndex, bool isOffloadKvCache, int contextSize)
     {
         _httpClient = new HttpClient();
         _httpClient.Timeout = TimeSpan.FromSeconds(5);
@@ -62,15 +63,46 @@ internal class LlamaService : IDisposable
         _binaryPath = GlobalService.LlamaServerBin;
 
         // arguments
-        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {PORT}";
+        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {PORT} --jinja";
         if (!isOffloadKvCache)
             arguments += " --no-kv-offload";
         _arguments = arguments;
-        
+        _modelType = modelType;
+        SetToolCallParam();
+
         _maxLogLines = 20;
         _healthCheckIntervalMs = 5000;
         _stdoutQueue = new ConcurrentQueue<string>();
         _stderrQueue = new ConcurrentQueue<string>();
+    }
+
+    private void SetToolCallParam()
+    {
+        // see:
+        // https://github.com/ggml-org/llama.cpp/blob/master/docs/function-calling.md
+        switch (_modelType)
+        {
+            case "llama":
+            case "llama3":
+            case "llama4":
+                break;
+            case "qwen2":
+            case "qwen2v1":
+            case "qwen3":
+                break;
+            case "gemma3":
+            case "gemma3n":
+                break;
+            case "phi3":
+                break;
+            case "deepseek2":
+                break;
+            case "gpt-oss":
+                break;
+            default:
+                // unsupported model?
+                break;
+        }
     }
 
     public async Task<bool> CheckHealth()

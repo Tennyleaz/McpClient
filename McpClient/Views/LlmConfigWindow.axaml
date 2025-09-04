@@ -50,8 +50,9 @@
                     </ComboBox.ItemTemplate>
 				</ComboBox>
 
-                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Context Length:</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Name="TbContextLenght" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center">4096</TextBox>
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Name="TbContextLenghtHeader">Context Length:</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="TbContextLenght" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" Text="4096" TextChanged="TbContextLenght_OnTextChanged">
+                </TextBox>
 
                 <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Offload KV Cache to VRAM:</Label>
 				<ToggleSwitch Grid.Row="2" Grid.Column="1" Name="ToggleOffloadKvCache"></ToggleSwitch>
