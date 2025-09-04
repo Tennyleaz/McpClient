@@ -206,12 +206,12 @@ public partial class StoreItemWindow : Window
         return mcpServer;
     }
 
-    private void BtnGithub_OnPointerPressed(object sender, PointerPressedEventArgs e)
+    private void BtnGithub_OnClick(object sender, RoutedEventArgs e)
     {
         Launcher.LaunchUriAsync(new Uri(detail.GithubUrl));
     }
 
-    private void BtnMcpSo_OnPointerPressed(object sender, PointerPressedEventArgs e)
+    private void BtnMcpSo_OnClick(object sender, RoutedEventArgs e)
     {
         Launcher.LaunchUriAsync(new Uri(detail.Url));
     }

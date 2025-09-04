@@ -6,63 +6,146 @@
         xmlns:vm="clr-namespace:McpClient.ViewModels"
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
         xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="McpClient.Views.StoreItemWindow"
         x:DataType="model:StoreMcpServer"
         WindowStartupLocation="CenterOwner"
-        Loaded="Control_OnLoaded" Width="900" Height="450"
+        Loaded="Control_OnLoaded" Width="1000" Height="600" MinWidth="900" MinHeight="500"
         Title="{Binding Name}">
 	<Design.DataContext>
 		<vm:DesignStoreMcpServerViewModel/>
 	</Design.DataContext>
-	<Panel>
-		<Label FontSize="22" Margin="20,20,0,0" Content="{Binding Name}"/>
-		<StackPanel Orientation="Horizontal" Margin="24,56,0,0">
-			<TextBlock Text="{Binding Author, StringFormat='By {0}'}" Foreground="{DynamicResource SystemBaseMediumColor}"/>
-			<TextBlock Text="{Binding TimestampText}" Foreground="{DynamicResource SystemBaseMediumColor}" Margin="10,0,0,0"/>
-		</StackPanel>
-		<Button Name="BtnInstall" Classes="Primary" Click="BtnInstall_OnClick" FontSize="18" IsEnabled="False"
-                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,24,24,0">Install ↓</Button>
-		<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="20,90,20,20" Padding="0,0,8,0">
-			<Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="3*,2*">
-				<!-- Tool description -->
-				<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,20"/>
-				<Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Margin="10,0,10,10"/>
-				<!-- -->
-				<TextBlock Grid.Row="1" Grid.Column="0" FontSize="16">Tool Description</TextBlock>
-				<StackPanel Grid.Row="2" Grid.Column="0" Margin="0,10,0,0">
-					<TextBlock Name="TbMcpType" Text="Type: unknown"/>
-					<!-- Tool markdown
-					     Fix for code block: https://github.com/whistyun/Markdown.Avalonia/issues/156
-					-->
-					<md:MarkdownScrollViewer Name="MarkdownViewer" ScrollViewer.VerticalScrollBarVisibility="Hidden" Margin="0,8,0,0">
-						<md:MarkdownScrollViewer.Styles>
-							<Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
-								<Style.Setters>
-									<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
-								</Style.Setters>
-							</Style>
-							<Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
-								<Style.Setters>
-									<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
-                                    <Setter Property="Padding" Value="2,0"></Setter>
-                                    <Setter Property="Margin" Value="2,0"></Setter>
-								</Style.Setters>
-							</Style>
-						</md:MarkdownScrollViewer.Styles>
-					</md:MarkdownScrollViewer>
-					<!-- URLs here -->
-					<StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-						<TextBlock Name="BtnGithub" Text="GitHub URL" PointerPressed="BtnGithub_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand" Margin="0,0,10,0"/>
-						<TextBlock Name="BtnMcpSo" Text="MCP.so URL" PointerPressed="BtnMcpSo_OnPointerPressed" TextDecorations="Underline" Foreground="{DynamicResource SystemBaseMediumColor}" Cursor="Hand"/>
+	<ScrollViewer VerticalScrollBarVisibility="Auto">
+		<Grid RowDefinitions="Auto,*">
+			<!-- Hero Section -->
+			<Border Grid.Row="0" Classes="hero-section" Margin="20,20,20,0">
+                <DockPanel>
+					<!-- icon -->
+					<Border DockPanel.Dock="Left" Background="#89B1F9" CornerRadius="8" Width="64" Height="64" VerticalAlignment="Top">
+                        <TextBlock Text="&#xF0EB;" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" FontFamily="{DynamicResource FontAwesome}" Foreground="White"/>
+                    </Border>
+					<!-- metrics -->
+					<Grid DockPanel.Dock="Right" RowDefinitions="*,*" ColumnDefinitions="*,*" VerticalAlignment="Top">
+                        <Border Grid.Row="0" Grid.Column="0" Classes="hero-stats-card">
+                            <Panel>
+                                <TextBlock Text="4.5" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                                <TextBlock Foreground="{StaticResource MetricsHeader}" HorizontalAlignment="Center" VerticalAlignment="Bottom">Rated (99)</TextBlock>
+                            </Panel>
+						</Border>
+                        <Border Grid.Row="0" Grid.Column="1" Classes="hero-stats-card" Margin="10,0,0,0">
+                            <Panel>
+                                <TextBlock Text="000" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                                <TextBlock Foreground="{StaticResource MetricsHeader}" HorizontalAlignment="Center" VerticalAlignment="Bottom">Download</TextBlock>
+                            </Panel>
+						</Border>
+                        <Border Grid.Row="1" Grid.Column="0" Classes="hero-stats-card" Margin="0,10,0,0">
+                            <Panel>
+                                <TextBlock Text="v0.1" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                                <TextBlock Foreground="{StaticResource MetricsHeader}" HorizontalAlignment="Center" VerticalAlignment="Bottom">Version</TextBlock>
+                            </Panel>
+						</Border>
+                        <Border Grid.Row="1" Grid.Column="1" Classes="hero-stats-card" Margin="10,10,0,0">
+							<Panel>
+                                <TextBlock Text="{Binding TimestampText}" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+								<TextBlock Foreground="{StaticResource MetricsHeader}" HorizontalAlignment="Center" VerticalAlignment="Bottom">Last Updated</TextBlock>
+							</Panel>
+                        </Border>
+                    </Grid>
+                    <!-- name/description -->
+					<StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" FontSize="{StaticResource FontSizeDisplay}"/>
+                        <TextBlock Text="{Binding Author, StringFormat='By {0}'}" Foreground="White" FontSize="{StaticResource FontSizeMedium}"/>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,10,12,0" Foreground="White" FontSize="13"/>
+                        <!-- actions -->
+						<StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <Button Name="BtnInstall" Classes="Primary" Click="BtnInstall_OnClick" FontSize="18" IsEnabled="False">Install ↓</Button>
+                            <Button Name="BtnGithub" Classes="Secondary" Click="BtnGithub_OnClick" FontSize="18" Margin="10,0,0,0">GitHub</Button>
+                            <Button Name="BtnMcpSo" Classes="Secondary" Click="BtnMcpSo_OnClick" FontSize="18" Margin="10,0,0,0">MCP.so</Button>
+						</StackPanel>
 					</StackPanel>
-				</StackPanel>
-				<!-- Tool config -->
-				<TextBlock Grid.Row="1"  Grid.Column="1" FontSize="16" Margin="10,0,0,0">Tool Configuration</TextBlock>
-				<TextBox Grid.Row="2" Grid.Column="1" Margin="10,10,0,0" Name="TbMcpSetting" IsReadOnly="True"/>
-				<Label Grid.Row="2" Grid.Column="1" Name="LabelInvalidJson" IsVisible="False"
-					   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource SystemAccentColor}">JSON config is not valid.</Label>
-			</Grid>
-		</ScrollViewer>
-	</Panel>
+				</DockPanel>
+			</Border>
+
+			<!-- 主要內容區 -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,10,20">
+                <!-- Tab 內容區 -->
+				<Border Grid.Column="0" Classes="CardFix" Margin="20,20,10,0">
+                    <TabControl >
+						<TabItem Header="Overview" Classes="feature-tab">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Name="TbMcpType" Text="Type: Unknown" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
+								<TextBlock Text="Features" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
+                                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
+                                    <Border Classes="feature-icon">
+                                        <Label>A</Label>
+                                    </Border>
+                                    <Border Classes="feature-icon">
+                                        <Label>B</Label>
+                                    </Border>
+                                    <Border Classes="feature-icon">
+                                        <Label>C</Label>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Text="System Requirements" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
+                                <Border MinHeight="30" Background="{DynamicResource SystemChromeHighColor}" CornerRadius="8" Margin="0,10,0,0">
+
+                                </Border>
+                                <TextBlock Text="Tags" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Config" Classes="feature-tab">
+                            <StackPanel Orientation="Vertical" Margin="0,10,0,0">
+                                <TextBlock Text="MCP Configuration" FontSize="{StaticResource FontSizeMedium}"/>
+								<Panel Margin="0,10,0,0">
+								    <TextBox Margin="0,0,0,0" Name="TbMcpSetting" IsReadOnly="True" MinHeight="100"/>
+                                    <Label Name="LabelInvalidJson" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                           Foreground="{DynamicResource SystemAccentColor}">JSON config is not valid.</Label>
+                                </Panel>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Document" Classes="feature-tab">
+                            <!-- Tool markdown
+					             Fix for code block: https://github.com/whistyun/Markdown.Avalonia/issues/156
+					        -->
+                            <md:MarkdownScrollViewer Name="MarkdownViewer" ScrollViewer.VerticalScrollBarVisibility="Hidden" Margin="0,8,0,0">
+                                <md:MarkdownScrollViewer.Styles>
+                                    <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+                                        <Style.Setters>
+                                            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+                                        </Style.Setters>
+                                    </Style>
+                                    <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
+                                        <Style.Setters>
+                                            <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+                                            <Setter Property="Padding" Value="2,0"></Setter>
+                                            <Setter Property="Margin" Value="2,0"></Setter>
+                                        </Style.Setters>
+                                    </Style>
+                                </md:MarkdownScrollViewer.Styles>
+                            </md:MarkdownScrollViewer>
+                        </TabItem>
+                        <TabItem Header="Rating" Classes="feature-tab">
+                            <StackPanel Orientation="Vertical" Margin="0,10,0,0">
+                                <TextBlock Text="User Ratings" FontSize="{StaticResource FontSizeMedium}"/>
+                                <TextBlock Text="My Rating: 4.5" FontSize="{StaticResource FontSizeMedium}"/>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </Border>
+                <!-- 側邊欄 -->
+                <StackPanel Grid.Column="1" Classes="sidebar-container" Margin="0,12,0,0">
+                    <!-- 側邊欄內容 -->
+					<Border Classes="CardFix">
+                        <Label>快速信息...</Label>
+                    </Border>
+                    <Border Classes="CardFix">
+                        <Label>相關工具...</Label>
+                    </Border>
+                    <Border Classes="CardFix">
+                        <Label>熱門標籤...</Label>
+                    </Border>
+                </StackPanel>
+            </Grid>
+		</Grid>
+	</ScrollViewer>
 </Window>
