@@ -17,12 +17,12 @@
         <TextBlock Text="MCP 市集" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
         <TextBlock Text="探索和安裝 MCP 擴展" Margin="0,40,0,0"/>
 
-        <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="0,56,0,0">
-            <TabItem Header="Latest" FontWeight="Medium"></TabItem>
-            <TabItem Header="Featured" FontWeight="Medium"></TabItem>
-            <TabItem Header="Category" FontWeight="Medium"></TabItem>
+        <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="10,64,0,0">
+			<TabStripItem Content="Latest" FontWeight="Medium" Classes="feature-tabstrip"/>
+			<TabStripItem Content="Featured" FontWeight="Medium" Classes="feature-tabstrip"/>
+			<TabStripItem Content="Category" FontWeight="Medium" Classes="feature-tabstrip"/>
         </TabStrip>
-        <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="0,68,120,0">
+        <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="10,68,120,0">
             <Button Name="BtnLeaveSearch" DockPanel.Dock="Right" Click="BtnLeaveSearch_OnClick">❌</Button>
             <TextBlock Name="TbQueryTitle" FontSize="24" FontWeight="Bold" KeyDown="TbQueryTitle_OnKeyDown"
                        TextTrimming="CharacterEllipsis">Search: "MCP tool name"</TextBlock>
@@ -32,7 +32,7 @@
             <Button Name="BtnSearch" Click="BtnSearch_OnClick">🔍</Button>
         </StackPanel>
         
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,102,20,32">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,110,20,32">
             <ItemsControl Name="McpListBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding Servers}">
 			    <ItemsControl.ItemsPanel>
 				    <ItemsPanelTemplate>
@@ -61,7 +61,7 @@
                            Foreground="{DynamicResource SystemAccentColor}"
                            Margin="0"/>
 
-        <local:StoreCategory Name="StoreCategory" IsVisible="False" Margin="20,102,20,32" VerticalAlignment="Top"/>
+        <local:StoreCategory Name="StoreCategory" IsVisible="False" Margin="20,110,20,32" VerticalAlignment="Top"/>
 
 		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="0,0,20,4" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
         
