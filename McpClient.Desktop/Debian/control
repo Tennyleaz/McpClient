@@ -1,0 +1,10 @@
+Package: ai-nexus-client
+Version: 0.0.1
+Section: office
+Priority: optional
+Architecture: amd64
+Maintainer: Tennyson Lu <tenny_lu@phison.com>
+Depends: libstdc++6, libgcc1, libc6
+Description: AI Nexus Client - An advanced AI utility.
+  The AI Nexus Client provides a modern, easy-to-use interface for AI-powered productivity. 
+  Built using AvaloniaUI and .NET.
