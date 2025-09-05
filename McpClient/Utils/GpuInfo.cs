@@ -6,32 +6,6 @@ using System.Threading.Tasks;
 
 namespace McpClient.Utils;
 
-internal class GpuInfoLinux
-{
-    public string Name { get; set; }
-    public int MemoryMiB { get; set; }
-    public RuntimeType Runtime { get; set; }
-}
-
-internal class GpuInfoWindows
-{
-    public string Name { get; set; }
-    public long? AdapterRAM { get; set; }
-    public RuntimeType Runtime { get; set; }
-}
-
-internal class PciIdsEntry
-{
-    public string VendorName;
-    public Dictionary<string, PciDeviceEntry> Devices = new();
-}
-
-internal class PciDeviceEntry
-{
-    public string DeviceName;
-    public Dictionary<string, string> Subsystems = new(); // key: "subvendor:subdev"
-}
-
 internal enum RuntimeType
 {
     CUDA,   // Nvidia CUDA windows/linux
