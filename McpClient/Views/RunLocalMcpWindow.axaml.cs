@@ -65,9 +65,9 @@ public partial class RunLocalMcpWindow : Window
 
     private async Task ExecuteWorkflow(int id, string modelName)
     {
-        //IAsyncEnumerable<AutogenResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, null);
-        //await foreach (AutogenResponse response in responses)
-        //{
+        IAsyncEnumerable<AutogenStreamResponse> responses = _service.ExecuteOfflineWorkflow(id, modelName, null);
+        await foreach (AutogenStreamResponse response in responses)
+        {
         //    Dispatcher.UIThread.Invoke(() =>
         //    {
         //        TbOutput.Text += response + "\n";
@@ -80,6 +80,6 @@ public partial class RunLocalMcpWindow : Window
         //            BtnRun.IsEnabled = true;
         //        }
         //    });
-        //}
+        }
     }
 }
