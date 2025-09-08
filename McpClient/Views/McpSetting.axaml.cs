@@ -124,7 +124,7 @@ public partial class McpSetting : UserControl
             {
                 enabled = true,
                 server_name = agent.Name,
-                type = "streamableHttp",
+                type = McpServerType.StreamableHttp,
                 streamable_http_url = agent.Url,
                 source = "cloud",
                 //owner = "",
@@ -299,7 +299,7 @@ public partial class McpSetting : UserControl
             if (editServer != null && DataContext is McpServerConfigViewModel vm)
             {
                 // Modify current viewmodel
-                if (editServer.type == "stdio")
+                if (editServer.type == McpServerType.Stdio)
                 {
                     // Command
                     mcpViewModel.Command = editServer.command;
@@ -316,11 +316,11 @@ public partial class McpSetting : UserControl
                     }
                     mcpViewModel.Env = collection;
                 }
-                else if (editServer.type == "sse")
+                else if (editServer.type == McpServerType.SSE)
                 {
                     mcpViewModel.SseUrl = editServer.sse_url;
                 }
-                else if (editServer.type == "streamableHttp")
+                else if (editServer.type == McpServerType.StreamableHttp)
                 {
                     mcpViewModel.StreamableHttpUrl = editServer.streamable_http_url;
                 }

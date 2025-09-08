@@ -81,7 +81,7 @@ public partial class TaskMcpToolList : UserControl
             {
                 enabled = true,
                 server_name = agent.Name,
-                type = "streamableHttp",
+                type = McpServerType.StreamableHttp,
                 streamable_http_url = agent.Url,
                 source = "cloud",
                 //owner = "",

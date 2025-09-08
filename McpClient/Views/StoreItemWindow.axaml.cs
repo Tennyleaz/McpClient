@@ -194,11 +194,11 @@ public partial class StoreItemWindow : Window
                 Console.WriteLine(ex);
             }
         }
-        else if (mcpServer.type == "streamableHttp")
+        else if (mcpServer.type == McpServerType.StreamableHttp)
         {
             mcpServer.streamable_http_url = url;
         }
-        else if (mcpServer.type == "sse")
+        else if (mcpServer.type == McpServerType.SSE)
         {
             mcpServer.sse_url = url;
         }

@@ -36,7 +36,7 @@ internal class McpViewModel : ReactiveObject
 
     private bool _enabled;
     private bool _active;
-    private string _type;
+    private McpServerType _type;
     private string _serverName;
     private string _owner;
     private string _sseUrl;
@@ -91,7 +91,7 @@ internal class McpViewModel : ReactiveObject
 
     public bool HasOwner => !string.IsNullOrEmpty(_owner);
 
-    public string Type => _type;
+    public McpServerType Type => _type;
 
     public string DisplayArgs
     {
@@ -113,11 +113,11 @@ internal class McpViewModel : ReactiveObject
         }
     }
 
-    public bool IsShowCommand => _type == "stdio";
+    public bool IsShowCommand => _type == McpServerType.Stdio;
 
-    public bool IsShowSseUrl => _type == "sse";
+    public bool IsShowSseUrl => _type == McpServerType.SSE;
 
-    public bool IsShowStreamablUrl => _type == "streamableHttp";
+    public bool IsShowStreamablUrl => _type == McpServerType.StreamableHttp;
 
     public bool IsCloud => _source == "cloud";
 

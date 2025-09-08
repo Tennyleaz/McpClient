@@ -50,17 +50,17 @@ public partial class AddServerWindow : Window
             }
 
             CbTypes.IsEnabled = false;
-            if (_mcpViewModel.Type == "stdio")
+            if (_mcpViewModel.Type == McpServerType.Stdio)
             {
                 CbTypes.SelectedIndex = 0;
                 TbCommand.Text = _mcpViewModel.Command;
             }
-            else if (_mcpViewModel.Type == "sse")
+            else if (_mcpViewModel.Type == McpServerType.SSE)
             {
                 CbTypes.SelectedIndex = 1;
                 TbUrl.Text = _mcpViewModel.SseUrl;
             }
-            else if (_mcpViewModel.Type == "streamableHttp")
+            else if (_mcpViewModel.Type == McpServerType.StreamableHttp)
             {
                 CbTypes.SelectedIndex = 2;
                 TbUrl.Text = _mcpViewModel.StreamableHttpUrl;
@@ -96,17 +96,17 @@ public partial class AddServerWindow : Window
         newServer.env = env;
         if (CbTypes.SelectedIndex == 1)
         {
-            newServer.type = "sse";
+            newServer.type = McpServerType.SSE;
             newServer.sse_url = TbUrl.Text;
         }
         else if (CbTypes.SelectedIndex == 2)
         {
-            newServer.type = "streamableHttp";
+            newServer.type = McpServerType.StreamableHttp;
             newServer.streamable_http_url = TbUrl.Text;
         }
         else
         {
-            newServer.type = "stdio";
+            newServer.type = McpServerType.Stdio;
         }
 
         Result = newServer;

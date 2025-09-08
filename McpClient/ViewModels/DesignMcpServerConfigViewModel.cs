@@ -14,7 +14,7 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
         McpServer config1 = new McpServer
         {
             enabled = false,
-            type = "stdio",
+            type = McpServerType.Stdio,
             server_name = "edgeone-pages-mcp-server",
             command = "npx",
             args = new List<string> { "edgeone-pages-mcp" },
@@ -25,7 +25,7 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
         McpServer config2 = new McpServer
         {
             enabled = true,
-            type = "sse",
+            type = McpServerType.SSE,
             server_name = "Text2Image",
             sse_url = "http://localhost:9000/sse",
             owner = "statham_li",
@@ -36,7 +36,7 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
         McpServer config3 = new McpServer
         {
             enabled = true,
-            type = "sse",
+            type = McpServerType.SSE,
             server_name = "RAGServer",
             sse_url = "http://192.168.41.60:8012/sse",
             owner = "statham_li",
@@ -47,7 +47,7 @@ internal class DesignMcpServerConfigViewModel : McpServerConfigViewModel
         McpServer config4 = new McpServer
         {
             enabled = true,
-            type = "streamableHttp",
+            type = McpServerType.StreamableHttp,
             server_name = "AwesomeStreamableHttpServer",
             sse_url = "http://192.168.41.60:8012/streamableHttp",
             owner = "statham_li",
