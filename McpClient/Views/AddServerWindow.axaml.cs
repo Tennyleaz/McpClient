@@ -1,9 +1,11 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using McpClient.Models;
 using McpClient.ViewModels;
+using ModelContextProtocol.Client;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using System.Collections.Generic;
@@ -25,12 +27,14 @@ public partial class AddServerWindow : Window
     {
         InitializeComponent();
         _isEdit = false;
+        BtnReset.IsVisible = false;
     }
 
     internal AddServerWindow(McpViewModel mcpViewModel)
     {
         InitializeComponent();
         _isEdit = true;
+        BtnReset.IsVisible = mcpViewModel.IsCloud;
         _mcpViewModel = mcpViewModel;
     }
 
@@ -107,6 +111,24 @@ public partial class AddServerWindow : Window
         else
         {
             newServer.type = McpServerType.Stdio;
+        }
+
+        try
+        {
+            bool mcpReuslt = await ValidateMcp(newServer);
+            if (!mcpReuslt)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("MCP", "Failed to find tools in MCP server.",
+                    ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+                await box.ShowWindowDialogAsync(this);
+            }
+        }
+        catch (Exception ex)
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("MCP", "Failed to find tools in MCP server:\n" + ex.Message,
+                ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+            await box.ShowWindowDialogAsync(this);
+            return;
         }
 
         Result = newServer;
@@ -216,5 +238,52 @@ public partial class AddServerWindow : Window
         }
 
         return true;
+    }
+
+    private async Task<bool> ValidateMcp(McpServer server)
+    {
+        IClientTransport clientTransport;
+        if (server.type == McpServerType.Stdio)
+        {
+            clientTransport = new StdioClientTransport(new StdioClientTransportOptions
+            {
+                Command = server.command,
+                Arguments = server.args,
+                EnvironmentVariables = server.env,
+                Name = server.server_name
+            });
+        }
+        else if (server.type == McpServerType.StreamableHttp)
+        {
+            clientTransport = new SseClientTransport(new SseClientTransportOptions
+            {
+                Endpoint = new Uri(server.streamable_http_url),
+                TransportMode = HttpTransportMode.StreamableHttp,
+                Name = server.server_name
+            });
+        }
+        else
+        {
+            clientTransport = new SseClientTransport(new SseClientTransportOptions
+            {
+                Endpoint = new Uri(server.sse_url),
+                TransportMode = HttpTransportMode.Sse,
+                Name = server.server_name
+            });
+        }
+
+        IMcpClient mcpClient = await McpClientFactory.CreateAsync(clientTransport);
+        IList<McpClientTool> tools = await mcpClient.ListToolsAsync();
+        if (tools.Count == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void BtnReset_OnClick(object sender, RoutedEventArgs e)
+    {
+
     }
 }

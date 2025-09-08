@@ -3,9 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:McpClient.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="480"
              x:Class="McpClient.Views.AddServerWindow"
-             Width="640" Height="400"
+             Width="640" Height="480"
              Title="Add New Server"
              WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
              Loaded="Control_OnLoaded">
@@ -35,6 +35,7 @@
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Name:</TextBlock>
@@ -67,8 +68,14 @@
 			<TextBlock Grid.Column="1" Grid.Row="6" Classes="input" Name="TbEnv" Text="(empty)"/>
             <Button Grid.Column="2" Grid.Row="6" Width="80" HorizontalContentAlignment="Center" Margin="8,0,0,0" 
                     Name="BtnEditEnv" Click="BtnEditEnv_OnClick">Edit Env</Button>
+
+            <TextBlock Grid.Column="0" Grid.Row="7" Text="Description:" Margin="0,8,0,0" VerticalAlignment="Top"/>
+            <TextBox Grid.Column="1" Grid.Row="7" Classes="input" Name="TbDescription" Watermark="What this agent do?" MinHeight="60" AcceptsReturn="True"/>
         </Grid>
 
-        <Button Name="ButtonApply" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Click="ButtonApply_OnClick">Apply</Button>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Spacing="20">
+            <Button Name="ButtonApply" Click="ButtonApply_OnClick">Apply</Button>
+            <Button Name="BtnReset" Click="BtnReset_OnClick">Reset Defaults</Button>
+        </StackPanel>
     </Panel>
 </Window>
