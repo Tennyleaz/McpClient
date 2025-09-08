@@ -44,12 +44,13 @@ internal class AiNexusService
         try
         {
             using HttpResponseMessage response = await _httpClient.PostAsJsonAsync("/api/v1/login", body);
+            string json = await response.Content.ReadAsStringAsync();
+
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                return null;
+                return new LoginResponse { ErrorMessage = json };
             }
-
-            string json = await response.Content.ReadAsStringAsync();
+            
             LoginResponse result = JsonSerializer.Deserialize<LoginResponse>(json, _options);
 
             // Also set self's token for future use
@@ -63,7 +64,7 @@ internal class AiNexusService
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return null;
+            return new LoginResponse { ErrorMessage = ex.Message };
         }
     }
 

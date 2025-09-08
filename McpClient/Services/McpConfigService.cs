@@ -107,15 +107,15 @@ internal class McpConfigService
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return null;
-        }
-
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            return null;
+            return new LoginResponse { ErrorMessage = ex.Message };
         }
 
         string json = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return new LoginResponse { ErrorMessage = json };
+        }
+
         LoginResponse result = JsonSerializer.Deserialize<LoginResponse>(json, _options);
 
         // Also set self's token for future use

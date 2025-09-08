@@ -11,5 +11,6 @@ namespace McpClient.Models
         public string UserEmail { get; set; }
         public string Token { get; set; }
         public DateTime ExpiresAt { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }

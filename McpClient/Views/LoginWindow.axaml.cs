@@ -77,9 +77,9 @@ public partial class LoginWindow : Window
         // generate JWT and login
         IsEnabled = false;
         LoginResponse resposne = await _service.Login(TbUserName.Text, TbPassword.Text);
-        if (resposne == null)
+        if (string.IsNullOrEmpty(resposne.Token))
         {
-            var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.",
+            var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.\n" + resposne.ErrorMessage,
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
             await box.ShowWindowDialogAsync(this);
@@ -89,9 +89,9 @@ public partial class LoginWindow : Window
 
         // Also login to AI Nexus
         LoginResponse aiResponse = await _aiNexusService.Login(TbUserName.Text, TbPassword.Text);
-        if (aiResponse == null)
+        if (string.IsNullOrEmpty(aiResponse.Token))
         {
-            var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.",
+            var box = MessageBoxManager.GetMessageBoxStandard("Login fail", "Please fill in correct username and password.\n" + aiResponse.ErrorMessage,
                 ButtonEnum.Ok,
                 MsBox.Avalonia.Enums.Icon.Info);
             await box.ShowWindowDialogAsync(this);
