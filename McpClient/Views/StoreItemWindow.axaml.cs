@@ -67,6 +67,8 @@ public partial class StoreItemWindow : Window
                 if (parsedMcpServer != null)
                 {
                     TbMcpType.Text = "Type: " + parsedMcpServer.type;
+                    List<string> requirements = ParseSystemRequirements(parsedMcpServer);
+                    TbSystemReq.Text = string.Join(", ", requirements);
 
                     // Check if already installed
                     if (_mcpServer.IsInstalled || _installedNames.Contains(parsedMcpServer.server_name))
@@ -137,12 +139,13 @@ public partial class StoreItemWindow : Window
         if (node == null)
             return null;
 
-        string name, url, type;
+        string name, url, type, command;
         try
         {
             name = node.AsObject().First().Key;
             url = node[name]?["url"]?.ToString();
             type = node[name]?["type"]?.ToString();
+            command = node[name]?["command"]?.ToString();
         }
         catch (JsonException ex)
         {
@@ -161,22 +164,25 @@ public partial class StoreItemWindow : Window
         switch (type)
         {
             case "streamable-http":
-                mcpServer.type = "streamableHttp";
+                mcpServer.type = McpServerType.StreamableHttp;
                 break;
             case "sse":
-                mcpServer.type = "sse";
+                mcpServer.type = McpServerType.SSE;
                 break;
             default:
-                mcpServer.type = "stdio";
+                if (string.IsNullOrEmpty(command))
+                    mcpServer.type = McpServerType.SSE;
+                else
+                    mcpServer.type = McpServerType.Stdio;
                 break;
         }
 
-        if (mcpServer.type == "stdio")
+        if (mcpServer.type == McpServerType.Stdio)
         {
             try
             {
                 JsonNode firstChild = node.Root[name];
-                mcpServer.command = firstChild["command"]?.ToString();
+                mcpServer.command = command;
                 if (firstChild["env"] != null)
                 {
                     string json = firstChild["env"].ToJsonString();
@@ -204,6 +210,43 @@ public partial class StoreItemWindow : Window
         }
 
         return mcpServer;
+    }
+
+    private List<string> ParseSystemRequirements(McpServer mcpServer)
+    {
+        List<string> requiredApps = new List<string>();
+
+        if (mcpServer.type == McpServerType.Stdio)
+        {
+            switch (mcpServer.command)
+            {
+                case "npm":
+                case "npx":
+                    requiredApps.Add("NodeJS");
+                    requiredApps.Add(mcpServer.command);
+                    break;
+                case "node":
+                    requiredApps.Add("NodeJS");
+                    break;
+                case "uv":
+                case "uvx":
+                    requiredApps.Add("Python 3");
+                    requiredApps.Add(mcpServer.command);
+                    break;
+                case "python":
+                case "python3":
+                    requiredApps.Add("Python 3");
+                    break;
+                case "docker":
+                    requiredApps.Add("Docker");
+                    break;
+                default:
+                    requiredApps.Add(mcpServer.command);
+                    break;
+            }
+        }
+
+        return requiredApps;
     }
 
     private void BtnGithub_OnClick(object sender, RoutedEventArgs e)

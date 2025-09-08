@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:McpClient.ViewModels"
         xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
         xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="800"
         x:Class="McpClient.Views.StoreItemWindow"
         x:DataType="model:StoreMcpServer"
         WindowStartupLocation="CenterOwner"
@@ -74,6 +74,7 @@
 						<TabItem Header="Overview" Classes="feature-tab">
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Name="TbMcpType" Text="Type: Unknown" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
+								<!-- Features -->
 								<TextBlock Text="Features" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
                                 <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
                                     <Border Classes="feature-icon">
@@ -86,9 +87,10 @@
                                         <Label>C</Label>
                                     </Border>
                                 </StackPanel>
+                                <!-- System Requirements -->
                                 <TextBlock Text="System Requirements" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
-                                <Border MinHeight="30" Background="{DynamicResource SystemChromeHighColor}" CornerRadius="8" Margin="0,10,0,0">
-
+                                <Border MinHeight="30" Background="{DynamicResource SystemChromeHighColor}" CornerRadius="8" Margin="0,10,0,0" Padding="12">
+                                    <TextBlock Name="TbSystemReq" TextWrapping="Wrap"/>
                                 </Border>
                                 <TextBlock Text="Tags" FontSize="{StaticResource FontSizeMedium}" Margin="0,10,0,0"/>
                             </StackPanel>
