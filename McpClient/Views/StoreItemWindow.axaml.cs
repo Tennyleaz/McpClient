@@ -10,6 +10,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using McpClient.Models;
 using McpClient.Services;
+using McpClient.Utils;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -102,11 +103,28 @@ public partial class StoreItemWindow : Window
         BtnInstall.IsEnabled = false;
         BtnInstall.Content = "Installing...";
 
+        // check local command
+        if (parsedMcpServer.type == McpServerType.Stdio)
+        {
+            if (!LocalServiceUtils.FindCommand(parsedMcpServer.command))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Info", $"You need command \"{parsedMcpServer.command}\" before installing this agent.",
+                    ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+                await box.ShowWindowDialogAsync(this);
+
+                BtnInstall.IsEnabled = true;
+                BtnInstall.Content = "Install ¡õ";
+                return;
+            }
+        }
+
         Settings settings = SettingsManager.Local.Load();
         McpConfigService configService = new McpConfigService(settings.McpConfigToken);
         McpServerConfig serverConfig = await configService.GetConfig();
         if (serverConfig == null)
         {
+            BtnInstall.IsEnabled = true;
+            BtnInstall.Content = "Install ¡õ";
             return;
         }
 
@@ -212,7 +230,7 @@ public partial class StoreItemWindow : Window
         return mcpServer;
     }
 
-    private List<string> ParseSystemRequirements(McpServer mcpServer)
+    private static List<string> ParseSystemRequirements(McpServer mcpServer)
     {
         List<string> requiredApps = new List<string>();
 

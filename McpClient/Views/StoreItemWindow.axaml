@@ -53,7 +53,7 @@
                     </Grid>
                     <!-- name/description -->
 					<StackPanel Orientation="Vertical" Margin="20,0,0,0">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" FontSize="{StaticResource FontSizeDisplay}"/>
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" FontSize="{StaticResource FontSizeDisplay}" TextWrapping="Wrap"/>
                         <TextBlock Text="{Binding Author, StringFormat='By {0}'}" Foreground="White" FontSize="{StaticResource FontSizeMedium}"/>
                         <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,10,12,0" Foreground="White" FontSize="13"/>
                         <!-- actions -->

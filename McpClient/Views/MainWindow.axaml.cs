@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
+using McpClient.Utils;
 
 namespace McpClient.Views;
 
@@ -36,6 +37,8 @@ public partial class MainWindow : Window
         ragWorker.WorkerSupportsCancellation = true;
         ragWorker.DoWork += RagWorker_DoWork;
         ragWorker.RunWorkerAsync();
+
+        GlobalService.KnownCommands = LocalServiceUtils.ListKnownLocalServices();
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
