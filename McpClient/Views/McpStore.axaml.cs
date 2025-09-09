@@ -95,6 +95,7 @@ public partial class McpStore : UserControl
             StoreCategory.IsVisible = true;
             StoreCategory.StoreCategoryList.SelectedIndex = -1;
             McpListBox.IsVisible = false;
+            LbEmptyList.IsVisible = false;
         }
     }
 
@@ -246,6 +247,14 @@ public partial class McpStore : UserControl
             StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
             await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
             IsUpdateNeeded = window.IsInstalled;
+        }
+    }
+
+    private async void TbSearch_OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            await Search();
         }
     }
 }

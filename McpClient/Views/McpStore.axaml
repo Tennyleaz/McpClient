@@ -28,11 +28,11 @@
                        TextTrimming="CharacterEllipsis">Search: "MCP tool name"</TextBlock>
         </DockPanel>
         <StackPanel Name="SearchBox" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,120,0">
-            <TextBox Name="TbSearch" Watermark="Search here" MinWidth="160"></TextBox>
+            <TextBox Name="TbSearch" Watermark="Search here" MinWidth="160" KeyDown="TbSearch_OnKeyDown"/>
             <Button Name="BtnSearch" Click="BtnSearch_OnClick">🔍</Button>
         </StackPanel>
         
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,110,20,32">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,115,20,32">
             <ItemsControl Name="McpListBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding Servers}">
 			    <ItemsControl.ItemsPanel>
 				    <ItemsPanelTemplate>
@@ -55,13 +55,13 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,100,0,0" IsVisible="False">Nothing here</Label>
+        <Label Name="LbEmptyList" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,200,0,0" IsVisible="False">Nothing here</Label>
         <ring:ProgressRing Name="ProgressRing" Width="40" Height="40" IsActive="True" IsVisible="False"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            Foreground="{DynamicResource SystemAccentColor}"
                            Margin="0"/>
 
-        <local:StoreCategory Name="StoreCategory" IsVisible="False" Margin="20,110,20,32" VerticalAlignment="Top"/>
+        <local:StoreCategory Name="StoreCategory" IsVisible="False" Margin="20,115,20,32" VerticalAlignment="Top"/>
 
 		<Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="0,0,20,4" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
         
