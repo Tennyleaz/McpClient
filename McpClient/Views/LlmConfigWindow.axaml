@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:McpClient.ViewModels"
+        xmlns:md="clr-namespace:McpClient.Models"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="550"
         x:Class="McpClient.Views.LlmConfigWindow"
         Loaded="Control_OnLoaded" Closing="Window_OnClosing"
@@ -18,24 +19,26 @@
                 <Button Name="BtnApplyUrl" HorizontalAlignment="Right" Click="BtnApplyUrl_OnClick">Apply</Button>
             </Panel>
             <RadioButton GroupName="g1" Content="Run local LLM service" Name="RadioLocal" IsCheckedChanged="RadioLocal_OnIsCheckedChanged" Margin="0,10,0,0"/>
-            <Grid Name="LocalGrid" Margin="25,0,0,0" ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,*,*,*,*">
+            <Grid Name="LocalGrid" Margin="25,0,0,0" ColumnDefinitions="200,*,Auto" RowDefinitions="*,*,*,*,*">
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Height="32">Engine:</Label>
                 <Label Grid.Row="0" Grid.Column="1" Name="LbLlamaPath" VerticalAlignment="Center" Height="32">C:\Users\xxx\AppData\Local\McpClient\llama-server.exe</Label>
 
-				<Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="32">Model:</Label>
-				<Label Grid.Row="1" Grid.Column="1" Name="LbModelPath" VerticalAlignment="Center" Height="32">C:\Users\xxx\AppData\Local\McpClient\Models\qwen3-4b-instruct-2507.gguf</Label>
-				<Button Grid.Row="1" Grid.Column="2" Name="BtnSelectModel" Click="BtnSelectModel_OnClick">Select Model</Button>
-
-                <Label Grid.Row="2" Grid.Column="0" Height="32">Name:</Label>
-                <Label Grid.Row="2" Grid.Column="1" Name="LbModelName" Height="32">qwen3-4b-instruct-2507</Label>
-
-                <Label Grid.Row="3" Grid.Column="0" Height="32">Type:</Label>
-                <Label Grid.Row="3" Grid.Column="1" Name="LbModelType" Height="32">qwen</Label>
-
-                <Label Grid.Row="4" Grid.Column="0" Height="32">Size:</Label>
-                <Label Grid.Row="4" Grid.Column="1" Name="LbModelSize" Height="32">4B</Label>
+				<Button Grid.Row="1" Grid.Column="2" Name="BtnSelectModel" Click="BtnSelectModel_OnClick">Select New Model</Button>
+                
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Model:</Label>
+                <ComboBox Grid.Row="1" Grid.Column="1" Name="CbModel" MinWidth="200" Height="45" SelectionChanged="CbModel_OnSelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="md:KnownGguf">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontWeight="DemiBold"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Architecture}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Size}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
-            <Grid Name="ModelConfigGrid" Margin="25,4,0,0" ColumnDefinitions="Auto,Auto,*" RowDefinitions="*,40,40,40,40">
+            <Grid Name="ModelConfigGrid" Margin="25,10,0,0" ColumnDefinitions="200,Auto,*" RowDefinitions="*,40,40,40,40">
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Run on Device:</Label>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="CbDevice" MinWidth="200" Height="45" SelectionChanged="CbDevice_OnSelectionChanged">
                     <ComboBox.ItemTemplate>

@@ -6,6 +6,7 @@ using System.Runtime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using McpClient.Models;
 
 namespace McpClient;
 
@@ -13,6 +14,7 @@ internal sealed class SettingsManager
 {
     private readonly string _settingDir;
     private readonly string _settingsPath;
+    private readonly string _modelSettingPath;
     private readonly string _historyPath;
     public static SettingsManager Local { get; } = new SettingsManager();
 
@@ -21,6 +23,7 @@ internal sealed class SettingsManager
         string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         _settingDir = Path.Combine(appdata, "McpClient");
         _settingsPath = Path.Combine(_settingDir, "settings.json");
+        _modelSettingPath = Path.Combine(_settingDir, "modelSetting.json");
         _historyPath = Path.Combine(_settingDir, "documentHistory.json");
     }
 
@@ -68,6 +71,37 @@ internal sealed class SettingsManager
         }
     }
 
+    public void SaveModelSettings(ModelSettings settings)
+    {
+        if (!Directory.Exists(_settingDir))
+        {
+            Directory.CreateDirectory(_settingDir);
+        }
+
+        using (var fs = new FileStream(_modelSettingPath, FileMode.Create))
+        {
+            JsonSerializer.Serialize(fs, settings);
+        }
+    }
+
+    public ModelSettings LoadModelSettings()
+    {
+        if (!File.Exists(_modelSettingPath))
+            return new ModelSettings();
+        try
+        {
+            using (var fs = new FileStream(_modelSettingPath, FileMode.Open))
+            {
+                return JsonSerializer.Deserialize<ModelSettings>(fs);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return new ModelSettings();
+        }
+    }
+
     public List<DocumentHistory> LoadDocumentHistories()
     {
         if (!File.Exists(_historyPath))
@@ -112,6 +146,12 @@ internal sealed record Settings
     public string LlmRemoteUrl { get; set; }
     public bool IsUseRemoteLlm { get; set; }
     public bool IsDarkMode { get; set; }
+}
+
+internal sealed record ModelSettings
+{
+    public List<KnownGguf> KnownGgufs { get; set; } = new();
+    public int LastSelectedModel { get; set; }
 }
 
 internal sealed record DocumentHistory

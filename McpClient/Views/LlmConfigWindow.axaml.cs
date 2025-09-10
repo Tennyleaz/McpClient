@@ -3,24 +3,30 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using McpClient.Models;
+using McpClient.Services;
 using McpClient.Utils;
 using McpClient.ViewModels;
+using ModelContextProtocol.Protocol;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-using McpClient.Services;
+using AvaloniaEdit.Utils;
 
 namespace McpClient.Views;
 
 public partial class LlmConfigWindow : Window
 {
     private List<GpuInfoViewModel> gpuList = new ();
+    private ObservableCollection<KnownGguf> modelList = new();
     private Settings settings;
+    private ModelSettings modelSettings;
     private int hgRecommendSize;
     private DispatcherTimer checkServerTimer;
     private int maxContextLength = 0, currentContextLength = 4096;
@@ -70,18 +76,32 @@ public partial class LlmConfigWindow : Window
         }
 
         // Check model file
-        if (File.Exists(settings.LlmModelFile))
+        CbModel.ItemsSource = modelList;
+        modelSettings = SettingsManager.Local.LoadModelSettings();
+        if (modelSettings.KnownGgufs.Count > 0)
         {
-            LbModelPath.Content = settings.LlmModelFile;
-            LbModelName.Content = "";
-            LoadModelMetadata(settings.LlmModelFile);
+            KnownGguf lastSelectedModel;
+
+            // Copy list to viewmodel
+            modelList.AddRange(modelSettings.KnownGgufs);
+
+            if (modelSettings.KnownGgufs.Count > modelSettings.LastSelectedModel)
+            {
+                lastSelectedModel = modelSettings.KnownGgufs[modelSettings.LastSelectedModel];
+                CbModel.SelectedIndex = modelSettings.LastSelectedModel;
+            }
+            else
+            {
+                lastSelectedModel = modelSettings.KnownGgufs.First();
+                CbModel.SelectedIndex = 0;
+            }
+
             // Check the service
             StartCheckServerStatus();
         }
         else
         {
-            LbModelPath.Content = "No model selected yet.";
-            LbModelName.Content = "---";
+            //LbModelPath.Content = "No model selected yet.";
         }
     }
 
@@ -152,6 +172,14 @@ public partial class LlmConfigWindow : Window
         {
             LocalGrid.IsEnabled = ModelConfigGrid.IsEnabled = false;
             ExternalPanel.IsEnabled = true;
+
+            // Stop any running local llama
+            if (GlobalService.LlamaService != null)
+            {
+                GlobalService.LlamaService.Stop();
+                GlobalService.LlamaService.Dispose();
+                GlobalService.LlamaService = null;
+            }
         }
     }
 
@@ -227,8 +255,15 @@ public partial class LlmConfigWindow : Window
 
         if (settings.LlmModelFile != file)
         {
-            LbModelPath.Content = file;
-            LoadModelMetadata(file);
+            KnownGguf newGGUF = LoadModelMetadata(file);
+            if (modelSettings.KnownGgufs.All(x => x.GgufFilePath != file))
+            {
+                // Only save new model if not the same file
+                modelList.Add(newGGUF);
+                modelSettings.LastSelectedModel = CbModel.SelectedIndex = modelList.Count - 1;
+                modelSettings.KnownGgufs.Add(newGGUF);
+                SettingsManager.Local.SaveModelSettings(modelSettings);
+            }
 
             // Save the model to setting
             settings.LlmModelFile = file;
@@ -239,39 +274,49 @@ public partial class LlmConfigWindow : Window
         }
     }
 
-    private void LoadModelMetadata(string modelFile)
+    private KnownGguf LoadModelMetadata(string modelFile)
     {
         GGUFReader reader = new GGUFReader(modelFile);
+
+        KnownGguf newGguf = new KnownGguf();
+        newGguf.GgufFilePath = modelFile;
+
+        string modeltype = "";
         foreach (var metadata in reader.Header.Metadata)
         {
             if (metadata.Key == "general.name")
             {
-                LbModelName.Content = metadata.Value.ToString();
+                newGguf.Name = metadata.Value.ToString();
             }
             else if (metadata.Key == "general.size_label")
             {
-                LbModelSize.Content = metadata.Value.ToString();
+                newGguf.Size = metadata.Value.ToString();
             }
             else if (metadata.Key == "general.architecture")
             {
-                LbModelType.Content = metadata.Value.ToString();
+                newGguf.Architecture = metadata.Value.ToString();
             }
             else if (metadata.Key.EndsWith(".context_length"))
             {
                 string len = metadata.Value.ToString();
                 int.TryParse(len, out maxContextLength);
+                newGguf.MaxContextLength = maxContextLength;
                 TbContextLenghtHeader.Content = $"Context Length: (max {len})";
             }
+            else if (metadata.Key == "general.file_type")
+            {
+                if (int.TryParse(metadata.Value.ToString(), out int iValue))
+                {
+                    newGguf.FileType = (LlamaFileType)iValue;
+                }
+            }
         }
+        return newGguf;
     }
 
     private void ClearLlmData()
     {
         LbLlamaPath.Content = "---";
-        LbModelPath.Content = "---";
-        LbModelName.Content = "---";
-        LbModelType.Content = "---";
-        LbModelSize.Content = "---";
     }
 
     private void BtnApplyUrl_OnClick(object sender, RoutedEventArgs e)
@@ -280,11 +325,7 @@ public partial class LlmConfigWindow : Window
 
     private void BtnStartLlama_OnClick(object sender, RoutedEventArgs e)
     {
-        if (!File.Exists(settings.LlmModelFile))
-        {
-            return;
-        }
-        if (CbDevice.SelectedIndex < 0)
+        if (CbDevice.SelectedIndex < 0 || CbModel.SelectedIndex < 0)
         {
             return;
         }
@@ -304,8 +345,8 @@ public partial class LlmConfigWindow : Window
             GlobalService.LlamaService.Dispose();
         }
 
-        string modelType = LbModelType.Content?.ToString();
-        GlobalService.LlamaService = new LlamaService(settings.LlmModelFile, modelType, CbDevice.SelectedIndex,
+        KnownGguf selected = modelList[CbModel.SelectedIndex];
+        GlobalService.LlamaService = new LlamaService(selected.GgufFilePath, selected.Architecture, CbDevice.SelectedIndex,
             isOffload, contentSize);
         GlobalService.LlamaService.Start();
 
@@ -393,5 +434,18 @@ public partial class LlmConfigWindow : Window
         TbContextLenght.TextChanged -= TbContextLenght_OnTextChanged;
         TbContextLenght.Text = currentContextLength.ToString();
         TbContextLenght.TextChanged += TbContextLenght_OnTextChanged;
+    }
+
+    private void CbModel_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CbModel == null)
+            return;
+
+        // Save the selected index
+        if (CbModel.SelectedIndex != modelSettings.LastSelectedModel)
+        {
+            modelSettings.LastSelectedModel = CbModel.SelectedIndex;
+            SettingsManager.Local.SaveModelSettings(modelSettings);
+        }
     }
 }
