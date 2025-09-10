@@ -32,10 +32,12 @@ internal class McpServer
 internal enum McpServerType
 {
     [EnumMember(Value = "stdio")]
-    Stdio,
+    Stdio = 1,
     [EnumMember(Value = "sse")]
-    SSE,
+    SSE = 2,
     [EnumMember(Value = "streambleHttp")]
-    StreamableHttp
+    StreamableHttp = 3,
+    [EnumMember(Value = "unknown")]
+    Unknown = 4
 }
 

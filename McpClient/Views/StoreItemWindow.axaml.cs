@@ -212,6 +212,12 @@ public partial class StoreItemWindow : Window
                     string json = firstChild["args"].ToJsonString();
                     mcpServer.args = JsonSerializer.Deserialize<List<string>>(json);
                 }
+
+                if (firstChild["headers"] != null)
+                {
+                    string json = firstChild["headers"].ToJsonString();
+                    mcpServer.http_headers = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                }
             }
             catch (JsonException ex)
             {

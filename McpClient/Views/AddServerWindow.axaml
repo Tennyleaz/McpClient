@@ -76,7 +76,7 @@
                     Name="BtnEditHeader" Click="BtnEditHeader_OnClick">Edit Headers</Button>
 
             <TextBlock Grid.Column="0" Grid.Row="8" Text="Description:" Margin="0,8,0,0" VerticalAlignment="Top"/>
-            <TextBox Grid.Column="1" Grid.Row="8" Classes="input" Name="TbDescription" Watermark="What this agent do?" MinHeight="60" AcceptsReturn="True"/>
+            <TextBox Grid.Column="1" Grid.Row="8" Classes="input" Name="TbDescription" Watermark="What this agent do?" MinHeight="60" AcceptsReturn="True" TextWrapping="Wrap"/>
         </Grid>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Spacing="20">

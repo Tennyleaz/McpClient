@@ -21,7 +21,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBox Name="TbPayload" DockPanel.Dock="Top" Margin="20,10,20,0" Height="80" VerticalAlignment="Top" AcceptsReturn="True" Watermark="Input your query here."></TextBox>
+        <TextBox Name="TbPayload" DockPanel.Dock="Top" Margin="20,10,20,0" Height="80" VerticalAlignment="Top" AcceptsReturn="True" TextWrapping="Wrap" Watermark="Input your query here."></TextBox>
         <Button Name="BtnRun" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Click="BtnRun_OnClick" Margin="0,0,0,20">Run This Task!</Button>
         <ScrollViewer Name="OutputScroller" VerticalScrollBarVisibility="Auto" Margin="20,10,20,20">
             <TextBlock Name="TbOutput" TextWrapping="Wrap">Output log here</TextBlock>

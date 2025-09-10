@@ -39,6 +39,12 @@ internal class StoreMcpServerDetailBase
 
     [JsonPropertyName("timestamp_text")]
     public string TimestampText { get; set; }
+
+    [JsonPropertyName("type_id")]
+    public McpServerType TypeId { get; set; }
+
+    [JsonPropertyName("type")]
+    public string Type { get; set; }
 }
 
 internal class StoreMcpServerDetail : StoreMcpServerDetailBase
