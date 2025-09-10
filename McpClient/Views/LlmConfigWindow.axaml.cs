@@ -281,7 +281,6 @@ public partial class LlmConfigWindow : Window
         KnownGguf newGguf = new KnownGguf();
         newGguf.GgufFilePath = modelFile;
 
-        string modeltype = "";
         foreach (var metadata in reader.Header.Metadata)
         {
             if (metadata.Key == "general.name")

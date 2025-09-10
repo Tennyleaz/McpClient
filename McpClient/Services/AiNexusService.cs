@@ -444,11 +444,13 @@ internal class AiNexusService
 
     #region MCP store
 
-    public async Task<StoreMcpResponse> GetStoreMcpServers(string tag, string category, int page)
+    public async Task<StoreMcpResponse> GetStoreMcpServers(string tag, string category, string type, int page)
     {
         string url = "/api/v1/mcpServer";
         if (!string.IsNullOrEmpty(tag))
             url += $"?tag={tag}";
+        else if (!string.IsNullOrEmpty(type))
+            url += $"?type={type}";
         else
             url += $"?category={category}";
         url += $"&page={page}&debug=false";

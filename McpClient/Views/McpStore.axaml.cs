@@ -1,18 +1,19 @@
-using System.Collections.Generic;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using AvaloniaProgressRing;
 using DynamicData;
 using McpClient.Models;
 using McpClient.Services;
 using McpClient.ViewModels;
-using System.Threading.Tasks;
-using Avalonia.Input;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace McpClient.Views;
 
@@ -23,7 +24,7 @@ public partial class McpStore : UserControl
     private StoreMcpViewModel storeMcpViewModel;
     private Pagination pagination;
     private int currentPage = 1;
-    private string currentTag, currentQuery, currentCategory;
+    private string currentTag, currentQuery, currentCategory, currentType;
     private List<string> installedMcpServers = new ();
 
     public bool IsUpdateNeeded { get; private set; }
@@ -47,7 +48,6 @@ public partial class McpStore : UserControl
         _configService = new McpConfigService(settings.McpConfigToken);
         _service = new AiNexusService(settings.AiNexusToken);
 
-        StoreCategory.StoreCategoryList.ItemsSource = Constants.STORE_CATEGORIES;
         StoreCategory.StoreCategoryList.SelectionChanged += StoreCategoryList_SelectionChanged;
     }
 
@@ -64,8 +64,16 @@ public partial class McpStore : UserControl
     {
         if (StoreCategory.StoreCategoryList.SelectedItem is StoreCategoryItem item)
         {
-            ShowCatrgory(item.Name);
-            await LoadStoreItems(null, item.Value, null, currentPage);
+            if (TabTypes.SelectedIndex == 2)
+            {
+                ShowCatrgory(item.Name);
+                await LoadStoreItems(null, item.Value, null, null, currentPage);
+            }
+            else if (TabTypes.SelectedIndex == 3)
+            {
+                ShowType(item.Name);
+                await LoadStoreItems(null, null, item.Value, null, currentPage);
+            }
         }
     }
 
@@ -80,19 +88,29 @@ public partial class McpStore : UserControl
             // Latest
             StoreCategory.IsVisible = false;
             McpListBox.IsVisible = true;
-            await LoadStoreItems("latest", null, null, currentPage);
+            await LoadStoreItems("latest", null, null, null, currentPage);
         }
         else if (TabTypes.SelectedIndex == 1)
         {
             // Featured
             StoreCategory.IsVisible = false;
             McpListBox.IsVisible = true;
-            await LoadStoreItems("featured", null, null, currentPage);
+            await LoadStoreItems("featured", null, null, null, currentPage);
         }
         else if (TabTypes.SelectedIndex == 2)
         {
             // Show category list
             StoreCategory.IsVisible = true;
+            StoreCategory.StoreCategoryList.ItemsSource = Constants.STORE_CATEGORIES;
+            StoreCategory.StoreCategoryList.SelectedIndex = -1;
+            McpListBox.IsVisible = false;
+            LbEmptyList.IsVisible = false;
+        }
+        else if (TabTypes.SelectedIndex == 3)
+        {
+            // Show type list
+            StoreCategory.IsVisible = true;
+            StoreCategory.StoreCategoryList.ItemsSource = Constants.STORE_TYPES;
             StoreCategory.StoreCategoryList.SelectedIndex = -1;
             McpListBox.IsVisible = false;
             LbEmptyList.IsVisible = false;
@@ -104,7 +122,7 @@ public partial class McpStore : UserControl
         currentPage = 1;
         if (TabTypes.SelectedIndex == 0)
         {
-            await LoadStoreItems("latest", null, null, currentPage);
+            await LoadStoreItems("latest", null, null, null, currentPage);
         }
         TabTypes.SelectedIndex = 0;
         TabTypes.IsVisible = true;
@@ -113,7 +131,7 @@ public partial class McpStore : UserControl
         await GetInstalledList();
     }
 
-    private async Task LoadStoreItems(string tag, string category, string query, int page)
+    private async Task LoadStoreItems(string tag, string category, string type, string query, int page)
     {
         LbEmptyList.IsVisible = false;
         ProgressRing.IsVisible = true;
@@ -122,7 +140,7 @@ public partial class McpStore : UserControl
         if (string.IsNullOrWhiteSpace(query))
         {
             // Normal tags
-            response = await _service.GetStoreMcpServers(tag, category, page);
+            response = await _service.GetStoreMcpServers(tag, category, type, page);
         }
         else
         {
@@ -144,6 +162,7 @@ public partial class McpStore : UserControl
 
         currentTag = tag;
         currentCategory = category;
+        currentType = type;
         currentQuery = query;
         pagination = response.Pagination;
         TbPageNumber.Content = $"{currentPage}/{pagination.TotalPages}";
@@ -178,7 +197,7 @@ public partial class McpStore : UserControl
         }
 
         currentPage = 1;
-        await LoadStoreItems(null, null, TbSearch.Text, currentPage);
+        await LoadStoreItems(null, null, null, TbSearch.Text, currentPage);
     }
 
     private void ShowSearch(string query)
@@ -197,6 +216,15 @@ public partial class McpStore : UserControl
         StoreCategory.IsVisible = false;
         McpListBox.IsVisible = true;
         TbQueryTitle.Text = "Category: " + category;
+    }
+
+    private void ShowType(string type)
+    {
+        TabTypes.IsVisible = false;
+        SearchPanel.IsVisible = true;
+        StoreCategory.IsVisible = false;
+        McpListBox.IsVisible = true;
+        TbQueryTitle.Text = "Type: " + type;
     }
 
     private void HideSearch()
@@ -237,7 +265,7 @@ public partial class McpStore : UserControl
 
     private async Task UpdatePages()
     {
-        await LoadStoreItems(currentTag, currentCategory, currentQuery, currentPage);
+        await LoadStoreItems(currentTag, currentCategory, currentType, currentQuery, currentPage);
     }
 
     private async void BtnInstall_OnClick(object sender, RoutedEventArgs e)

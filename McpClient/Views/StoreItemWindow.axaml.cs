@@ -158,12 +158,17 @@ public partial class StoreItemWindow : Window
             return null;
 
         string name, url, type, command;
+        JsonNode firstChild;
         try
         {
             name = node.AsObject().First().Key;
-            url = node[name]?["url"]?.ToString();
-            type = node[name]?["type"]?.ToString();
-            command = node[name]?["command"]?.ToString();
+            firstChild = node.Root[name];
+            if (firstChild == null)
+                return null;
+
+            url = firstChild["url"]?.ToString();
+            type = firstChild["type"]?.ToString();
+            command = firstChild["command"]?.ToString();
         }
         catch (JsonException ex)
         {
@@ -199,7 +204,6 @@ public partial class StoreItemWindow : Window
         {
             try
             {
-                JsonNode firstChild = node.Root[name];
                 mcpServer.command = command;
                 if (firstChild["env"] != null)
                 {
@@ -212,12 +216,6 @@ public partial class StoreItemWindow : Window
                     string json = firstChild["args"].ToJsonString();
                     mcpServer.args = JsonSerializer.Deserialize<List<string>>(json);
                 }
-
-                if (firstChild["headers"] != null)
-                {
-                    string json = firstChild["headers"].ToJsonString();
-                    mcpServer.http_headers = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                }
             }
             catch (JsonException ex)
             {
@@ -227,10 +225,20 @@ public partial class StoreItemWindow : Window
         else if (mcpServer.type == McpServerType.StreamableHttp)
         {
             mcpServer.streamable_http_url = url;
+            if (firstChild["headers"] != null)
+            {
+                string json = firstChild["headers"].ToJsonString();
+                mcpServer.http_headers = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            }
         }
         else if (mcpServer.type == McpServerType.SSE)
         {
             mcpServer.sse_url = url;
+            if (firstChild["headers"] != null)
+            {
+                string json = firstChild["headers"].ToJsonString();
+                mcpServer.http_headers = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            }
         }
 
         return mcpServer;

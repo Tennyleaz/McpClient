@@ -21,6 +21,7 @@
 			<TabStripItem Content="Latest" FontWeight="Medium" Classes="feature-tabstrip"/>
 			<TabStripItem Content="Featured" FontWeight="Medium" Classes="feature-tabstrip"/>
 			<TabStripItem Content="Category" FontWeight="Medium" Classes="feature-tabstrip"/>
+            <TabStripItem Content="Type" FontWeight="Medium" Classes="feature-tabstrip"/>
         </TabStrip>
         <DockPanel Name="SearchPanel" IsVisible="False" VerticalAlignment="Top" Margin="10,68,120,0">
             <Button Name="BtnLeaveSearch" DockPanel.Dock="Right" Click="BtnLeaveSearch_OnClick">❌</Button>

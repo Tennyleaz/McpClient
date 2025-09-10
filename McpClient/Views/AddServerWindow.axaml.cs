@@ -75,7 +75,7 @@ public partial class AddServerWindow : Window
             TbEnv.Text = string.Join(", ", env);
 
             headers = _mcpViewModel.HttpHeaders.ToDictionary();
-            TbEnv.Text = string.Join(", ", headers);
+            TbHttpHeader.Text = string.Join(", ", headers);
 
             args = _mcpViewModel.Args.ToList();
             TbArgs.Text = string.Join(", ", args);

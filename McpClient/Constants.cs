@@ -44,4 +44,11 @@ internal static class Constants
         new StoreCategoryItem("Virtualization", "virtualization"),
         new StoreCategoryItem("Cloud Storage", "cloud-storage")
     };
+
+    public static readonly List<StoreCategoryItem> STORE_TYPES = new List<StoreCategoryItem>
+    {
+        new StoreCategoryItem("Stdio", "stdio"),
+        new StoreCategoryItem("SSE", "sse"),
+        new StoreCategoryItem("Streamable HTTP", "streamable-http")
+    };
 }

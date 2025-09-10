@@ -26,6 +26,11 @@ internal class McpServer
     public Dictionary<string, string> env { get; set; } = new();
     public Dictionary<string, string> http_headers { get; set; } = new();
     public string source { get; set; }
+
+    public override string ToString()
+    {
+        return $"{server_name} ({type})";
+    }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
