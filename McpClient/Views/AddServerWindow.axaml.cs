@@ -19,6 +19,7 @@ public partial class AddServerWindow : Window
     private readonly bool _isEdit = false;
     private List<string> args = new();
     private Dictionary<string, string> env = new();
+    private Dictionary<string, string> headers = new();
     private readonly McpViewModel _mcpViewModel;
 
     internal McpServer Result { get; private set; }
@@ -73,6 +74,9 @@ public partial class AddServerWindow : Window
             env = _mcpViewModel.Env.ToDictionary();
             TbEnv.Text = string.Join(", ", env);
 
+            headers = _mcpViewModel.HttpHeaders.ToDictionary();
+            TbEnv.Text = string.Join(", ", headers);
+
             args = _mcpViewModel.Args.ToList();
             TbArgs.Text = string.Join(", ", args);
         }
@@ -98,6 +102,7 @@ public partial class AddServerWindow : Window
         newServer.owner = TbOwner.Text;
         newServer.args = args;
         newServer.env = env;
+        newServer.http_headers = headers;
         if (CbTypes.SelectedIndex == 1)
         {
             newServer.type = McpServerType.SSE;
@@ -165,7 +170,7 @@ public partial class AddServerWindow : Window
             });
         }
         // Show edit window
-        EnvEditor editWindow = new EnvEditor();
+        EnvEditor editWindow = new EnvEditor(false);
         editWindow.DataContext = envEditorViewModel;
         await editWindow.ShowDialog(this);
         // Replace whole collection, so UI could change
@@ -173,8 +178,32 @@ public partial class AddServerWindow : Window
         TbEnv.Text = string.Join(", ", env);
     }
 
+    private async void BtnEditHeader_OnClick(object sender, RoutedEventArgs e)
+    {
+        EnvEditorViewModel envEditorViewModel = new EnvEditorViewModel();
+        // Copy the data
+        foreach (var pair in headers)
+        {
+            envEditorViewModel.Env.Add(new EnvironmentItem
+            {
+                Name = pair.Key,
+                Value = pair.Value
+            });
+        }
+        // Show edit window
+        EnvEditor editWindow = new EnvEditor(true);
+        editWindow.DataContext = envEditorViewModel;
+        await editWindow.ShowDialog(this);
+        // Replace whole collection, so UI could change
+        headers = envEditorViewModel.ToDictionary();
+        TbHttpHeader.Text = string.Join(", ", headers);
+    }
+
     private void CbTypes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
+
         if (CbTypes.SelectedIndex <= 0)
         {
             // stdio, has command, no URL
@@ -187,6 +216,12 @@ public partial class AddServerWindow : Window
             // Show env/args
             TbArgsHeader.IsVisible = TbArgs.IsVisible = BtnEditArgs.IsVisible = true;
             TbEnvHeader.IsVisible = TbEnv.IsVisible = BtnEditEnv.IsVisible = true;
+            MainGrid.RowDefinitions[5].Height = GridLength.Parse("40");
+            MainGrid.RowDefinitions[6].Height = GridLength.Parse("40");
+
+            // Hide http headers
+            TbHttpHeader.IsVisible = TbHttpHeaderTitle.IsVisible = BtnEditHeader.IsVisible = false;
+            MainGrid.RowDefinitions[7].Height = GridLength.Parse("0");
         }
         else
         {
@@ -200,6 +235,12 @@ public partial class AddServerWindow : Window
             // Hide env/args
             TbArgsHeader.IsVisible = TbArgs.IsVisible = BtnEditArgs.IsVisible = false;
             TbEnvHeader.IsVisible = TbEnv.IsVisible = BtnEditEnv.IsVisible = false;
+            MainGrid.RowDefinitions[5].Height = GridLength.Parse("0");
+            MainGrid.RowDefinitions[6].Height = GridLength.Parse("0");
+
+            // Show http headers
+            TbHttpHeader.IsVisible = TbHttpHeaderTitle.IsVisible = BtnEditHeader.IsVisible = true;
+            MainGrid.RowDefinitions[7].Height = GridLength.Parse("40");
         }
     }
 
@@ -259,7 +300,8 @@ public partial class AddServerWindow : Window
             {
                 Endpoint = new Uri(server.streamable_http_url),
                 TransportMode = HttpTransportMode.StreamableHttp,
-                Name = server.server_name
+                Name = server.server_name,
+                AdditionalHeaders = server.http_headers
             });
         }
         else
@@ -268,7 +310,8 @@ public partial class AddServerWindow : Window
             {
                 Endpoint = new Uri(server.sse_url),
                 TransportMode = HttpTransportMode.Sse,
-                Name = server.server_name
+                Name = server.server_name,
+                AdditionalHeaders = server.http_headers
             });
         }
 

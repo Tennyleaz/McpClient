@@ -12,9 +12,9 @@
         Title="Edit Environment Variables"
         WindowStartupLocation="CenterOwner">
 	<Panel>
-        <TextBlock Text="Environment Variables:" FontWeight="Bold" Margin="20,20,0,0"/>
+        <TextBlock Name="TitleTextbox" Text="Environment Variables:" FontWeight="Bold" Margin="20,20,0,0"/>
 
-        <Button Content="Add Environment Variable" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,20,0"
+        <Button Name="BtnAdd" Content="Add Environment Variable" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,20,0"
                 Command="{Binding AddArgCommand}"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16,48,20,20">

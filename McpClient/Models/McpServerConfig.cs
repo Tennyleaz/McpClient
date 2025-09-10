@@ -24,6 +24,7 @@ internal class McpServer
     public string command { get; set; }
     public List<string> args { get; set; } = new();
     public Dictionary<string, string> env { get; set; } = new();
+    public Dictionary<string, string> http_headers { get; set; } = new();
     public string source { get; set; }
 }
 

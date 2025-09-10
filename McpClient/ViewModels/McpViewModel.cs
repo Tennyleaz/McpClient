@@ -31,6 +31,11 @@ internal class McpViewModel : ReactiveObject
         {
             _env.Add(new KeyValuePair<string, string>(kv.Key, kv.Value));
         }
+        _headers = new ObservableCollection<KeyValuePair<string, string>>();
+        foreach (var kv in model.http_headers)
+        {
+            _headers.Add(new KeyValuePair<string, string>(kv.Key, kv.Value));
+        }
         _source = model.source;
     }
 
@@ -44,6 +49,7 @@ internal class McpViewModel : ReactiveObject
     private string _command;
     private ObservableCollection<string> _args;
     private ObservableCollection<KeyValuePair<string, string>> _env;
+    private ObservableCollection<KeyValuePair<string, string>> _headers;
     private bool _isBusy;
     private string _source;
 
@@ -178,6 +184,15 @@ internal class McpViewModel : ReactiveObject
         }
     }
 
+    public ObservableCollection<KeyValuePair<string, string>> HttpHeaders
+    {
+        get => _headers;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _headers, value);
+        }
+    }
+
     public bool IsBusy
     {
         get => _isBusy;
@@ -200,6 +215,7 @@ internal class McpViewModel : ReactiveObject
             command = Command,
             args = new List<string>(Args),
             env = new Dictionary<string, string>(Env),
+            http_headers = new Dictionary<string, string>(HttpHeaders),
             source = _source
         };
     }

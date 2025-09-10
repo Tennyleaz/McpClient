@@ -227,7 +227,7 @@ public partial class McpSetting : UserControl
             }
             // Show edit window
             Window parent = TopLevel.GetTopLevel(this) as Window;
-            EnvEditor editWindow = new EnvEditor();
+            EnvEditor editWindow = new EnvEditor(false);
             editWindow.DataContext = envEditorViewModel;
             await editWindow.ShowDialog(parent);
             // Replace whole collection, so UI could change
@@ -315,6 +315,16 @@ public partial class McpSetting : UserControl
                         }
                     }
                     mcpViewModel.Env = collection;
+                    // Http headers
+                    ObservableCollection<KeyValuePair<string, string>> headerCollection = new ObservableCollection<KeyValuePair<string, string>>();
+                    foreach (var pair in editServer.http_headers)
+                    {
+                        if (!string.IsNullOrWhiteSpace(pair.Key) && !string.IsNullOrWhiteSpace(pair.Value))
+                        {
+                            headerCollection.Add(new KeyValuePair<string, string>(pair.Key, pair.Value));
+                        }
+                    }
+                    mcpViewModel.HttpHeaders = headerCollection;
                 }
                 else if (editServer.type == McpServerType.SSE)
                 {
