@@ -8,6 +8,11 @@ public partial class EnvEditor : Window
 {
     private readonly bool _isEditHttpHeader = false;
 
+    public EnvEditor()
+    {
+        InitializeComponent();
+    }
+
     public EnvEditor(bool isEditHttpHeader)
     {
         InitializeComponent();
