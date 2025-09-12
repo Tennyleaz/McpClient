@@ -72,13 +72,22 @@ public partial class AddServerWindow : Window
             }
 
             env = _mcpViewModel.Env.ToDictionary();
-            TbEnv.Text = string.Join(", ", env);
+            if (env.Count == 0)
+                TbEnv.Text = "(empty)";
+            else
+                TbEnv.Text = string.Join(", ", env);
 
             headers = _mcpViewModel.HttpHeaders.ToDictionary();
-            TbHttpHeader.Text = string.Join(", ", headers);
+            if (headers.Count == 0)
+                TbHttpHeader.Text = "(empty)";
+            else
+                TbHttpHeader.Text = string.Join(", ", headers);
 
             args = _mcpViewModel.Args.ToList();
-            TbArgs.Text = string.Join(", ", args);
+            if (args.Count == 0)
+                TbArgs.Text = "(empty)";
+            else
+                TbArgs.Text = string.Join(", ", args);
         }
         else
         {
@@ -154,7 +163,10 @@ public partial class AddServerWindow : Window
         await editWin.ShowDialog(this);
         // Replace whole collection, so UI could change
         args = argsEditorViewModel.ToCollenction().ToList();
-        TbArgs.Text = string.Join(' ', args);
+        if (args.Count == 0)
+            TbArgs.Text = "(empty)";
+        else
+            TbArgs.Text = string.Join(", ", args);
     }
 
     private async void BtnEditEnv_OnClick(object sender, RoutedEventArgs e)
@@ -175,7 +187,10 @@ public partial class AddServerWindow : Window
         await editWindow.ShowDialog(this);
         // Replace whole collection, so UI could change
         env = envEditorViewModel.ToDictionary();
-        TbEnv.Text = string.Join(", ", env);
+        if (env.Count == 0)
+            TbEnv.Text = "(empty)";
+        else
+            TbEnv.Text = string.Join(", ", env);
     }
 
     private async void BtnEditHeader_OnClick(object sender, RoutedEventArgs e)
@@ -196,7 +211,10 @@ public partial class AddServerWindow : Window
         await editWindow.ShowDialog(this);
         // Replace whole collection, so UI could change
         headers = envEditorViewModel.ToDictionary();
-        TbHttpHeader.Text = string.Join(", ", headers);
+        if (headers.Count == 0)
+            TbHttpHeader.Text = "(empty)";
+        else
+            TbHttpHeader.Text = string.Join(", ", headers);
     }
 
     private void CbTypes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
