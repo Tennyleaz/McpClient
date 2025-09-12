@@ -98,10 +98,12 @@ public partial class LlmConfigWindow : Window
 
             // Check the service
             StartCheckServerStatus();
+            TbContextLenght.IsEnabled = BtnStartLlama.IsEnabled = BtnStopLlama.IsEnabled = true;
         }
         else
         {
-            //LbModelPath.Content = "No model selected yet.";
+            // Disable start section if no model could be used
+            TbContextLenght.IsEnabled = BtnStartLlama.IsEnabled = BtnStopLlama.IsEnabled =  false;
         }
     }
 
@@ -268,6 +270,9 @@ public partial class LlmConfigWindow : Window
             // Save the model to setting
             settings.LlmModelFile = file;
             await SettingsManager.Local.SaveAsync(settings);
+
+            // Enable start section
+            TbContextLenght.IsEnabled = BtnStartLlama.IsEnabled = BtnStopLlama.IsEnabled = true;
 
             // Load the model now
             BtnStartLlama_OnClick(null, null);
