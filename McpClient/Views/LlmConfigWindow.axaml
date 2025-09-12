@@ -24,7 +24,8 @@
                 <Label Grid.Row="0" Grid.Column="1" Name="LbLlamaPath" VerticalAlignment="Center" Height="32">C:\Users\xxx\AppData\Local\McpClient\llama-server.exe</Label>
 
 				<Button Grid.Row="1" Grid.Column="2" Name="BtnSelectModel" Click="BtnSelectModel_OnClick">Select New Model</Button>
-                
+
+				<!-- GGUF model selection -->
                 <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Model:</Label>
                 <ComboBox Grid.Row="1" Grid.Column="1" Name="CbModel" MinWidth="200" Height="45" SelectionChanged="CbModel_OnSelectionChanged">
                     <ComboBox.ItemTemplate>
@@ -38,7 +39,8 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
             </Grid>
-            <Grid Name="ModelConfigGrid" Margin="25,10,0,0" ColumnDefinitions="200,Auto,*" RowDefinitions="*,40,40,40,40">
+            <Grid Name="ModelConfigGrid" Margin="25,10,0,0" ColumnDefinitions="200,Auto,*" RowDefinitions="*,Auto">
+                <!-- GPU device selection -->
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Run on Device:</Label>
                 <ComboBox Grid.Row="0" Grid.Column="1" Name="CbDevice" MinWidth="200" Height="45" SelectionChanged="CbDevice_OnSelectionChanged">
                     <ComboBox.ItemTemplate>
@@ -53,24 +55,28 @@
                     </ComboBox.ItemTemplate>
 				</ComboBox>
 
-                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Name="TbContextLenghtHeader">Context Length:</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Name="TbContextLenght" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" Text="4096" TextChanged="TbContextLenght_OnTextChanged">
-                </TextBox>
+				<!-- model config/toggle/start/stop -->
+                <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="ModelConfigGridInner" ColumnDefinitions="200,*" RowDefinitions="40,40,40,40" Margin="0,10,0,0">
+                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Name="TbContextLenghtHeader">Context Length:</Label>
+                    <TextBox Grid.Row="0" Grid.Column="1" Name="TbContextLenght" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" Text="4096" TextChanged="TbContextLenght_OnTextChanged">
+                    </TextBox>
 
-                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Offload KV Cache to VRAM:</Label>
-				<ToggleSwitch Grid.Row="2" Grid.Column="1" Name="ToggleOffloadKvCache"></ToggleSwitch>
+                    <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Offload KV Cache to VRAM:</Label>
+                    <ToggleSwitch Grid.Row="1" Grid.Column="1" Name="ToggleOffloadKvCache"></ToggleSwitch>
 
 
-                <Label Grid.Row="3" Grid.Column="0"  VerticalAlignment="Center" Height="24">Status:</Label>
-                <Label Grid.Row="3" Grid.Column="1" Name="LbServiceStatus"  VerticalAlignment="Center" Height="24" Foreground="Red">Stopped</Label>
-                <Button Grid.Row="3" Grid.Column="1" Name="BtnStartLlama" Margin="80,0,0,0" Click="BtnStartLlama_OnClick">Start</Button>
-                <Button Grid.Row="3" Grid.Column="1" Name="BtnStopLlama" Margin="140,0,0,0" Click="BtnStopLlama_OnClick">Stop</Button>
+                    <Label Grid.Row="2" Grid.Column="0"  VerticalAlignment="Center" Height="24">Status:</Label>
+                    <Label Grid.Row="2" Grid.Column="1" Name="LbServiceStatus"  VerticalAlignment="Center" Height="24" Foreground="Red">Stopped</Label>
+                    <Button Grid.Row="2" Grid.Column="1" Name="BtnStartLlama" Margin="80,0,0,0" Click="BtnStartLlama_OnClick">Start</Button>
+                    <Button Grid.Row="2" Grid.Column="1" Name="BtnStopLlama" Margin="140,0,0,0" Click="BtnStopLlama_OnClick">Stop</Button>
 
-                <Label Grid.Row="4" Grid.Column="0"  VerticalAlignment="Center" Height="24">Local Server Address:</Label>
-                <Label Grid.Row="4" Grid.Column="1"  VerticalAlignment="Center" Height="24" Name="LbLocalServerUrl">---</Label>
+                    <Label Grid.Row="3" Grid.Column="0"  VerticalAlignment="Center" Height="24">Local Server Address:</Label>
+                    <Label Grid.Row="3" Grid.Column="1"  VerticalAlignment="Center" Height="24" Name="LbLocalServerUrl">---</Label>
+                </Grid>
+                <Label Name="LbNoModelSelected" Grid.Column="0" Grid.Row="1" Content="No model. Please select a model first." Grid.ColumnSpan="2" Margin="0,10,0,0" IsVisible="False"/>
 
 				<!-- GPU info here -->
-				<Grid Grid.Row="0" Grid.Column="2"  Grid.RowSpan="4" Margin="20,0,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" HorizontalAlignment="Right">
+				<Grid Grid.Row="0" Grid.Column="2"  Grid.RowSpan="2" Margin="20,0,0,0" RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" HorizontalAlignment="Right">
                     <TextBlock Grid.Column="0" Grid.Row="0" Margin="0,0,10,0">Recommend model size:</TextBlock>
                     <TextBlock Grid.Column="1" Grid.Row="0" Name="TbRecommend">Unknown</TextBlock>
                     <Button Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,8,0,0" Name="BtnSearchHg" Click="BtnSearchHg_OnClick">Go seach huggingface: 0B</Button>
