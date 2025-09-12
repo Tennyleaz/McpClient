@@ -21,7 +21,7 @@ public partial class StoreItemWindow : Window
     private readonly StoreMcpServer _mcpServer;
     private readonly AiNexusService _service;
     private readonly List<string> _installedNames;
-    private StoreMcpServerDetail detail;
+    private StoreMcpServerDetailBase detailBase;
     private McpServer parsedMcpServer;
 
     public bool IsInstalled { get; private set; }
@@ -47,7 +47,7 @@ public partial class StoreItemWindow : Window
         if (Design.IsDesignMode)
             return;
 
-        StoreMcpServerDetailBase detailBase = await _service.GetStoreMcpServerDetail(_mcpServer.Url);
+        detailBase = await _service.GetStoreMcpServerDetail(_mcpServer.Url);
         if (detailBase != null)
         {
             // Set url
@@ -58,7 +58,6 @@ public partial class StoreItemWindow : Window
             // Check if detail is real or not
             if (detailBase is StoreMcpServerDetail detailReal && detailReal.ServerConfig?.McpServers != null)
             {
-                detail = detailReal;
                 TbMcpSetting.Text = detailReal.ServerConfig.McpServers.ToJsonString(new JsonSerializerOptions
                 {
                     WriteIndented = true
@@ -294,11 +293,11 @@ public partial class StoreItemWindow : Window
 
     private void BtnGithub_OnClick(object sender, RoutedEventArgs e)
     {
-        Launcher.LaunchUriAsync(new Uri(detail.GithubUrl));
+        Launcher.LaunchUriAsync(new Uri(detailBase.GithubUrl));
     }
 
     private void BtnMcpSo_OnClick(object sender, RoutedEventArgs e)
     {
-        Launcher.LaunchUriAsync(new Uri(detail.Url));
+        Launcher.LaunchUriAsync(new Uri(detailBase.Url));
     }
 }

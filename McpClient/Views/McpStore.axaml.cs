@@ -273,7 +273,10 @@ public partial class McpStore : UserControl
         if (sender is Button btn && btn.DataContext is StoreMcpServer storeMcpServer)
         {
             StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
-            await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            if (owner.WindowState == WindowState.Maximized)
+                window.WindowState = WindowState.Maximized;
+            await window.ShowDialog(owner);
             IsUpdateNeeded = window.IsInstalled;
         }
     }
