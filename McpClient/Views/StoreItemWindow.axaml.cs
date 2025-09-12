@@ -157,6 +157,17 @@ public partial class StoreItemWindow : Window
         if (node == null)
             return null;
 
+        /*
+         Find this pattern:
+         "server_config": {
+               "mcpServers": {
+                   "名字在這裡": {
+                       "url": "http://localhost:8080/mcp/",
+                       "type": "sse"
+                   }
+               }
+           }
+         */
         string name, url, type, command;
         JsonNode firstChild;
         try
@@ -170,7 +181,7 @@ public partial class StoreItemWindow : Window
             type = firstChild["type"]?.ToString();
             command = firstChild["command"]?.ToString();
         }
-        catch (JsonException ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex);
             return null;
