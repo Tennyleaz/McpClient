@@ -41,6 +41,8 @@ public partial class AddServerWindow : Window
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
         if (_isEdit)
         {
             TbHeader.Text = Title = "Edit Agent";
@@ -98,9 +100,11 @@ public partial class AddServerWindow : Window
 
     private async void ButtonApply_OnClick(object sender, RoutedEventArgs e)
     {
+        ButtonApply.IsEnabled = false;
         bool isValid = await Validate();
         if (!isValid)
         {
+            ButtonApply.IsEnabled = true;
             return;
         }
 
@@ -129,19 +133,25 @@ public partial class AddServerWindow : Window
 
         try
         {
+            ButtonApply.Content = "Validating...";
             bool mcpReuslt = await ValidateMcp(newServer);
             if (!mcpReuslt)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("MCP", "Failed to find tools in MCP server.",
+                var box = MessageBoxManager.GetMessageBoxStandard("MCP", $"Failed to find tools in MCP server: {TbUrl.Text}",
                     ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
                 await box.ShowWindowDialogAsync(this);
+                ButtonApply.Content = "Apply";
+                ButtonApply.IsEnabled = true;
+                return;
             }
         }
         catch (Exception ex)
         {
-            var box = MessageBoxManager.GetMessageBoxStandard("MCP", "Failed to find tools in MCP server:\n" + ex.Message,
+            var box = MessageBoxManager.GetMessageBoxStandard("MCP", $"Failed to find tools in MCP server: {TbUrl.Text}\n{ex.Message}",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
             await box.ShowWindowDialogAsync(this);
+            ButtonApply.Content = "Apply";
+            ButtonApply.IsEnabled = true;
             return;
         }
 
@@ -264,7 +274,7 @@ public partial class AddServerWindow : Window
 
     private async Task<bool> Validate()
     {
-        if (string.IsNullOrWhiteSpace(TbServerName.Text))
+        if (!_isEdit && string.IsNullOrWhiteSpace(TbServerName.Text))
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Info", "Please input your server name.",
                 ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
@@ -311,6 +321,9 @@ public partial class AddServerWindow : Window
                 EnvironmentVariables = server.env,
                 Name = server.server_name
             });
+            // TODO:
+            // let server find stdio tools, not client
+            return true;
         }
         else if (server.type == McpServerType.StreamableHttp)
         {
