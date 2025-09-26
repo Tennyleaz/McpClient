@@ -314,7 +314,7 @@ public partial class AddServerWindow : Window
         }
         else if (server.type == McpServerType.StreamableHttp)
         {
-            clientTransport = new SseClientTransport(new SseClientTransportOptions
+            clientTransport = new HttpClientTransport(new HttpClientTransportOptions
             {
                 Endpoint = new Uri(server.streamable_http_url),
                 TransportMode = HttpTransportMode.StreamableHttp,
@@ -324,7 +324,7 @@ public partial class AddServerWindow : Window
         }
         else
         {
-            clientTransport = new SseClientTransport(new SseClientTransportOptions
+            clientTransport = new HttpClientTransport(new HttpClientTransportOptions
             {
                 Endpoint = new Uri(server.sse_url),
                 TransportMode = HttpTransportMode.Sse,
@@ -333,7 +333,7 @@ public partial class AddServerWindow : Window
             });
         }
 
-        IMcpClient mcpClient = await McpClientFactory.CreateAsync(clientTransport);
+        ModelContextProtocol.Client.McpClient mcpClient = await ModelContextProtocol.Client.McpClient.CreateAsync(clientTransport);
         IList<McpClientTool> tools = await mcpClient.ListToolsAsync();
         if (tools.Count == 0)
         {
