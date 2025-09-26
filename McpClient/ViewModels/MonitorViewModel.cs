@@ -20,7 +20,7 @@ internal class MonitorViewModel : ReactiveObject
     {
         // see:
         // https://livecharts.dev/docs/avalonia/2.0.0-rc5.4/samples.axes.labelsFormat2
-        LiveCharts.Configure(config => config.HasGlobalSKTypeface(SKFontManager.Default.MatchCharacter('汉')));
+        //LiveCharts.Configure(config => config.HasGlobalSKTypeface(SKFontManager.Default.MatchCharacter('汉')));
     }
 
     public Axis[] XAxes { get; set; } =
