@@ -82,13 +82,20 @@ public partial class RunOfflineWindow : Window
             availableModels = data.Data;
         }
 
+        ModelViewModel qwen = null;
         List<ModelViewModel> viewModels = new List<ModelViewModel>();
         foreach (ModelItem modelItem in availableModels)
         {
-            viewModels.Add(new ModelViewModel(modelItem));
+            var vm = new ModelViewModel(modelItem);
+            viewModels.Add(vm);
+            if (vm.Name == "Qwen2.5-72B")
+                qwen = vm;
         }
         CbModelName.ItemsSource = viewModels;
-        CbModelName.SelectedIndex = availableModels.Count - 1;
+        if (qwen != null)
+            CbModelName.SelectedItem = qwen;
+        else
+            CbModelName.SelectedIndex = availableModels.Count - 1;
     }
 
     private async void BtnRun_OnClick(object sender, RoutedEventArgs e)
