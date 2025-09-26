@@ -89,5 +89,6 @@
                 <Button Margin="0,4,0,0" Name="BtnDetectLlama" Click="BtnDetectLlama_OnClick">Detect Again</Button>
 			</StackPanel>
 		</StackPanel>
+        <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
 	</Panel>
 </Window>
