@@ -353,7 +353,7 @@ public partial class LlmConfigWindow : Window
         }
 
         KnownGguf selected = modelList[CbModel.SelectedIndex];
-        GlobalService.LlamaService = new LlamaService(selected.GgufFilePath, selected.Architecture, CbDevice.SelectedIndex,
+        GlobalService.LlamaService = LlamaService.CreateLlamaService(selected.GgufFilePath, selected.Architecture, CbDevice.SelectedIndex,
             isOffload, contentSize);
         GlobalService.LlamaService.Start();
 
@@ -384,15 +384,15 @@ public partial class LlmConfigWindow : Window
             LbServiceStatus.Content = GlobalService.LlamaService.State;
             switch (GlobalService.LlamaService.State)
             {
-                case LlamaServerState.Running:
+                case CliServiceState.Running:
                     LbServiceStatus.Foreground = Brushes.Green;
                     LbLocalServerUrl.Content = GlobalService.LlamaService.Address;
                     break;
-                case LlamaServerState.Starting:
+                case CliServiceState.Starting:
                     LbServiceStatus.Foreground = Brushes.GreenYellow;
                     LbLocalServerUrl.Content = "---";
                     break;
-                case LlamaServerState.Stopping:
+                case CliServiceState.Stopping:
                     LbServiceStatus.Foreground = Brushes.Orange;
                     LbLocalServerUrl.Content = "---";
                     break;

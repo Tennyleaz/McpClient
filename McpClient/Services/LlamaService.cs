@@ -1,4 +1,5 @@
-﻿using System;
+﻿using McpClient.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,69 +12,75 @@ using System.Threading.Tasks;
 
 namespace McpClient.Services;
 
-internal enum LlamaServerState
+internal struct LlamaParam
 {
-    Stopped,
-    Starting,
-    Running,
-    Stopping,
-    Crashed,
-    Error
+    public string modelPath;
+    public string modelType;
+    public int deviceIndex;
+    public bool isOffloadKvCache;
+    public int contextSize;
+
+    // base
+    public string binaryPath;
+    public string arguments;
+    public int maxLogLines;
 }
 
-internal class LlamaService : IDisposable
+internal class LlamaService : CliService, IDisposable
 {
     private readonly HttpClient _httpClient;
     private const int PORT = 2200;
     private static readonly string BASE_URL = "http://localhost:" + PORT;
-    private Process _process;
-    private readonly ConcurrentQueue<string> _stdoutQueue;
-    private readonly ConcurrentQueue<string> _stderrQueue;
-    private CancellationTokenSource _cts;
     private Task _healthTask;
 
     // EVENTS
-    public event Action<LlamaServerState, LlamaServerState> OnStateChanged;
 
     // PROPERTIES
-    public LlamaServerState State { get; private set; } = LlamaServerState.Stopped;
-    public string[] LastStdOut => _stdoutQueue.ToArray();
-    public string[] LastStdErr => _stderrQueue.ToArray();
     public string Address => BASE_URL + "/v1";
 
     // CONFIG
-    private readonly string _binaryPath;
-    private readonly string _arguments;
-    private readonly int _maxLogLines;
     private readonly int _healthCheckIntervalMs;
     private readonly string _modelType;
 
-    public LlamaService(string modelPath, string modelType, int deviceIndex, bool isOffloadKvCache, int contextSize)
+    public static LlamaService CreateLlamaService(string modelPath, string modelType, int deviceIndex, bool isOffloadKvCache, int contextSize)
     {
-        _httpClient = new HttpClient();
-        _httpClient.Timeout = TimeSpan.FromSeconds(5);
-        _httpClient.BaseAddress = new Uri(BASE_URL);
-
-        // llama directory
-        string dir = GlobalService.LlamaInstallFolder;
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-
         // server binary
-        _binaryPath = GlobalService.LlamaServerBin;
+        string binaryPath = GlobalService.LlamaServerBin;
 
         // arguments
         string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {PORT} --jinja";
         if (!isOffloadKvCache)
             arguments += " --no-kv-offload";
-        _arguments = arguments;
-        _modelType = modelType;
+
+        // create llama directory
+        string dir = GlobalService.LlamaInstallFolder;
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+
+        LlamaParam param = new LlamaParam
+        {
+            modelPath = modelPath,
+            modelType = modelType,
+            deviceIndex = deviceIndex,
+            isOffloadKvCache = isOffloadKvCache,
+            contextSize = contextSize,
+            binaryPath = binaryPath,
+            arguments = arguments,
+            maxLogLines = 50
+        };
+        return new LlamaService(param);
+    }
+
+    private LlamaService(LlamaParam param) : base(param.binaryPath, param.arguments, param.maxLogLines)
+    {
+        _httpClient = new HttpClient();
+        _httpClient.Timeout = TimeSpan.FromSeconds(5);
+        _httpClient.BaseAddress = new Uri(BASE_URL);
+
+        _modelType = param.modelType;
         SetToolCallParam();
 
-        _maxLogLines = 20;
         _healthCheckIntervalMs = 5000;
-        _stdoutQueue = new ConcurrentQueue<string>();
-        _stderrQueue = new ConcurrentQueue<string>();
     }
 
     private void SetToolCallParam()
@@ -119,103 +126,16 @@ internal class LlamaService : IDisposable
         }
     }
 
-    // STATE MANAGEMENT
-    private void SetState(LlamaServerState state)
-    {
-        var old = State;
-        State = state;
-        OnStateChanged?.Invoke(old, state);
-    }
-
     // LAUNCH
-    public bool Start()
+    public new bool Start()
     {
-        lock (this)
+        if (base.Start())
         {
-            if (State == LlamaServerState.Running || State == LlamaServerState.Starting)
-                return false;
-            if (!File.Exists(_binaryPath))
-                return false;
-
-            SetState(LlamaServerState.Starting);
-
-            // Clean up last process if any
-            Stop();
-
-            _stdoutQueue.Clear();
-            _stderrQueue.Clear();
-            _cts = new CancellationTokenSource();
-
-            _process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = _binaryPath,
-                    Arguments = _arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                },
-                EnableRaisingEvents = true
-            };
-            _process.OutputDataReceived += (s, e) => HandleOutput(_stdoutQueue, e.Data);
-            _process.ErrorDataReceived += (s, e) => HandleOutput(_stderrQueue, e.Data);
-            _process.Exited += (s, e) => HandleExit();
-
-            try
-            {
-                _process.Start();
-                _process.BeginOutputReadLine();
-                _process.BeginErrorReadLine();
-
-                _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
-                SetState(LlamaServerState.Starting);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                HandleOutput(_stderrQueue, "Startup FAILED: " + ex.Message);
-                SetState(LlamaServerState.Error);
-                return false;
-            }
+            _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
+            return true;
         }
-    }
 
-    // STOP
-    public void Stop()
-    {
-        lock (this)
-        {
-            if (_process == null || _process.HasExited)
-            {
-                SetState(LlamaServerState.Stopped);
-                return;
-            }
-
-            SetState(LlamaServerState.Stopping);
-            try
-            {
-                _cts?.Cancel();
-
-                if (!_process.HasExited)
-                {
-                    _process.CloseMainWindow();
-                    if (!_process.WaitForExit(2000))
-                    {
-                        _process.Kill(entireProcessTree: true);
-                        _process.WaitForExit(2000);
-                    }
-                }
-            }
-            catch { /* ignore if already dead */ }
-            finally
-            {
-                SetState(LlamaServerState.Stopped);
-                _process?.Dispose();
-                _process = null;
-            }
-        }
+        return false;
     }
 
     // For cleaning up on shutdown
@@ -225,67 +145,42 @@ internal class LlamaService : IDisposable
         _httpClient.Dispose();
     }
 
-    private void HandleOutput(ConcurrentQueue<string> queue, string data)
-    {
-        if (string.IsNullOrEmpty(data))
-            return;
-
-        Debug.WriteLine(data);
-
-        queue.Enqueue(data);
-        while (queue.Count > _maxLogLines)
-            queue.TryDequeue(out _);
-    }
-
-    private void HandleExit()
-    {
-        // This runs on a threadpool thread
-        if (State == LlamaServerState.Stopping || State == LlamaServerState.Stopped)
-        {
-            SetState(LlamaServerState.Stopped);
-        }
-        else
-        {
-            SetState(LlamaServerState.Crashed);
-        }
-    }
-
     private async Task HealthLoop(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_process == null || _process.HasExited)
             {
-                SetState(LlamaServerState.Crashed);
+                SetState(CliServiceState.Crashed);
                 break;
             }
             // Optional: ping HTTP /health endpoint here for deeper checks
             bool isUp = await CheckHealth();
             if (!isUp)
             {
-                if (State == LlamaServerState.Running)
+                if (State == CliServiceState.Running)
                 {
-                    SetState(LlamaServerState.Crashed);
+                    SetState(CliServiceState.Crashed);
                     break;
                 }
-                else if (State == LlamaServerState.Starting)
+                else if (State == CliServiceState.Starting)
                 {
                     // Do nothing, wait for start finish
                 }
-                else if (State == LlamaServerState.Stopping || State == LlamaServerState.Stopped)
+                else if (State == CliServiceState.Stopping || State == CliServiceState.Stopped)
                 {
-                    SetState(LlamaServerState.Stopped);
+                    SetState(CliServiceState.Stopped);
                     break;
                 }
                 else
                 {
-                    SetState(LlamaServerState.Crashed);
+                    SetState(CliServiceState.Crashed);
                     break;
                 }
             }
             else
             {
-                SetState(LlamaServerState.Running);
+                SetState(CliServiceState.Running);
             }
 
             await Task.Delay(_healthCheckIntervalMs, cancellationToken).ContinueWith(_ => { }, cancellationToken);

@@ -52,6 +52,7 @@ public partial class McpService : UserControl
 
         // llama service status
         UpdateLlmStatus();
+        UpdateMcpNodeJsStatus();
     }
 
     private async void BtnChangeRag_OnClick(object sender, RoutedEventArgs e)
@@ -169,7 +170,21 @@ public partial class McpService : UserControl
 
     private void UpdateLlmStatus()
     {
-        if (GlobalService.LlamaService?.State == LlamaServerState.Running)
+        if (GlobalService.LlamaService?.State == CliServiceState.Running)
+        {
+            TbllmStatus.Text = "Running";
+            TbllmStatus.Foreground = Brushes.Green;
+        }
+        else
+        {
+            TbllmStatus.Text = "Stopped";
+            TbllmStatus.Foreground = Brushes.Red;
+        }
+    }
+
+    private void UpdateMcpNodeJsStatus()
+    {
+        if (GlobalService.LlamaService?.State == CliServiceState.Running)
         {
             TbllmStatus.Text = "Running";
             TbllmStatus.Foreground = Brushes.Green;
