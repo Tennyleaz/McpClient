@@ -1,0 +1,116 @@
+﻿{
+  "nodejs": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "node"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "nodejs"
+      }
+    ],
+    "rhel": [
+      {
+        "manager": "dnf",
+        "package": "nodejs"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "winget",
+        "package": "OpenJS.NodeJS"
+      }
+    ],
+    "url": "https://nodejs.org/en/download"
+  },
+  "npx": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "node"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "nodejs"
+      }
+    ],
+    "rhel": [
+      {
+        "manager": "dnf",
+        "package": "nodejs"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "winget",
+        "package": "OpenJS.NodeJS"
+      }
+    ],
+    "url": "https://nodejs.org/en/download"
+  },
+  "uvx": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "uv"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "uv"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "pip",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "uv"
+      }
+    ],
+    "url": "https://docs.astral.sh/uv/getting-started/installation/"
+  },
+  "python": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "python3"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "python3"
+      }
+    ],
+    "rhel": [
+      {
+        "manager": "dnf",
+        "package": "python3"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "winget",
+        "package": "python3"
+      }
+    ],
+    "url": "https://www.python.org/downloads/"
+  }
+}

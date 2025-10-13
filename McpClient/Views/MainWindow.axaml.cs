@@ -38,8 +38,11 @@ public partial class MainWindow : Window
             await MainView.ReloadMainView();
         }
 
-        // start upload docments in background
+        // check MCP tool runtime dependency
+        LocalCommandWizard wizard = new LocalCommandWizard();
+        await wizard.ShowDialog(this);
 
+        // start upload docments in background
         ragWorker = new BackgroundWorker();
         ragWorker.WorkerSupportsCancellation = true;
         ragWorker.DoWork += RagWorker_DoWork;

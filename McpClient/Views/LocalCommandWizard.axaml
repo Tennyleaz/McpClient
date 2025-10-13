@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        x:Class="McpClient.Views.LocalCommandWizard"
+        x:DataType="vm:WizardViewModel"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        Width="600" Height="450"
+        WindowStartupLocation="CenterOwner"
+        Closing="Window_OnClosing"
+        Title="Install MCP Wizard">
+    <Panel>
+        <TextBlock Name="TbWinTitle" Text="Install MCP Runtimes" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Margin="20"/>
+        
+        <StackPanel Name="PanelMissingInfo" Margin="20,60,0,0" IsVisible="True">
+			<TextBlock>The following runtimes are required by your MCP servers:</TextBlock>
+            <ListBox Name="MissingListbox" ItemsSource="{Binding DetectedRuntimes}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="{Binding Name}" Width="160"/>
+                            <Label Content="{Binding Status}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <StackPanel Name="PanelPreInstall" Margin="20,60,0,0" IsVisible="False">
+			<TextBlock Name="TbPreInstallHeader" FontSize="{StaticResource FontSizeMedium}">Install: nodejs</TextBlock>
+			<RadioButton GroupName="installGroup" Name="RadioInstallPacakge" IsChecked="True" Margin="0,8,0,0">Install via package manager</RadioButton>
+            <TextBlock Name="TbPackageScript" Text="Windows: winget install OpenJS.NodeJS" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+			<RadioButton GroupName="installGroup" Name="RadioDownload" Margin="0,12,0,0">Download and install from official website</RadioButton>
+            <TextBlock Name="TbDownloadUrl" Text="https://nodejs.org/en/download" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+        </StackPanel>
+
+        <StackPanel Name="PanelInstall" Margin="20,60,0,0" IsVisible="False">
+            <TextBlock Name="TbInstallHeader" FontSize="{StaticResource FontSizeMedium}">Installing: nodejs</TextBlock>
+            <TextBlock Name="IbInstallProgress" Text="Please wait..." Margin="0,10,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+        </StackPanel>
+
+        <StackPanel Name="PanelVerify" Margin="20,60,0,0" IsVisible="False">
+            <TextBlock FontSize="{StaticResource FontSizeMedium}">Verification</TextBlock>
+            <TextBlock Margin="0,8,0,0">Re-checking installed runtimes...</TextBlock>
+            <TextBlock Margin="0,8,0,0" Name="VerifyResult" Text="All required runtimes are now installed."></TextBlock>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Spacing="20">
+            <Button Name="BtnPrev" Click="BtnPrev_OnClick" IsVisible="False">Prev</Button>
+            <Button Name="BtnNext" Click="BtnNext_OnClick">Next</Button>
+            <Button Name="BtnClose" Click="BtnClose_OnClick" IsVisible="False">Close</Button>
+        </StackPanel>
+    </Panel>
+</Window>
