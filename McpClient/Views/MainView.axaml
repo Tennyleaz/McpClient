@@ -48,6 +48,7 @@
         </DockPanel>
         <Button Name="BtnShowMonitor" Margin="4,0,0,4" Click="BtnShowMonitor_OnClick" VerticalAlignment="Bottom">Monitor</Button>
         <Button Name="BtnLogout" Click="BtnLogout_OnClick" Margin="80,0,0,4" VerticalAlignment="Bottom">Logout</Button>
+        <Button Name="BtnUpdate" Click="BtnUpdate_OnClick" Margin="150,0,0,4" VerticalAlignment="Bottom" IsVisible="False">Update !</Button>
         <ToggleSwitch Content="Dark Mode" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" IsChecked="{Binding IsNightMode, Mode=TwoWay}"/>
     </Grid>
 </UserControl>

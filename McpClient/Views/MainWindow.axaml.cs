@@ -2,19 +2,23 @@
 using Avalonia.Interactivity;
 using McpClient.Models;
 using McpClient.Services;
+using McpClient.Utils;
 using McpClient.ViewModels;
+using NetSparkleUpdater;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
-using McpClient.Utils;
+using NetSparkleUpdater.Enums;
+using NetSparkleUpdater.SignatureVerifiers;
 
 namespace McpClient.Views;
 
 public partial class MainWindow : Window
 {
     private BackgroundWorker ragWorker;
+    private SparkleUpdater sparkle;
 
     public MainWindow()
     {
@@ -23,6 +27,9 @@ public partial class MainWindow : Window
 
     private async void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (Design.IsDesignMode)
+            return;
+
         IsEnabled = false;
         bool isLogin = await Login();
         IsEnabled = true;
@@ -39,10 +46,32 @@ public partial class MainWindow : Window
         ragWorker.RunWorkerAsync();
 
         GlobalService.KnownCommands = LocalServiceUtils.ListKnownLocalServices();
+
+        // Check for update
+        const string pubKey = "0pYHDlcVVP0l2JhsjSjBqH6SW447IF7oqjcksn1UXjk=";
+        const string URL = "http://192.168.41.173:8080/appcast.xml";
+        sparkle = new SparkleUpdater(
+            URL, // link to your app cast file - change extension to .json if using json
+            new Ed25519Checker(SecurityMode.Unsafe, // security mode -- use .Unsafe to ignore all signature checking (NOT recommended!!)
+                pubKey) // your base 64 public key
+        )
+        {
+            UIFactory = new NetSparkleUpdater.UI.Avalonia.UIFactory(Icon), // or null, or choose some other UI factory, or build your own IUIFactory implementation!
+            RelaunchAfterUpdate = false, // set to true if needed
+        };
+        sparkle.UpdateDetected += Sparkle_UpdateDetected;
+        await sparkle.StartLoop(true, true);
+    }
+
+    private void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
+    {
+        MainView.BtnUpdate.IsVisible = true;
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
     {
+        sparkle?.StopLoop();
+        sparkle?.Dispose();
         ragWorker?.CancelAsync();
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();

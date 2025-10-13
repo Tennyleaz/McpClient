@@ -172,4 +172,10 @@ public partial class MainView : UserControl
         // Switch to MCP tool tab
         MainListbox.SelectedIndex = 2;
     }
+
+    private async void BtnUpdate_OnClick(object sender, RoutedEventArgs e)
+    {
+        const string url = "http://ainexus.phison.com/desktop";
+        await TopLevel.GetTopLevel(this).Launcher.LaunchUriAsync(new Uri(url));
+    }
 }
