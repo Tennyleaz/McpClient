@@ -37,10 +37,22 @@ public partial class MainWindow : Window
         {
             await MainView.ReloadMainView();
         }
+        else
+        {
+            return;
+        }
+
+        // show main UI
+        TbLogin.IsVisible = false;
+        MainView.IsVisible = true;
 
         // check MCP tool runtime dependency
         LocalCommandWizard wizard = new LocalCommandWizard();
-        await wizard.ShowDialog(this);
+        bool needInstall = wizard.GenerateInstalledRuntimeViewModel();
+        if (needInstall)
+        {
+            await wizard.ShowDialog(this);
+        }
 
         // start upload docments in background
         ragWorker = new BackgroundWorker();
@@ -49,6 +61,12 @@ public partial class MainWindow : Window
         ragWorker.RunWorkerAsync();
 
         GlobalService.KnownCommands = LocalServiceUtils.ListKnownLocalServices();
+
+        // Start MCP host service
+        GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
+        GlobalService.NodeJsService.Start();
+
+        // Start LLM service
 
         // Check for update
         const string pubKey = "0pYHDlcVVP0l2JhsjSjBqH6SW447IF7oqjcksn1UXjk=";
@@ -78,6 +96,7 @@ public partial class MainWindow : Window
         ragWorker?.CancelAsync();
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
+        GlobalService.NodeJsService?.Stop();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
@@ -113,6 +132,12 @@ public partial class MainWindow : Window
         // Load darkmode
         Settings settings = SettingsManager.Local.Load();
         GlobalService.MainViewModel.IsNightMode = settings.IsDarkMode;
+
+        // Show username
+        if (!string.IsNullOrWhiteSpace(settings.UserName))
+        {
+            TbLogin.Text = $"Logging in AI Nexus as {settings.UserName} ...";
+        }
 
         // Test saved token
         if (!string.IsNullOrWhiteSpace(settings.McpConfigToken))

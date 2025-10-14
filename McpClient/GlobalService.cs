@@ -26,6 +26,8 @@ internal static class GlobalService
 
     public static LlamaService LlamaService { get; set; }
 
+    public static McpNodeJsService NodeJsService { get; set; }
+
     public static MainViewModel MainViewModel { get; set; }
 
     public static List<string> KnownCommands { get; set; }

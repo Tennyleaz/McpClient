@@ -33,6 +33,7 @@ internal class McpConfigService
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _token = token;
         }
+        _httpClient.Timeout = TimeSpan.FromSeconds(10);
 
         _options = new JsonSerializerOptions();
         _options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
