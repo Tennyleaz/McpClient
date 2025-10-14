@@ -32,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\SystemSetting.axaml.cs">
+      <DependentUpon>SystemSetting.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\RunStaticTaskWindow.axaml.cs">
       <DependentUpon>RunStaticTaskWindow.axaml</DependentUpon>
     </Compile>

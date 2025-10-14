@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Dialogs;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using McpClient.Services;
 using McpClient.Utils;
@@ -12,16 +14,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Avalonia.Media;
 
 namespace McpClient.Views;
 
-public partial class McpService : UserControl
+public partial class SystemSetting : UserControl
 {
     private Settings settings;
     private int hgRecommendSize = 0;
 
-    public McpService()
+    public SystemSetting()
     {
         InitializeComponent();
     }
@@ -38,6 +39,7 @@ public partial class McpService : UserControl
     {
         settings = SettingsManager.Local.Load();
         TbRagFolder.Text = settings.RagFolder;
+        TbFileSystemFolder.Text = settings.FileSystemFolder;
         if (Directory.Exists(settings.RagFolder))
         {
             TbRagStatus.Text = "Running";
@@ -201,5 +203,26 @@ public partial class McpService : UserControl
         LlmConfigWindow window = new LlmConfigWindow();
         await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
         UpdateLlmStatus();
+    }
+
+    private async void BtnChangeFileSystem_OnClick(object sender, RoutedEventArgs e)
+    {
+        IStorageProvider storage = TopLevel.GetTopLevel(this).StorageProvider;
+        IStorageFolder documentsFolder = await storage.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+        var selectedFolders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            AllowMultiple = false,
+            SuggestedStartLocation = documentsFolder
+        });
+
+        if (selectedFolders.Count > 0)
+        {
+            IStorageFolder selected = selectedFolders.First();
+            string folder = selected.TryGetLocalPath();
+            settings.FileSystemFolder = folder;
+            await SettingsManager.Local.SaveAsync(settings);
+
+            TbFileSystemFolder.Text = settings.RagFolder;
+        }
     }
 }

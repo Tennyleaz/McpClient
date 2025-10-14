@@ -39,7 +39,7 @@ public partial class MainView : UserControl
     //    MainPanel.IsVisible = false;
     //    McpSetting.IsVisible = true;
     //    Chat.IsVisible = false;
-    //    McpService.IsVisible = false;
+    //    SystemSetting.IsVisible = false;
     //    McpStore.IsVisible = false;
 
     //    BtnBack.IsVisible = true;
@@ -103,7 +103,7 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = false;
                 Chat.IsVisible = false;
                 McpStore.IsVisible = false;
-                McpService.IsVisible = false;
+                SystemSetting.IsVisible = false;
 
                 await MyAppList.LoadGroupList(true);
                 break;
@@ -114,7 +114,7 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = false;
                 Chat.IsVisible = false;
                 McpStore.IsVisible = false;
-                McpService.IsVisible = false;
+                SystemSetting.IsVisible = false;
 
                 await OfflineWorkflowList.LoadOfflineList(true);
                 break;
@@ -125,7 +125,7 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = true;
                 Chat.IsVisible = false;
                 McpStore.IsVisible = false;
-                McpService.IsVisible = false;
+                SystemSetting.IsVisible = false;
 
                 await AgentList.LoadConfig();
                 break;
@@ -136,7 +136,7 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = false;
                 Chat.IsVisible = true;
                 McpStore.IsVisible = false;
-                McpService.IsVisible = false;
+                SystemSetting.IsVisible = false;
 
                 Chat.LoadChatServer();
                 break;
@@ -147,7 +147,7 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = false;
                 Chat.IsVisible = false;
                 McpStore.IsVisible = true;
-                McpService.IsVisible = false;
+                SystemSetting.IsVisible = false;
 
                 await McpStore.LoadDefault();
                 break;
@@ -158,9 +158,9 @@ public partial class MainView : UserControl
                 AgentList.IsVisible = false;
                 Chat.IsVisible = false;
                 McpStore.IsVisible = false;
-                McpService.IsVisible = true;
+                SystemSetting.IsVisible = true;
 
-                McpService.LoadFromSettings();
+                SystemSetting.LoadFromSettings();
                 break;
         }
     }

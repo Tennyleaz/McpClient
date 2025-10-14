@@ -4,20 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              Loaded="Control_OnLoaded"
-             x:Class="McpClient.Views.McpService">
+             x:Class="McpClient.Views.SystemSetting">
 	<Panel Margin="20,20,0,0">
         <TextBlock Text="服務狀態" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
         <TextBlock Text="監控系統服務和資源使用情況" Margin="0,40,0,0"/>
-        <DockPanel Margin="0,80,0,0">
+		<WrapPanel Margin="0,80,0,20" Orientation="Vertical">
             <Border Classes="CardFix" DockPanel.Dock="Top" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
 				<Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="40,40,40,40">
                     <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">系統服務</TextBlock>
 
-                    <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">NodeJS server</TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">MCP NodeJS server</TextBlock>
                     <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
                     <Button Grid.Column="2" Grid.Row="1" Name="BtnRestartNodeJs" VerticalAlignment="Center">Restart</Button>
 
-                    <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center">.Net server</TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center">.Net API server</TextBlock>
                     <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
                     <Button Grid.Column="2" Grid.Row="2" Name="BtnRestartDotNet" VerticalAlignment="Center">Restart</Button>
 
@@ -40,23 +40,15 @@
                     </Panel>-->
                 </Grid>
             </Border>
-        </DockPanel>
-
-		<Grid Margin="24,60,20,20" RowDefinitions="60,60,60,60,*" ColumnDefinitions="Auto,Auto,*,Auto" IsVisible="False">
-            
-
-
-
-            <!--<Grid Grid.Column="3" Grid.Row="0" Grid.RowSpan="5" Margin="0,0,20,0" Grid.RowDefinitions="Auto,Auto,Auto,Auto" Grid.ColumnDefinitions="Auto,Auto">
-				<TextBlock Grid.Column="0" Grid.Row="0">GPU:</TextBlock>
-                <TextBlock Grid.Column="1" Grid.Row="0" Name="TbGpuName">Unknown Model</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="1">VRAM:</TextBlock>
-				<TextBlock Grid.Column="1" Grid.Row="1" Name="TbGpuVram">0 MB</TextBlock>
-                <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,10,0">Recommend model size:</TextBlock>
-				<TextBlock Grid.Column="1" Grid.Row="2" Name="TbRecommend">Unknown size</TextBlock>
-                <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0" Name="BtnSearchHg" Click="BtnSearchHg_OnClick">Go seach huggingface: 0B</Button>
-            </Grid>-->
-        </Grid>
+            <Border Classes="CardFix" DockPanel.Dock="Right" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,40">
+                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">MCP 設定</TextBlock>
+					<TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">MCP FileSystem Folder:</TextBlock>
+                    <Button Grid.Column="1" Grid.Row="1" Name="BtnChangeFileSystem" VerticalAlignment="Center" Click="BtnChangeFileSystem_OnClick">Change Folder</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="TbFileSystemFolder" VerticalAlignment="Center">C:\\users\tenny\documents\MCP File System</TextBlock>
+				</Grid>
+            </Border>
+        </WrapPanel>
         <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>
 	</Panel>
 </UserControl>

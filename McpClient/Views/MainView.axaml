@@ -43,7 +43,7 @@
                 <views:Chat Name="Chat" IsVisible="False"/>
                 <views:McpStore Name="McpStore" IsVisible="False"/>
                 <!--<views:McpSetting Name="McpSetting" IsVisible="False"/>-->
-                <views:McpService Name="McpService" IsVisible="False"/>
+                <views:SystemSetting Name="SystemSetting" IsVisible="False"/>
             </Panel>
         </DockPanel>
         <Button Name="BtnShowMonitor" Margin="4,0,0,4" Click="BtnShowMonitor_OnClick" VerticalAlignment="Bottom">Monitor</Button>

@@ -46,6 +46,9 @@ public partial class MainWindow : Window
         TbLogin.IsVisible = false;
         MainView.IsVisible = true;
 
+        // Create default MCP filesystem folder
+        await CreateMcpFileSytemFolder();
+
         // check MCP tool runtime dependency
         LocalCommandWizard wizard = new LocalCommandWizard();
         bool needInstall = wizard.GenerateInstalledRuntimeViewModel();
@@ -232,5 +235,28 @@ public partial class MainWindow : Window
         AiNexusService service = new AiNexusService(token);
         var groups = await service.GetAllGroups();
         return groups != null;
+    }
+
+    private static async Task CreateMcpFileSytemFolder()
+    {
+        Settings settings = SettingsManager.Local.Load();
+        if (string.IsNullOrEmpty(settings.FileSystemFolder))
+        {
+            settings.FileSystemFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "MCP File System");
+            await SettingsManager.Local.SaveAsync(settings);
+        }
+        if (!Directory.Exists(settings.FileSystemFolder))
+        {
+            try
+            {
+                Directory.CreateDirectory(settings.FileSystemFolder);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
     }
 }
