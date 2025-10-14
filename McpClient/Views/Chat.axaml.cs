@@ -28,6 +28,8 @@ public partial class Chat : UserControl
 
     public bool IsNeedRefreshWorkflow { get; private set; }
 
+    public event EventHandler TokenExpired;
+
     public Chat()
     {
         if (Design.IsDesignMode)
@@ -116,6 +118,15 @@ public partial class Chat : UserControl
             Dispatcher.UIThread.Invoke(async () =>
             {
                 await OnDownloadFile(args);
+            });
+        };
+        tennyObject.OnTokenExpired += (o, args) =>
+        {
+            // This event is raised on background thread
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                // Tell main window to logout
+                TokenExpired?.Invoke(this, EventArgs.Empty);
             });
         };
     }
@@ -218,7 +229,7 @@ public partial class Chat : UserControl
 
     internal class TennyObject
     {
-        public event EventHandler OnRefresh;
+        public event EventHandler OnRefresh, OnTokenExpired;
         public event EventHandler<string> OnDownload;
 
         public void NotifyRefreshMcp()
@@ -229,6 +240,11 @@ public partial class Chat : UserControl
         public void NotifyFileDownload(string url)
         {
             OnDownload?.Invoke(this, url);
+        }
+
+        public void NotifyTokenExpired()
+        {
+            OnTokenExpired?.Invoke(this, EventArgs.Empty);
         }
     }
 

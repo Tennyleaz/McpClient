@@ -40,7 +40,7 @@
 				<views:TaskGroupList Name="MyAppList"/>
 				<views:TaskOfflineWorkflowList Name="OfflineWorkflowList" IsVisible="False"/>
 				<views:McpSetting Name="AgentList" IsVisible="False"/>
-                <views:Chat Name="Chat" IsVisible="False"/>
+                <views:Chat Name="Chat" IsVisible="False" TokenExpired="Chat_OnTokenExpired"/>
                 <views:McpStore Name="McpStore" IsVisible="False"/>
                 <!--<views:McpSetting Name="McpSetting" IsVisible="False"/>-->
                 <views:SystemSetting Name="SystemSetting" IsVisible="False"/>

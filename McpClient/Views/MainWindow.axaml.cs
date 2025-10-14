@@ -94,6 +94,9 @@ public partial class MainWindow : Window
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
     {
+        // hide main UI
+        Hide();
+
         sparkle?.StopLoop();
         sparkle?.Dispose();
         ragWorker?.CancelAsync();
@@ -120,6 +123,12 @@ public partial class MainWindow : Window
         settings.UserName = null;
         settings.ExpiredAt = default;
         await SettingsManager.Local.SaveAsync(settings);
+
+        // Hide main UI
+        TbLogin.Text = "You have been logged out.\nPlease login again.";
+        TbLogin.IsVisible = true;
+        MainView.IsVisible = false;
+
         // Login again
         IsEnabled = false;
         bool isLogin = await Login();

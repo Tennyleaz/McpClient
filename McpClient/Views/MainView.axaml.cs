@@ -178,4 +178,10 @@ public partial class MainView : UserControl
         const string url = "http://ainexus.phison.com/desktop";
         await TopLevel.GetTopLevel(this).Launcher.LaunchUriAsync(new Uri(url));
     }
+
+    private void Chat_OnTokenExpired(object sender, EventArgs e)
+    {
+        // Tell main window to logout
+        LogoutClick?.Invoke(this, EventArgs.Empty);
+    }
 }
