@@ -14,17 +14,22 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Avalonia.Threading;
 
 namespace McpClient.Views;
 
 public partial class SystemSetting : UserControl
 {
     private Settings settings;
-    private int hgRecommendSize = 0;
+    private readonly DispatcherTimer checkStatusTimer;
 
     public SystemSetting()
     {
         InitializeComponent();
+
+        checkStatusTimer = new DispatcherTimer();
+        checkStatusTimer.Interval = TimeSpan.FromSeconds(1);
+        checkStatusTimer.Tick += CheckStatusTimer_Tick;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -53,8 +58,20 @@ public partial class SystemSetting : UserControl
         }
 
         // llama service status
-        UpdateLlmStatus();
-        UpdateMcpNodeJsStatus();
+        UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
+        UpdateCliServiceStatus(GlobalService.NodeJsService, TbNodeJsStatus);
+        UpdateCliServiceStatus(GlobalService.BackendService, TbDotnetBackendStatus);
+        StartMonitorServices();
+    }
+
+    internal void StartMonitorServices()
+    {
+        checkStatusTimer.Start();
+    }
+
+    internal void StopMonitorServices()
+    {
+        checkStatusTimer.Stop();
     }
 
     private async void BtnChangeRag_OnClick(object sender, RoutedEventArgs e)
@@ -79,6 +96,8 @@ public partial class SystemSetting : UserControl
             TbRagStatus.Foreground = Brushes.Green;
         }
     }
+
+    #region Test audio recording
 
     private AudioService audioService;
 
@@ -116,6 +135,8 @@ public partial class SystemSetting : UserControl
             }
         }
     }
+
+    #endregion
 
     //private void LoadGpuStatus()
     //{
@@ -165,44 +186,49 @@ public partial class SystemSetting : UserControl
         launcher.LaunchUriAsync(new Uri(url));
     }
 
-    private void BtnSearchHg_OnClick(object sender, RoutedEventArgs e)
+    private static void UpdateCliServiceStatus(CliService service, TextBlock textBlock)
     {
-        GoSeachHuggingFace(hgRecommendSize);
-    }
-
-    private void UpdateLlmStatus()
-    {
-        if (GlobalService.LlamaService?.State == CliServiceState.Running)
+        if (service == null)
         {
-            TbllmStatus.Text = "Running";
-            TbllmStatus.Foreground = Brushes.Green;
+            textBlock.Text = "Stopped";
+            textBlock.Foreground = Brushes.Red;
         }
         else
         {
-            TbllmStatus.Text = "Stopped";
-            TbllmStatus.Foreground = Brushes.Red;
+            textBlock.Text = service.State.ToString();
+            switch (service.State)
+            {
+                case CliServiceState.Running:
+                    textBlock.Foreground = Brushes.Green;
+                    break;
+                case CliServiceState.Starting:
+                    textBlock.Foreground = Brushes.GreenYellow;
+                    break;
+                case CliServiceState.Stopping:
+                    textBlock.Foreground = Brushes.Orange;
+                    break;
+                default:
+                    textBlock.Foreground = Brushes.Red;
+                    break;
+            }
         }
     }
 
-    private void UpdateMcpNodeJsStatus()
+    private void CheckStatusTimer_Tick(object sender, EventArgs e)
     {
-        if (GlobalService.LlamaService?.State == CliServiceState.Running)
-        {
-            TbllmStatus.Text = "Running";
-            TbllmStatus.Foreground = Brushes.Green;
-        }
-        else
-        {
-            TbllmStatus.Text = "Stopped";
-            TbllmStatus.Foreground = Brushes.Red;
-        }
+        if (!IsVisible)
+            return;
+
+        UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
+        UpdateCliServiceStatus(GlobalService.NodeJsService, TbNodeJsStatus);
+        UpdateCliServiceStatus(GlobalService.BackendService, TbDotnetBackendStatus);
     }
 
     private async void BtnLlmConfig_OnClick(object sender, RoutedEventArgs e)
     {
         LlmConfigWindow window = new LlmConfigWindow();
         await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
-        UpdateLlmStatus();
+        UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
     }
 
     private async void BtnChangeFileSystem_OnClick(object sender, RoutedEventArgs e)
@@ -224,5 +250,22 @@ public partial class SystemSetting : UserControl
 
             TbFileSystemFolder.Text = settings.RagFolder;
         }
+    }
+
+    private void BtnRestartNodeJs_OnClick(object sender, RoutedEventArgs e)
+    {
+        GlobalService.NodeJsService.Stop();
+        GlobalService.NodeJsService.Start();
+    }
+
+    private void BtnRestartDotNet_OnClick(object sender, RoutedEventArgs e)
+    {
+        GlobalService.BackendService.Stop();
+        GlobalService.BackendService.Start();
+    }
+
+    private void Control_OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        StopMonitorServices();
     }
 }

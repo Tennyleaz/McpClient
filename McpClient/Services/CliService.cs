@@ -77,7 +77,8 @@ internal abstract class CliService
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(_binaryPath)
                 },
                 EnableRaisingEvents = true
             };

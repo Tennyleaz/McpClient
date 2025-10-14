@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
-             Loaded="Control_OnLoaded"
+             Loaded="Control_OnLoaded" Unloaded="Control_OnUnloaded"
              x:Class="McpClient.Views.SystemSetting">
 	<Panel Margin="20,20,0,0">
         <TextBlock Text="服務狀態" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
@@ -14,12 +14,12 @@
                     <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">系統服務</TextBlock>
 
                     <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">MCP NodeJS server</TextBlock>
-                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
-                    <Button Grid.Column="2" Grid.Row="1" Name="BtnRestartNodeJs" VerticalAlignment="Center">Restart</Button>
+                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbNodeJsStatus" Foreground="Red">Stopped</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="1" Name="BtnRestartNodeJs" VerticalAlignment="Center" Click="BtnRestartNodeJs_OnClick">Restart</Button>
 
                     <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center">.Net API server</TextBlock>
-                    <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center" Foreground="Green">Running</TextBlock>
-                    <Button Grid.Column="2" Grid.Row="2" Name="BtnRestartDotNet" VerticalAlignment="Center">Restart</Button>
+                    <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbDotnetBackendStatus" Foreground="Red">Stopped</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="2" Name="BtnRestartDotNet" VerticalAlignment="Center" Click="BtnRestartDotNet_OnClick">Restart</Button>
 
                     <TextBlock Grid.Column="0" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center">LLM server</TextBlock>
                     <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbllmStatus" Foreground="Green">Running</TextBlock>

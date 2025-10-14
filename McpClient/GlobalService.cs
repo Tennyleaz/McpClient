@@ -21,6 +21,8 @@ internal static class GlobalService
         LlamaServerBin = Path.Combine(LlamaInstallFolder, name);
 
         McpHostFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpNodeJs");
+
+        DispatcherFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpBackend");
     }
 
     public static readonly string LlamaInstallFolder;
@@ -28,9 +30,13 @@ internal static class GlobalService
 
     public static readonly string McpHostFolder;
 
+    public static readonly string DispatcherFolder;
+
     public static LlamaService LlamaService { get; set; }
 
     public static McpNodeJsService NodeJsService { get; set; }
+
+    public static DispatcherBackendService BackendService { get; set; }
 
     public static MainViewModel MainViewModel { get; set; }
 

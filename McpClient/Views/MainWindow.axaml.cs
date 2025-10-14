@@ -69,6 +69,10 @@ public partial class MainWindow : Window
         GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
         GlobalService.NodeJsService.Start();
 
+        // Start .net backend
+        GlobalService.BackendService = DispatcherBackendService.CreateBackendService();
+        GlobalService.BackendService.Start();
+
         // Start LLM service
 
         // Check for update
@@ -103,6 +107,7 @@ public partial class MainWindow : Window
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
         GlobalService.NodeJsService?.Stop();
+        GlobalService.BackendService?.Stop();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
