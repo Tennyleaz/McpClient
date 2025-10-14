@@ -16,7 +16,7 @@ internal class McpNodeJsService : CliService
 {
     public static McpNodeJsService CreateMcpNodeJsService()
     {
-        string path = @"D:\tenny_lu\Documents\mcp node js\mcp-host-use.exe";
+        string path = Path.Combine(GlobalService.McpHostFolder, "mcp-host-use.exe");
         if (File.Exists(path))
             return new McpNodeJsService(path);
         return null;

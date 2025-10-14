@@ -63,4 +63,27 @@ internal static class LocalServiceUtils
 
         return false;
     }
+
+    public static string FindRuntimeByCommand(string command)
+    {
+        switch (command)
+        {
+            case "python":
+            case "python3":
+            case "pip":
+            case "pip3":
+                return "python3";
+            case "uv":
+            case "uvx":
+                return "uv";
+            case "node":
+            case "npm":
+            case "npx":
+                return "node";
+            case "docker":
+                return "docker";
+            default:
+                return command;
+        }
+    }
 }

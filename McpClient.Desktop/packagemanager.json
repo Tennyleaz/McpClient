@@ -26,7 +26,7 @@
     ],
     "url": "https://nodejs.org/en/download"
   },
-  "npx": {
+  "node": {
     "macos": [
       {
         "manager": "brew",
@@ -53,7 +53,7 @@
     ],
     "url": "https://nodejs.org/en/download"
   },
-  "uvx": {
+  "uv": {
     "macos": [
       {
         "manager": "brew",
@@ -86,7 +86,7 @@
     ],
     "url": "https://docs.astral.sh/uv/getting-started/installation/"
   },
-  "python": {
+  "python3": {
     "macos": [
       {
         "manager": "brew",
@@ -112,5 +112,27 @@
       }
     ],
     "url": "https://www.python.org/downloads/"
+  },
+  "docker": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "docker"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "docker-ce"
+      }
+    ],
+    "rhel": [
+      {
+        "manager": "dnf",
+        "package": "docker-ce"
+      }
+    ],
+    "windows": [],
+    "url": "https://docs.docker.com/engine/install/"
   }
 }

@@ -8,6 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         Width="600" Height="450"
         WindowStartupLocation="CenterOwner"
+        Loaded="Window_OnLoaded"
         Closing="Window_OnClosing"
         Title="Install MCP Wizard">
     <Panel>
@@ -37,6 +38,7 @@
 
         <StackPanel Name="PanelInstall" Margin="20,60,0,0" IsVisible="False">
             <TextBlock Name="TbInstallHeader" FontSize="{StaticResource FontSizeMedium}">Installing: nodejs</TextBlock>
+            <TextBlock Name="TbInstallUrl" IsVisible="False" Cursor="Hand" PointerReleased="TbInstallUrl_OnPointerReleased" Foreground="{DynamicResource SystemAccentColor}"/>
             <TextBlock Name="IbInstallProgress" Text="Please wait..." Margin="0,10,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
         </StackPanel>
 

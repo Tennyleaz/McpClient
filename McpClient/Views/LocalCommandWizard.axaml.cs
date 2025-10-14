@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using McpClient.Models;
 using McpClient.Utils;
 using McpClient.ViewModels;
 using System;
@@ -10,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using Avalonia.Input;
 
 namespace McpClient.Views;
 
@@ -34,19 +36,72 @@ public partial class LocalCommandWizard : Window
             new RuntimeItem("uvx", "❌ missing"),
         };
 
-        // update installed status
-        CheckInstalled();
-
         DataContext = viewModel;
 
         if (Design.IsDesignMode)
             return;
 
+        // prepare readonly fields
         string fileName = "packagemanager.json";
         string text = System.IO.File.ReadAllText(fileName);
         allDepConfig = JsonNode.Parse(text);
         platform = DetectPlatform();
+    }
+
+    private void Window_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (Design.IsDesignMode)
+            return;
+
+        DataContext = viewModel;
+
+        // update installed status
+        CheckInstalled();
+
         ShowNextStep();
+    }
+
+    public List<string> ReadMcpConfigList()
+    {
+        // read the config file
+        string path = System.IO.Path.Combine(GlobalService.McpHostFolder, "mcp_servers.config.json");
+        string json = System.IO.File.ReadAllText(path);
+        McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
+
+        // findout all stdio commands
+        HashSet<string> commands = new HashSet<string>();
+        foreach (var mcpServer in config.mcp_servers)
+        {
+            if (mcpServer.type == McpServerType.Stdio)
+            {
+                commands.Add(mcpServer.command);
+            }
+        }
+        return commands.ToList();
+    }
+
+    public bool GenerateInstalledRuntimeViewModel()
+    {
+        bool needInstall = false;
+        WizardViewModel newWizardViewModel = new WizardViewModel();
+        List<string> commands = ReadMcpConfigList();
+        foreach (string command in commands)
+        {
+            bool isExist = LocalServiceUtils.FindCommand(command);
+            string status = isExist ? "✔ installed" : "❌ missing";
+            string runtimeName = LocalServiceUtils.FindRuntimeByCommand(command);
+            RuntimeItem runtimeItem = new RuntimeItem(runtimeName, status);
+            runtimeItem.IsCommandExist = isExist;
+            newWizardViewModel.DetectedRuntimes.Add(runtimeItem);
+            if (!isExist)
+            {
+                newWizardViewModel.MissingRuntimes.Add(runtimeItem);
+                needInstall = true;
+            }
+        }
+
+        viewModel = newWizardViewModel;
+        return needInstall;
     }
 
     private void CheckInstalled()
@@ -134,8 +189,20 @@ public partial class LocalCommandWizard : Window
 
             RuntimeItem currentItem = viewModel.MissingRuntimes[installIndex];
             TbPreInstallHeader.Text = $"Install: {currentItem.Name}";
-            TbDownloadUrl.Text = GetDownloadUrl(currentItem.Name);
+            TbInstallUrl.Text = TbDownloadUrl.Text = GetDownloadUrl(currentItem.Name);
             TbPackageScript.Text = GetInstructionsCommand(currentItem.Name);
+
+            // only go to url if not available from package manager
+            if (string.IsNullOrEmpty(TbPackageScript.Text))
+            {
+                TbPackageScript.Text = "Not availabie in your package manager.";
+                RadioInstallPacakge.IsEnabled = false;
+                RadioDownload.IsChecked = true;
+            }
+            else
+            {
+                RadioInstallPacakge.IsEnabled = true;
+            }
         }
         else if (state == WizardState.Install)
         {
@@ -149,10 +216,12 @@ public partial class LocalCommandWizard : Window
             TbInstallHeader.Text = $"Installing: {currentItem.Name}";
             if (RadioDownload.IsChecked == true)
             {
+                TbInstallUrl.IsVisible = true;
                 IbInstallProgress.Text = $"Please click \"next\" after you download and install {currentItem.Name}.";
             }
             else
             {
+                TbInstallUrl.IsVisible = false;
                 IbInstallProgress.Text = "Please wait...";
                 BtnNext.IsEnabled = false;
             }
@@ -224,12 +293,16 @@ public partial class LocalCommandWizard : Window
     private string GetDownloadUrl(string depName)
     {
         JsonNode depConfig = LoadDependencyConfig(depName);
+        if (depConfig == null)
+            return null;
         return depConfig["url"]?.ToString();
     }
 
     private List<Instruction> GetInstructions(string depName)
     {
         JsonNode depConfig = LoadDependencyConfig(depName);
+        if (depConfig == null)
+            return new List<Instruction>();
         JsonNode instructionsJson = depConfig[platform];
         List<Instruction> instructions = instructionsJson.Deserialize<List<Instruction>>();
         return instructions;
@@ -305,6 +378,16 @@ public partial class LocalCommandWizard : Window
         {
             e.Cancel = true;
             return;
+        }
+    }
+
+    private async void TbInstallUrl_OnPointerReleased(object sender, PointerReleasedEventArgs e)
+    {
+        // goto download URL
+        if (!string.IsNullOrEmpty(TbDownloadUrl.Text))
+        {
+            Uri uri = new Uri(TbDownloadUrl.Text);
+            await Launcher.LaunchUriAsync(uri);
         }
     }
 }

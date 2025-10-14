@@ -19,10 +19,14 @@ internal static class GlobalService
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             name += ".exe";
         LlamaServerBin = Path.Combine(LlamaInstallFolder, name);
+
+        McpHostFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpNodeJs");
     }
 
     public static readonly string LlamaInstallFolder;
     public static readonly string LlamaServerBin;
+
+    public static readonly string McpHostFolder;
 
     public static LlamaService LlamaService { get; set; }
 
