@@ -27,12 +27,17 @@ internal sealed class SettingsManager
         _historyPath = Path.Combine(_settingDir, "documentHistory.json");
     }
 
-    public async Task SaveAsync(Settings settings)
+    private void TryCreateDir()
     {
         if (!Directory.Exists(_settingDir))
         {
             Directory.CreateDirectory(_settingDir);
         }
+    }
+
+    public async Task SaveAsync(Settings settings)
+    {
+        TryCreateDir();
 
         using (var fs = new FileStream(_settingsPath, FileMode.Create))
         {
@@ -42,10 +47,7 @@ internal sealed class SettingsManager
 
     public void Save(Settings settings)
     {
-        if (!Directory.Exists(_settingDir))
-        {
-            Directory.CreateDirectory(_settingDir);
-        }
+        TryCreateDir();
 
         using (var fs = new FileStream(_settingsPath, FileMode.Create))
         {
@@ -73,10 +75,7 @@ internal sealed class SettingsManager
 
     public void SaveModelSettings(ModelSettings settings)
     {
-        if (!Directory.Exists(_settingDir))
-        {
-            Directory.CreateDirectory(_settingDir);
-        }
+        TryCreateDir();
 
         using (var fs = new FileStream(_modelSettingPath, FileMode.Create))
         {
@@ -123,14 +122,43 @@ internal sealed class SettingsManager
 
     public async Task SaveDocumentHistoriesAsync(List<DocumentHistory> histories)
     {
-        if (!Directory.Exists(_settingDir))
-        {
-            Directory.CreateDirectory(_settingDir);
-        }
+        TryCreateDir();
 
         using (var fs = new FileStream(_historyPath, FileMode.Create))
         {
             await JsonSerializer.SerializeAsync(fs, histories);
+        }
+    }
+
+    public void SavePid(string serviceName, int pid)
+    {
+        if (pid <= 0)
+            return;
+
+        TryCreateDir();
+
+        string fileName = Path.Combine(_settingDir, $"{serviceName}.pid");
+        File.WriteAllText(fileName, pid.ToString());
+    }
+
+    public int LoadPid(string serviceName)
+    {
+        string fileName = Path.Combine(_settingDir, $"{serviceName}.pid");
+        if (File.Exists(fileName))
+        {
+            string text = File.ReadAllText(fileName);
+            if (int.TryParse(text, out int pid))
+                return pid;
+        }
+        return 0;
+    }
+
+    public void RemovePid(string serviceName)
+    {
+        string fileName = Path.Combine(_settingDir, $"{serviceName}.pid");
+        if (File.Exists(fileName))
+        {
+            File.Delete(fileName);
         }
     }
 }
