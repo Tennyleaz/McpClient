@@ -163,6 +163,12 @@ public partial class MainView : UserControl
                 SystemSetting.LoadFromSettings();
                 break;
         }
+
+        // stop monitoring
+        if (index != 5)
+        {
+            SystemSetting.StopMonitorServices();
+        }
     }
 
     private async void MyAppList_DownloadGroup(object sender, Models.Group e)

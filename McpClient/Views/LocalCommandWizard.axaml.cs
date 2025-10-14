@@ -28,13 +28,13 @@ public partial class LocalCommandWizard : Window
         InitializeComponent();
 
         viewModel = new WizardViewModel();
-        viewModel.DetectedRuntimes = new List<RuntimeItem>()
-        {
-            new RuntimeItem("nodejs", "✔ installed"),
-            new RuntimeItem("npx", "✔ installed"),
-            new RuntimeItem("python3", "❌ missing"),
-            new RuntimeItem("uvx", "❌ missing"),
-        };
+        //viewModel.DetectedRuntimes = new List<RuntimeItem>()
+        //{
+        //    new RuntimeItem("nodejs", "✔ installed"),
+        //    new RuntimeItem("npx", "✔ installed"),
+        //    new RuntimeItem("python3", "❌ missing"),
+        //    new RuntimeItem("uvx", "❌ missing"),
+        //};
 
         DataContext = viewModel;
 
@@ -374,7 +374,7 @@ public partial class LocalCommandWizard : Window
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
     {
-        if (state != WizardState.Verify)
+        if (state != WizardState.Verify && state != WizardState.Check)
         {
             e.Cancel = true;
             return;
