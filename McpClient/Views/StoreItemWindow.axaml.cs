@@ -105,7 +105,7 @@ public partial class StoreItemWindow : Window
         // check local command
         if (parsedMcpServer.type == McpServerType.Stdio)
         {
-            if (!LocalServiceUtils.FindCommand(parsedMcpServer.command))
+            /*if (!LocalServiceUtils.FindCommand(parsedMcpServer.command))
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Info", $"You need command \"{parsedMcpServer.command}\" before installing this agent.",
                     ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
@@ -114,6 +114,19 @@ public partial class StoreItemWindow : Window
                 BtnInstall.IsEnabled = true;
                 BtnInstall.Content = "Install ¡õ";
                 return;
+            }*/
+
+            LocalCommandWizard wizard = new LocalCommandWizard();
+            if (wizard.GenerateMcpStoreRuntimeViewModel(parsedMcpServer.command))
+            {
+                await wizard.ShowDialog(this);
+                if (!wizard.IsAllRuntimeInstalled)
+                {
+                    // TODO: warn user again?
+                    BtnInstall.IsEnabled = true;
+                    BtnInstall.Content = "Install ¡õ";
+                    return;
+                }
             }
         }
 

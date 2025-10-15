@@ -22,6 +22,8 @@ public partial class LocalCommandWizard : Window
     private int installIndex = 0;
     private readonly string platform;
     private readonly JsonNode allDepConfig;
+    
+    public bool IsAllRuntimeInstalled { get; private set; }
 
     public LocalCommandWizard()
     {
@@ -80,6 +82,10 @@ public partial class LocalCommandWizard : Window
         return commands.ToList();
     }
 
+    /// <summary>
+    /// This is called by main window startup.
+    /// </summary>
+    /// <returns>Return true if missing some runtime.</returns>
     public bool GenerateInstalledRuntimeViewModel()
     {
         bool needInstall = false;
@@ -101,6 +107,32 @@ public partial class LocalCommandWizard : Window
         }
 
         viewModel = newWizardViewModel;
+        IsAllRuntimeInstalled = !needInstall;
+        return needInstall;
+    }
+
+    /// <summary>
+    /// This is called by MCP store, before installing a MCP server.
+    /// </summary>
+    /// <returns>Return true if missing some runtime.</returns>
+    public bool GenerateMcpStoreRuntimeViewModel(string command)
+    {
+        bool needInstall = false;
+        WizardViewModel newWizardViewModel = new WizardViewModel();
+        bool isExist = LocalServiceUtils.FindCommand(command);
+        string status = isExist ? "✔ installed" : "❌ missing";
+        string runtimeName = LocalServiceUtils.FindRuntimeByCommand(command);
+        RuntimeItem runtimeItem = new RuntimeItem(runtimeName, status);
+        runtimeItem.IsCommandExist = isExist;
+        newWizardViewModel.DetectedRuntimes.Add(runtimeItem);
+        if (!isExist)
+        {
+            newWizardViewModel.MissingRuntimes.Add(runtimeItem);
+            needInstall = true;
+        }
+
+        viewModel = newWizardViewModel;
+        IsAllRuntimeInstalled = !needInstall;
         return needInstall;
     }
 
@@ -254,10 +286,12 @@ public partial class LocalCommandWizard : Window
             if (fails.Count == 0)
             {
                 VerifyResult.Text = "All required runtimes are now installed.";
+                IsAllRuntimeInstalled = true;
             }
             else
             {
                 VerifyResult.Text = $"These runtime faied to install:\n\n{string.Join(", ", fails)}\n\nPlease install them manually.";
+                IsAllRuntimeInstalled = false;
             }
         }
     }
