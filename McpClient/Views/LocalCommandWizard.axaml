@@ -31,7 +31,7 @@
         <StackPanel Name="PanelPreInstall" Margin="20,60,0,0" IsVisible="False">
 			<TextBlock Name="TbPreInstallHeader" FontSize="{StaticResource FontSizeMedium}">Install: nodejs</TextBlock>
 			<RadioButton GroupName="installGroup" Name="RadioInstallPacakge" IsChecked="True" Margin="0,8,0,0">Install via package manager</RadioButton>
-            <TextBlock Name="TbPackageScript" Text="Windows: winget install OpenJS.NodeJS" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+            <TextBlock Name="TbPackageScript" Text="Windows: winget install OpenJS.NodeJS" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}" TextWrapping="Wrap"/>
 			<RadioButton GroupName="installGroup" Name="RadioDownload" Margin="0,12,0,0">Download and install from official website</RadioButton>
             <TextBlock Name="TbDownloadUrl" Text="https://nodejs.org/en/download" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
         </StackPanel>

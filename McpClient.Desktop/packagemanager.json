@@ -76,6 +76,10 @@
     ],
     "windows": [
       {
+        "manager": "winget",
+        "package": "python3"
+      },
+      {
         "manager": "pip",
         "package": "pipx"
       },

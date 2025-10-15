@@ -272,6 +272,9 @@ public partial class LocalCommandWizard : Window
         // do the selected command, or goto download URL
         if (RadioInstallPacakge.IsChecked == true)
         {
+            // wait for UI to update
+            await Task.Delay(50);
+
             currentItem.IsManualDownload = false;
             // run the command via admin
             InstallDependency(currentItem.Name);
@@ -316,11 +319,11 @@ public partial class LocalCommandWizard : Window
         foreach (Instruction step in instructions)
         {
             PackageManager manager = PackageManagerFactory.Create(step.Manager);
-            if (!manager.IsAvailable())
-                continue;
+            //if (!manager.IsAvailable())
+            //    continue;
 
-            //if (!manager.IsPackageInstalled(step.Package))
-            if (!LocalServiceUtils.FindCommand(step.Package))
+            if (!manager.IsPackageInstalled(step.Package))
+            //if (!LocalServiceUtils.FindCommand(step.Package))
             {
                 string cmd = manager.InstallCommand(step.Package);
                 command += cmd + "\n";
@@ -343,7 +346,12 @@ public partial class LocalCommandWizard : Window
             if (!manager.IsPackageInstalled(step.Package))
             {
                 string cmd = manager.InstallCommand(step.Package);
-                var result = ShellHelper.RunShellCommand(cmd);
+                var result = manager.RunInstallCommand(cmd);
+
+                // update result to logs
+                IbInstallProgress.Text += "\n" + result.Error;
+
+                // TODO: wait some times after showing the logs
             }
         }
     }

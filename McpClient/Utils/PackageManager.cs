@@ -132,6 +132,14 @@ internal abstract class PackageManager
         process.WaitForExit();
         return result;
     }
+
+    /// <summary>
+    /// Normal managers simply run the command via shell.
+    /// </summary>
+    public virtual CommandResult RunInstallCommand(string command)
+    {
+        return ShellHelper.RunShellCommand(command);
+    }
 }
 
 internal class WingetManager : PackageManager
@@ -143,9 +151,12 @@ internal class WingetManager : PackageManager
 
     public override bool IsPackageInstalled(string package)
     {
+        // Note: winget list is too slow
+        return LocalServiceUtils.FindCommand(package);
+
         // Example: winget list NodeJS
-        string output = RunCommand("winget", $"list {package}");
-        return output.Contains(package, StringComparison.OrdinalIgnoreCase);
+        //string output = RunCommand("winget", $"list {package}");
+        //return output.Contains(package, StringComparison.OrdinalIgnoreCase);
     }
 
     public override string InstallCommand(string package) => $"winget install --id={package} -e"; // -e for exact match
@@ -191,14 +202,21 @@ public override string InstallCommand(string package) => $"sudo dnf install -y {
 internal class PipManager : PackageManager
 {
     public override string Name => "pip";
-    public override bool IsAvailable() =>
-        !string.IsNullOrWhiteSpace(RunCommand("python3", "-m pip --version"));
+
+    public override bool IsAvailable()
+    {
+        string output = RunCommand("python3", "-m pip --version");
+        // pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.12)
+        // pip 25.2 from C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.2544.0_x64__qbz5n2kfra8p0\Lib\site-packages\pip (python 3.13)
+        return !string.IsNullOrWhiteSpace(output) && output.StartsWith("pip");
+    }
 
     public override bool IsPackageInstalled(string package)
     {
         // Returns non-empty if installed
         string output = RunCommand("python3", $"-m pip show {package}");
-        return !string.IsNullOrWhiteSpace(output);
+        string match = $"Name: {package}";
+        return !string.IsNullOrWhiteSpace(output) && output.Contains(match, StringComparison.OrdinalIgnoreCase);
     }
 
     public override string InstallCommand(string package) =>
@@ -212,7 +230,13 @@ internal class PipxManager : PackageManager
     public override bool IsAvailable()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return !string.IsNullOrWhiteSpace(RunCommand("where", "pipx"));
+        {
+            //return !string.IsNullOrWhiteSpace(RunCommand("where", "pipx"));
+            // Note: where.exe or Get-Command cannot find pipx from windows store!
+            string output = RunCommand("python3", "-m pip show pipx");
+            string match = "Name: pipx";
+            return !string.IsNullOrWhiteSpace(output) && output.Contains(match, StringComparison.OrdinalIgnoreCase);
+        }
 
         return !string.IsNullOrWhiteSpace(RunCommand("which", "pipx"));
     }
@@ -220,12 +244,40 @@ internal class PipxManager : PackageManager
     public override bool IsPackageInstalled(string package)
     {
         // pipx list includes a heading like 'package <version>'
-        string output = RunCommand("pipx", "list");
-        return output.Contains(package, StringComparison.OrdinalIgnoreCase);
+        // python3 -m pipx list
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            string output = RunCommand("python3", "-m pipx list");
+            return output.Contains(package, StringComparison.OrdinalIgnoreCase);
+        }
+        else
+        {
+            string output = RunCommand("pipx", "list");
+            return output.Contains(package, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     public override string InstallCommand(string package) =>
         $"pipx install {package}";
+
+    /// <summary>
+    /// On windows, pipx should be executed by python3 module.
+    /// </summary>
+    public override CommandResult RunInstallCommand(string command)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return ShellHelper.RunShellCommand(command);
+        }
+
+        // pipx install xxx => python3 -m pipx install xxx
+        if (command.StartsWith("pipx install "))
+        {
+            command = "python3 -m " + command;
+        }
+
+        return ShellHelper.RunShellCommand(command);
+    }
 }
 
 internal static class ShellHelper

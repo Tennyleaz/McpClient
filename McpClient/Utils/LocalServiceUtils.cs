@@ -25,6 +25,12 @@ internal static class LocalServiceUtils
 
     public static bool FindCommand(string command)
     {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            //return PowershellGetCommand(command);
+            return CmdWhere(command);
+        }
+
         ProcessStartInfo psi = new ProcessStartInfo
         {
             Arguments = command,
@@ -32,25 +38,13 @@ internal static class LocalServiceUtils
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            FileName = "where.exe"  // works for all unix like os
         };
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            psi.FileName = "where.exe";
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            //psi.FileName = "where.exe";
-        }
-        else
-        {
-            psi.FileName = "which";
-        }
-
-        Process process = new Process();
+        using Process process = new Process();
         process.StartInfo = psi;
         process.Start();
-        process.WaitForExit(1500);
+        process.WaitForExit(2000);
 
         //string stdout = process.StandardOutput.ReadToEnd();
         //string stderr = process.StandardError.ReadToEnd();
@@ -60,6 +54,69 @@ internal static class LocalServiceUtils
             // found in windows or linux
             return true;
         }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Because where.exe is not good at microsoft store apps, we use powershell get-command instead.
+    /// </summary>
+    private static bool PowershellGetCommand(string command)
+    {
+        // Compose the PS command.
+        string psCmd = $"Get-Command {command} | Select-Object -ExpandProperty Source";
+
+        ProcessStartInfo psi = new ProcessStartInfo
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-Command \"{psCmd}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = true,
+            CreateNoWindow = true,
+        };
+
+        using Process process = new Process();
+
+        process.StartInfo = psi;
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd().Trim();
+        string error = process.StandardError.ReadToEnd().Trim();
+        process.WaitForExit();
+
+        // Non-empty output means found (should be the path)
+        if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
+            return true;
+
+        return false;
+    }
+
+    private static bool CmdWhere(string command)
+    {
+        // Compose the PS command.
+        string psCmd = $"/c where {command}";
+
+        ProcessStartInfo psi = new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            Arguments = psCmd,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        using Process process = new Process();
+
+        process.StartInfo = psi;
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd().Trim();
+        string error = process.StandardError.ReadToEnd().Trim();
+        process.WaitForExit();
+
+        // Non-empty output means found (should be the path)
+        if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
+            return true;
 
         return false;
     }
