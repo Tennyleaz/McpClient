@@ -32,6 +32,7 @@ internal class PackageManagerFactory
             "winget" => new WingetManager(),
             "pip" => new PipManager(),
             "pipx" => new PipxManager(),
+            "npm" => new NpmManager(),
             _ => null
         };
     }
@@ -151,6 +152,10 @@ internal class WingetManager : PackageManager
 
     public override bool IsPackageInstalled(string package)
     {
+        // Special case: search command "node" for "OpenJS.NodeJS" package
+        if (package == "OpenJS.NodeJS")
+            package = "node";
+
         // Note: winget list is too slow
         return LocalServiceUtils.FindCommand(package);
 
@@ -221,6 +226,42 @@ internal class PipManager : PackageManager
 
     public override string InstallCommand(string package) =>
         $"python3 -m pip install --user {package}";
+}
+
+internal class NpmManager : PackageManager
+{
+    public override string Name => "npm";
+
+    public override bool IsAvailable()
+    {
+        string output = RunCommand("npm", "-v");
+        return !string.IsNullOrWhiteSpace(output);
+    }
+
+    public override bool IsPackageInstalled(string package)
+    {
+        // PS C:\Users\tenny_lu> npm list -g --depth=0 npm
+        // C:\nvm4w\nodejs -> .\
+        // `-- npm@11.4.2
+        string output;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Use CMD to run npm, because it is a script
+            var result = ShellHelper.RunShellCommand($"npm list -g --depth=0 {package}");
+            output = result.Output;
+        }
+        else
+        {
+            // Run npm directly
+            output = RunCommand("npm", $"list -g --depth=0 {package}");
+        }
+
+        string match = $"-- {package}@";
+        return !string.IsNullOrWhiteSpace(output) && output.Contains(match, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override string InstallCommand(string package) =>
+        $"npm install -g {package}";
 }
 
 internal class PipxManager : PackageManager

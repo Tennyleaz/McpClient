@@ -6,7 +6,7 @@ namespace McpClient.Utils;
 
 internal static class LocalServiceUtils
 {
-    private static readonly string[] knownCommands = ["python3", "node", "npm", "npx", "uv", "uvx", "docker"];
+    private static readonly string[] knownCommands = ["python3", "node", "npm", "npx", "uv", "uvx", "docker", "bun", "bunx"];
 
     public static List<string> ListKnownLocalServices()
     {
@@ -139,6 +139,9 @@ internal static class LocalServiceUtils
                 return "node";
             case "docker":
                 return "docker";
+            case "bun":
+            case "bunx":
+                return "bun";
             default:
                 return command;
         }

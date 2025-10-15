@@ -295,6 +295,11 @@ public partial class StoreItemWindow : Window
                 case "docker":
                     requiredApps.Add("Docker");
                     break;
+                case "bun":
+                case "bunx":
+                    requiredApps.Add("NodeJS");
+                    requiredApps.Add(mcpServer.command);
+                    break;
                 default:
                     requiredApps.Add(mcpServer.command);
                     break;

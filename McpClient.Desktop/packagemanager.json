@@ -1,31 +1,4 @@
 ﻿{
-  "nodejs": {
-    "macos": [
-      {
-        "manager": "brew",
-        "package": "node"
-      }
-    ],
-    "debian": [
-      {
-        "manager": "apt",
-        "package": "nodejs"
-      }
-    ],
-    "rhel": [
-      {
-        "manager": "dnf",
-        "package": "nodejs"
-      }
-    ],
-    "windows": [
-      {
-        "manager": "winget",
-        "package": "OpenJS.NodeJS"
-      }
-    ],
-    "url": "https://nodejs.org/en/download"
-  },
   "node": {
     "macos": [
       {
@@ -138,5 +111,48 @@
     ],
     "windows": [],
     "url": "https://docs.docker.com/engine/install/"
+  },
+  "bun": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "nodejs"
+      },
+      {
+        "manager": "npm",
+        "package": "bun"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "nodejs"
+      },
+      {
+        "manager": "npm",
+        "package": "bun"
+      }
+    ],
+    "rhel": [
+      {
+        "manager": "dnf",
+        "package": "nodejs"
+      },
+      {
+        "manager": "npm",
+        "package": "bun"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "winget",
+        "package": "OpenJS.NodeJS"
+      },
+      {
+        "manager": "npm",
+        "package": "bun"
+      }
+    ],
+    "url": "https://bun.com/docs/installation#installing"
   }
 }
