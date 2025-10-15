@@ -401,7 +401,6 @@ public partial class LlmConfigWindow : Window
                     LbLocalServerUrl.Content = "---";
                     break;
             }
-            
         }
     }
 

@@ -8,9 +8,13 @@
         x:Class="McpClient.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         MinWidth="960" MinHeight="400"
+        WindowStartupLocation="CenterScreen"
         Title="AI Nexus Client" Loaded="Control_OnLoaded" Closing="Window_OnClosing">
     <Panel>
-        <TextBlock Name="TbLogin" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="{StaticResource FontSizeMedium}">Loggin in AI Nexus...</TextBlock>
-        <views:MainView Name="MainView" LogoutClick="MainView_OnLogoutClick" IsVisible="False"/>
+        <StackPanel Orientation="Vertical" Name="LoginPanel" IsVisible="False" VerticalAlignment="Center">
+            <views:Logo Height="80" Margin="16,16,16,20" HorizontalAlignment="Center" Width="200"/>
+            <TextBlock Name="TbLogin" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="{StaticResource FontSizeMedium}">Loggin in AI Nexus...</TextBlock>
+        </StackPanel>
+        <views:MainView Name="MainView" LogoutClick="MainView_OnLogoutClick" IsVisible="True"/>
     </Panel>
 </Window>

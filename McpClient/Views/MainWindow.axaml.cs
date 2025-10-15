@@ -23,6 +23,13 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        if (Design.IsDesignMode)
+            return;
+
+        // Hide main view and show login text
+        LoginPanel.IsVisible = true;
+        MainView.IsVisible = false;
     }
 
     private async void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -43,7 +50,7 @@ public partial class MainWindow : Window
         }
 
         // show main UI
-        TbLogin.IsVisible = false;
+        LoginPanel.IsVisible = false;
         MainView.IsVisible = true;
 
         // Create default MCP filesystem folder
@@ -131,7 +138,7 @@ public partial class MainWindow : Window
 
         // Hide main UI
         TbLogin.Text = "You have been logged out.\nPlease login again.";
-        TbLogin.IsVisible = true;
+        LoginPanel.IsVisible = true;
         MainView.IsVisible = false;
 
         // Login again
