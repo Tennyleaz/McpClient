@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using McpClient.Models;
 using McpClient.Utils;
 using McpClient.ViewModels;
@@ -11,7 +13,6 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Avalonia.Input;
 
 namespace McpClient.Views;
 
@@ -172,7 +173,7 @@ public partial class LocalCommandWizard : Window
             BtnNext.IsEnabled = true;
             if (autoNext)
             {
-                BtnNext_OnClick(null, null);
+                //BtnNext_OnClick(null, null);
             }
         }
         else if (state == WizardState.Install)
@@ -311,7 +312,7 @@ public partial class LocalCommandWizard : Window
 
             currentItem.IsManualDownload = false;
             // run the command via admin
-            InstallDependency(currentItem.Name);
+            await InstallDependency(currentItem.Name);
             return true;
         }
         else
@@ -367,7 +368,7 @@ public partial class LocalCommandWizard : Window
         return command;
     }
 
-    private void InstallDependency(string depName)
+    private async Task InstallDependency(string depName)
     {
         List<Instruction> instructions = GetInstructions(depName);
 
@@ -379,15 +380,25 @@ public partial class LocalCommandWizard : Window
 
             if (!manager.IsPackageInstalled(step.Package))
             {
+                manager.ConsoleOutput += Manager_ConsoleOutput;
                 string cmd = manager.InstallCommand(step.Package);
-                var result = manager.RunInstallCommand(cmd);
+                CommandResult result = await manager.RunInstallCommand(cmd);
 
                 // update result to logs
-                IbInstallProgress.Text += "\n" + result.Error;
+                //IbInstallProgress.Text += "\n" + result.Error;
 
-                // TODO: wait some times after showing the logs
+                manager.ConsoleOutput -= Manager_ConsoleOutput;
             }
         }
+    }
+
+    private void Manager_ConsoleOutput(object sender, ShellOutoutEventArgs e)
+    {
+        // This event is fired on background
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            IbInstallProgress.Text += $"\n[{e.Name}] {e.Data}";
+        });
     }
 
     private JsonNode LoadDependencyConfig(string name)

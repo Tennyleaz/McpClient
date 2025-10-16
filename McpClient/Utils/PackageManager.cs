@@ -112,12 +112,21 @@ internal abstract class PackageManager
 {
     public abstract string Name { get; }
 
+    public event EventHandler<ShellOutoutEventArgs> ConsoleOutput;
+
     public abstract bool IsAvailable();
     public abstract bool IsPackageInstalled(string package);
     public abstract string InstallCommand(string package);
 
-    // Helper: Runs a shell command and returns stdout
-    protected string RunCommand(string cmd, string args = "")
+    private string stdOut, stdErr;  // used for RunShellCommand()
+
+    /// <summary>
+    /// Use executable file to run a command.
+    /// </summary>
+    /// <param name="cmd"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    protected static string RunCommand(string cmd, string args = "")
     {
         var psi = new ProcessStartInfo
         {
@@ -135,11 +144,121 @@ internal abstract class PackageManager
     }
 
     /// <summary>
+    /// Use cmd.exe or bash to run a command.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="runAsAdmin"></param>
+    /// <param name="supressOutput"></param>
+    /// <returns></returns>
+    protected CommandResult RunShellCommand(string command, bool runAsAdmin = false, bool supressOutput = false)
+    {
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        var psi = new ProcessStartInfo();
+
+        if (isWindows)
+        {
+            psi.FileName = "cmd.exe";
+            psi.Arguments = $"/c {command}";
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+
+            if (command.StartsWith("winget"))
+                runAsAdmin = true;
+
+            // On Windows, request admin if needed
+            if (runAsAdmin)
+            {
+                psi.UseShellExecute = true; // Required for RunAs
+                psi.RedirectStandardOutput = false;
+                psi.RedirectStandardError = false;
+                psi.Verb = "runas";
+            }
+        }
+        else // Linux/macOS
+        {
+            psi.FileName = "/bin/bash";
+            psi.Arguments = $"-c \"{command}\"";
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+            // Sudo must be handled in the command string itself
+        }
+
+        //string output = "", error = "";
+        stdErr = stdOut = string.Empty;
+        int exitCode = -1;
+
+        try
+        {
+            using (var process = new Process())
+            {
+                process.StartInfo = psi;
+                process.OutputDataReceived += Process_OutputDataReceived;
+                process.ErrorDataReceived += Process_ErrorDataReceived;
+                process.Start();
+                process.BeginOutputReadLine();  // This raises OutputDataReceived events for each line of output.
+
+                // Note: We cannot use StandardOutput & StandardError when calling BeginOutputReadLine()
+                //if (!psi.UseShellExecute)
+                //{
+                //    output = process.StandardOutput.ReadToEnd();
+                //    error = process.StandardError.ReadToEnd();
+                //}
+
+                process.WaitForExit();
+                exitCode = process.ExitCode;
+            }
+        }
+        catch (Exception ex)
+        {
+            //error += Environment.NewLine + ex.ToString();
+            stdErr += Environment.NewLine + ex.ToString();
+        }
+
+        return new CommandResult(stdOut, stdErr, exitCode);
+    }
+
+    private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Data))
+        {
+            stdErr += Environment.NewLine + e.Data;
+            ConsoleOutput?.Invoke(this, new ShellOutoutEventArgs
+            {
+                Name = Name,
+                Data = e.Data,
+                IsError = true
+            });
+        }
+    }
+
+    private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Data))
+        {
+            stdOut += Environment.NewLine + e.Data;
+            ConsoleOutput?.Invoke(this, new ShellOutoutEventArgs
+            {
+                Name = Name,
+                Data = e.Data
+            });
+        }
+    }
+
+    /// <summary>
     /// Normal managers simply run the command via shell.
     /// </summary>
-    public virtual CommandResult RunInstallCommand(string command)
+    public virtual async Task<CommandResult> RunInstallCommand(string command)
     {
-        return ShellHelper.RunShellCommand(command);
+        Task<CommandResult> installTask = Task.Run(() =>
+        {
+            return RunShellCommand(command);
+        });
+        CommandResult result = await installTask;
+        return result;
     }
 }
 
@@ -247,7 +366,7 @@ internal class NpmManager : PackageManager
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // Use CMD to run npm, because it is a script
-            var result = ShellHelper.RunShellCommand($"npm list -g --depth=0 {package}");
+            var result = RunShellCommand($"npm list -g --depth=0 {package}");
             output = result.Output;
         }
         else
@@ -304,11 +423,11 @@ internal class PipxManager : PackageManager
     /// <summary>
     /// On windows, pipx should be executed by python3 module.
     /// </summary>
-    public override CommandResult RunInstallCommand(string command)
+    public override async Task<CommandResult> RunInstallCommand(string command)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            return ShellHelper.RunShellCommand(command);
+            return await base.RunInstallCommand(command);
         }
 
         // pipx install xxx => python3 -m pipx install xxx
@@ -317,76 +436,7 @@ internal class PipxManager : PackageManager
             command = "python3 -m " + command;
         }
 
-        return ShellHelper.RunShellCommand(command);
-    }
-}
-
-internal static class ShellHelper
-{
-    // Runs a shell command - optionally as administrator (affects Windows)
-    public static CommandResult RunShellCommand(string command, bool runAsAdmin = false)
-    {
-        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        var psi = new ProcessStartInfo();
-
-        if (isWindows)
-        {
-            psi.FileName = "cmd.exe";
-            psi.Arguments = $"/c {command}";
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-
-            if (command.StartsWith("winget"))
-                runAsAdmin = true;
-
-            // On Windows, request admin if needed
-            if (runAsAdmin)
-            {
-                psi.UseShellExecute = true; // Required for RunAs
-                psi.RedirectStandardOutput = false;
-                psi.RedirectStandardError = false;
-                psi.Verb = "runas";
-            }
-        }
-        else // Linux/macOS
-        {
-            psi.FileName = "/bin/bash";
-            psi.Arguments = $"-c \"{command}\"";
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardError = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-            // Sudo must be handled in the command string itself
-        }
-
-        string output = "", error = "";
-        int exitCode = -1;
-
-        try
-        {
-            using (var process = new Process())
-            {
-                process.StartInfo = psi;
-                process.Start();
-
-                if (!psi.UseShellExecute)
-                {
-                    output = process.StandardOutput.ReadToEnd();
-                    error = process.StandardError.ReadToEnd();
-                }
-
-                process.WaitForExit();
-                exitCode = process.ExitCode;
-            }
-        }
-        catch (Exception ex)
-        {
-            error += Environment.NewLine + ex.ToString();
-        }
-
-        return new CommandResult(output, error, exitCode);
+        return await base.RunInstallCommand(command);
     }
 }
 
@@ -404,4 +454,11 @@ internal struct CommandResult
         Error = error;
         ExitCode = exitCode;
     }
+}
+
+internal class ShellOutoutEventArgs : EventArgs
+{
+    public string Name;
+    public string Data;
+    public bool IsError;
 }
