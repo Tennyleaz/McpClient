@@ -77,7 +77,7 @@ public partial class LocalCommandWizard : Window
         {
             if (mcpServer.type == McpServerType.Stdio)
             {
-                commands.Add(mcpServer.command);
+                commands.Add(LocalServiceUtils.FindRuntimeByCommand(mcpServer.command));
             }
         }
         return commands.ToList();
