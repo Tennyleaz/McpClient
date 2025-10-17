@@ -92,8 +92,7 @@ public partial class Chat : UserControl
 
         //ChatWebView.Address = SERVER_URL;
         //ChatWebView.Address = "http://localhost:5174/";
-        string file = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        file = Path.Combine(file, "dist", "index.html");
+        string file = Path.Combine(GlobalService.ChatFrontendFolder, "index.html");
         if (File.Exists(file))
             ChatWebView.LoadUrl(file);
         else
