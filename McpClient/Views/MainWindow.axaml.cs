@@ -5,13 +5,14 @@ using McpClient.Services;
 using McpClient.Utils;
 using McpClient.ViewModels;
 using NetSparkleUpdater;
+using NetSparkleUpdater.Enums;
+using NetSparkleUpdater.SignatureVerifiers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
-using NetSparkleUpdater.Enums;
-using NetSparkleUpdater.SignatureVerifiers;
 
 namespace McpClient.Views;
 
@@ -38,6 +39,13 @@ public partial class MainWindow : Window
             return;
 
         IsEnabled = false;
+
+        // Create default MCP filesystem folder
+        await CreateMcpFileSytemFolder();
+
+        // Start the backend services
+        StartServices();
+
         bool isLogin = await Login();
         IsEnabled = true;
         if (isLogin)
@@ -52,9 +60,6 @@ public partial class MainWindow : Window
         // show main UI
         LoginPanel.IsVisible = false;
         MainView.IsVisible = true;
-
-        // Create default MCP filesystem folder
-        await CreateMcpFileSytemFolder();
 
         // check MCP tool runtime dependency
         LocalCommandWizard wizard = new LocalCommandWizard();
@@ -71,14 +76,6 @@ public partial class MainWindow : Window
         ragWorker.RunWorkerAsync();
 
         GlobalService.KnownCommands = LocalServiceUtils.ListKnownLocalServices();
-
-        // Start MCP host service
-        GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
-        GlobalService.NodeJsService.Start();
-
-        // Start .net backend
-        GlobalService.BackendService = DispatcherBackendService.CreateBackendService();
-        GlobalService.BackendService.Start();
 
         // Start LLM service
 
@@ -101,6 +98,17 @@ public partial class MainWindow : Window
     private void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
     {
         MainView.BtnUpdate.IsVisible = true;
+    }
+
+    private void StartServices()
+    {
+        // Start MCP host service
+        GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
+        GlobalService.NodeJsService.Start();
+
+        // Start .net backend
+        GlobalService.BackendService = DispatcherBackendService.CreateBackendService();
+        GlobalService.BackendService.Start();
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
@@ -265,7 +273,7 @@ public partial class MainWindow : Window
         {
             settings.FileSystemFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "MCP File System");
+                "McpFileSystem");
             await SettingsManager.Local.SaveAsync(settings);
         }
         if (!Directory.Exists(settings.FileSystemFolder))
@@ -278,6 +286,46 @@ public partial class MainWindow : Window
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        // Update this setting to MCP host config
+        try
+        {
+            string path = Path.Combine(GlobalService.McpHostFolder, "mcp_servers.config.json");
+            string json = await File.ReadAllTextAsync(path);
+            McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
+
+            bool isSave = false;
+            foreach (McpServer server in config.mcp_servers)
+            {
+                if (server.server_name == "filesystem" && server.type == McpServerType.Stdio)
+                {
+                    // Update the 3rd parameter
+                    int index = 2;
+                    if (server.args.Count > index)
+                    {
+                        if (Path.IsPathFullyQualified(server.args[index]))
+                        {
+                            if (server.args[index] != settings.FileSystemFolder)
+                            {
+                                server.args[index] = settings.FileSystemFolder;
+                                isSave = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (isSave)
+            {
+                json = JsonSerializer.Serialize(config);
+                await File.WriteAllTextAsync(path, json);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 }

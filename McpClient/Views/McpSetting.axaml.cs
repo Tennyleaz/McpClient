@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaProgressRing;
+using LibreHardwareMonitor.Hardware.Motherboard;
 using McpClient.Models;
 using McpClient.Services;
 using McpClient.ViewModels;
@@ -16,6 +17,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 namespace McpClient.Views;
 
@@ -24,10 +26,15 @@ public partial class McpSetting : UserControl
     private McpConfigService _mcpService;
     private AiNexusService _nexusService;
     private McpServerConfigViewModel viewModel;
+    private readonly DispatcherTimer updateStatusTimer;
 
     public McpSetting()
     {
         InitializeComponent();
+
+        updateStatusTimer = new DispatcherTimer();
+        updateStatusTimer.Interval = TimeSpan.FromSeconds(3);
+        updateStatusTimer.Tick += UpdateStatusTimer_Tick;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
@@ -62,6 +69,8 @@ public partial class McpSetting : UserControl
             ProgressRing.IsVisible = false;
             ScrollViewer.IsVisible = true;
             BtnAdd.IsVisible = true;
+
+            updateStatusTimer.Start();
         }
         else
         {
@@ -159,6 +168,29 @@ public partial class McpSetting : UserControl
                 Icon.Info);
             await box.ShowWindowDialogAsync(owner);
         }
+    }
+
+    private async Task UpdateServerStatus()
+    {
+        McpServerListResponse listResponse = await _mcpService.ListCurrent();
+        if (listResponse != null)
+        {
+            foreach (McpViewModel server in viewModel.McpServers)
+            {
+                bool isActive = listResponse.data.Exists(x => x.server_name == server.ServerName);
+                server.Active = isActive;
+            }
+        }
+    }
+
+    private async void UpdateStatusTimer_Tick(object sender, EventArgs e)
+    {
+        await UpdateServerStatus();
+    }
+
+    internal void StopUpdateStatus()
+    {
+        updateStatusTimer.Stop();
     }
 
     private async void BtnAdd_OnClick(object sender, RoutedEventArgs e)

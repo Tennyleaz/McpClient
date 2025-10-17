@@ -169,6 +169,10 @@ public partial class MainView : UserControl
         {
             SystemSetting.StopMonitorServices();
         }
+        if (index != 2)
+        {
+            AgentList.StopUpdateStatus();
+        }
     }
 
     private async void MyAppList_DownloadGroup(object sender, Models.Group e)

@@ -91,7 +91,14 @@ internal class McpViewModel : ReactiveObject
     //    }
     //}
 
-    public bool Active => _active;
+    public bool Active
+    {
+        get => _active;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _active, value);
+        }
+    }
 
     public string Owner => _owner;
 
