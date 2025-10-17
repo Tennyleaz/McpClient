@@ -24,7 +24,7 @@ internal class AiNexusService
     {
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri(BASE_URL);
-        _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        //_httpClient.Timeout = TimeSpan.FromSeconds(10);
         if (!string.IsNullOrEmpty(token))
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

@@ -118,9 +118,16 @@ internal class DispatcherBackendService : CliService, IDisposable
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "/shutdown");
         request.Headers.Add("X-Shutdown-Token", "AI_NEXUS_CLIENT");
 
-        using HttpResponseMessage response = _httpClient.Send(request);
-        if (response.IsSuccessStatusCode)
-            return true;
+        try
+        {
+            using HttpResponseMessage response = _httpClient.Send(request);
+            if (response.IsSuccessStatusCode)
+                return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
         return false;
     }
 }

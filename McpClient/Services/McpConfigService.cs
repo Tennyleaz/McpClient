@@ -17,7 +17,8 @@ namespace McpClient.Services;
 
 internal class McpConfigService
 {
-    private const string BASE_URL = "http://192.168.41.60:7235";
+    //private const string BASE_URL = "http://192.168.41.60:7235";
+    private const string BASE_URL = "http://localhost:5000";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _options;
     private string _token;
@@ -33,7 +34,7 @@ internal class McpConfigService
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _token = token;
         }
-        _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        _httpClient.Timeout = TimeSpan.FromSeconds(30);
 
         _options = new JsonSerializerOptions();
         _options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -42,39 +43,63 @@ internal class McpConfigService
 
     public async Task<McpServerConfig> GetConfig()
     {
-        HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/chat/mcpserver/config");
-        if (response.StatusCode != HttpStatusCode.OK)
+        try
         {
+            HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/chat/mcpserver/config");
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return null;
+            }
+
+            string json = await response.Content.ReadAsStringAsync();
+            McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json, _options);
+            return config;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
             return null;
         }
-
-        string json = await response.Content.ReadAsStringAsync();
-        McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json, _options);
-        return config;
     }
 
     public async Task<bool> SetConfig(McpServerConfig config)
     {
-        string contentString = JsonSerializer.Serialize(config, _options);
-        var body = new 
+        try
         {
-            content = contentString
-        };
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(BASE_URL + "/chat/mcpserver/config", body);
-        return response.StatusCode == HttpStatusCode.OK;
+            string contentString = JsonSerializer.Serialize(config, _options);
+            var body = new
+            {
+                content = contentString
+            };
+            HttpResponseMessage response = await _httpClient.PostAsJsonAsync(BASE_URL + "/chat/mcpserver/config", body);
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
+        }
     }
 
     public async Task<McpServerListResponse> ListCurrent()
     {
-        HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/chat/mcpserver/list");
-        if (response.StatusCode != HttpStatusCode.OK)
+        try
         {
+            HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/chat/mcpserver/list");
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return null;
+            }
+
+            string json = await response.Content.ReadAsStringAsync();
+            McpServerListResponse servers = JsonSerializer.Deserialize<McpServerListResponse>(json, _options);
+            return servers;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
             return null;
         }
-
-        string json = await response.Content.ReadAsStringAsync();
-        McpServerListResponse servers = JsonSerializer.Deserialize<McpServerListResponse>(json, _options);
-        return servers;
     }
 
     public async Task<McpServerConfigViewModel> GetAllConfigAndStatus()
@@ -176,6 +201,25 @@ internal class McpConfigService
         {
             Console.WriteLine(ex);
             return null;
+        }
+    }
+
+    public async Task<bool> IsHealthy()
+    {
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(BASE_URL + "/health");
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
         }
     }
 }
