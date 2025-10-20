@@ -11,6 +11,7 @@ using MsBox.Avalonia.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using McpClient.Utils;
 
 namespace McpClient.Views;
 
@@ -134,7 +135,33 @@ public partial class AddServerWindow : Window
         try
         {
             ButtonApply.Content = "Validating...";
-            bool mcpReuslt = await ValidateMcp(newServer);
+            bool mcpReuslt = ValidateCommand(newServer);
+            if (!mcpReuslt)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("MCP", $"You don't have command \"{newServer.command}\" install yet.\nDo you want to install now?",
+                    ButtonEnum.YesNo, MsBox.Avalonia.Enums.Icon.Question);
+                var messageBoxResult = await box.ShowWindowDialogAsync(this);
+                if (messageBoxResult == ButtonResult.Yes)
+                {
+                    LocalCommandWizard wizard = new LocalCommandWizard();
+                    wizard.GenerateMcpStoreRuntimeViewModel(newServer.command);
+                    await wizard.ShowDialog(this);
+                    if (!wizard.IsAllRuntimeInstalled)
+                    {
+                        ButtonApply.Content = "Apply";
+                        ButtonApply.IsEnabled = true;
+                        return;
+                    }
+                }
+                else
+                {
+                    ButtonApply.Content = "Apply";
+                    ButtonApply.IsEnabled = true;
+                    return;
+                }
+            }
+            
+            mcpReuslt = await ValidateMcp(newServer);
             if (!mcpReuslt)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("MCP", $"Failed to find tools in MCP server: {TbUrl.Text}",
@@ -321,9 +348,6 @@ public partial class AddServerWindow : Window
                 EnvironmentVariables = server.env,
                 Name = server.server_name
             });
-            // TODO:
-            // let server find stdio tools, not client
-            return true;
         }
         else if (server.type == McpServerType.StreamableHttp)
         {
@@ -351,6 +375,16 @@ public partial class AddServerWindow : Window
         if (tools.Count == 0)
         {
             return false;
+        }
+
+        return true;
+    }
+
+    private bool ValidateCommand(McpServer server)
+    {
+        if (server.type == McpServerType.Stdio)
+        {
+            return LocalServiceUtils.FindCommand(server.command);
         }
 
         return true;
