@@ -292,6 +292,9 @@ public partial class MainWindow : Window
                         server.args.Add(defaultDir);
                         // Update to global variable
                         GlobalService.FileSystemFolders.Add(defaultDir);
+                        // Write back to config
+                        json = JsonSerializer.Serialize(config);
+                        await File.WriteAllTextAsync(path, json);
                     }
                     else
                     {
