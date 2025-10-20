@@ -33,7 +33,7 @@ public partial class McpSetting : UserControl
         InitializeComponent();
 
         updateStatusTimer = new DispatcherTimer();
-        updateStatusTimer.Interval = TimeSpan.FromSeconds(3);
+        updateStatusTimer.Interval = TimeSpan.FromSeconds(4);
         updateStatusTimer.Tick += UpdateStatusTimer_Tick;
     }
 
@@ -324,8 +324,18 @@ public partial class McpSetting : UserControl
     {
         if (sender is Button btn && btn.DataContext is McpViewModel mcpViewModel)
         {
-            AddServerWindow editWindow = new AddServerWindow(mcpViewModel);
             Window parent = TopLevel.GetTopLevel(this) as Window;
+
+            // special case: MCP filesystem
+            if (mcpViewModel.IsFileSystem)
+            {
+                McpShareFolderSettingWindow shareFolderWindow = new McpShareFolderSettingWindow();
+                shareFolderWindow.ShareFolderSetting.SetServices(_mcpService);
+                await shareFolderWindow.ShowDialog(parent);
+                return;
+            }
+
+            AddServerWindow editWindow = new AddServerWindow(mcpViewModel);
             await editWindow.ShowDialog(parent);
             McpServer editServer = editWindow.Result;
             if (editServer != null && DataContext is McpServerConfigViewModel vm)

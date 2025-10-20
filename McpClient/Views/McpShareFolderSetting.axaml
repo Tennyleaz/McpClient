@@ -1,0 +1,23 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:McpClient.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="McpClient.Views.McpShareFolderSetting">
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,Auto">
+        <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">MCP 設定</TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">MCP FileSystem Folder:</TextBlock>
+        <Button Grid.Column="1" Grid.Row="1" Name="BtnChangeFileSystem" VerticalAlignment="Center" Click="BtnChangeFileSystem_OnClick">Add Folder</Button>
+        <ItemsControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="ShareFoldersControl">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:FileSystemFolderViewModel">
+                    <Grid ColumnDefinitions="*, 40">
+                        <TextBlock Grid.Column="0" Text="{Binding Folder}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <Button Grid.Column="1" Content="❌" Click="BtnRemoveFolder_OnClick"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

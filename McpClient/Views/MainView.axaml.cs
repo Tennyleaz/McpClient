@@ -69,6 +69,7 @@ public partial class MainView : UserControl
             MyAppList.SetService(_nexusService);
             OfflineWorkflowList.SetServices(_nexusService, _mcpService);
             AgentList.SetServices(_nexusService, _mcpService);
+            SystemSetting.SetServices(_mcpService);
             // Trigger RefreshCurrentTab()
             MainListbox.SelectedIndex = 0;
         }

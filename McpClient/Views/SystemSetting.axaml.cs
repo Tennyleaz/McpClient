@@ -6,15 +6,18 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using McpClient.Models;
 using McpClient.Services;
 using McpClient.Utils;
+using McpClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Avalonia.Threading;
+using System.Threading.Tasks;
 
 namespace McpClient.Views;
 
@@ -40,11 +43,15 @@ public partial class SystemSetting : UserControl
         //LoadGpuStatus();
     }
 
+    internal void SetServices(McpConfigService mcpConfigService)
+    {
+        McpShareFolderSetting.SetServices(mcpConfigService);
+    }
+
     internal void LoadFromSettings()
     {
         settings = SettingsManager.Local.Load();
         TbRagFolder.Text = settings.RagFolder;
-        TbFileSystemFolder.Text = settings.FileSystemFolder;
         if (Directory.Exists(settings.RagFolder))
         {
             TbRagStatus.Text = "Running";
@@ -56,6 +63,8 @@ public partial class SystemSetting : UserControl
             TbRagStatus.Foreground = Brushes.Red;
             TbRagFolder.Text = "RAG folder not set.";
         }
+
+        McpShareFolderSetting.UpdateShareFolderToUi();
 
         // llama service status
         UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
@@ -229,27 +238,6 @@ public partial class SystemSetting : UserControl
         LlmConfigWindow window = new LlmConfigWindow();
         await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
         UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
-    }
-
-    private async void BtnChangeFileSystem_OnClick(object sender, RoutedEventArgs e)
-    {
-        IStorageProvider storage = TopLevel.GetTopLevel(this).StorageProvider;
-        IStorageFolder documentsFolder = await storage.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-        var selectedFolders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
-        {
-            AllowMultiple = false,
-            SuggestedStartLocation = documentsFolder
-        });
-
-        if (selectedFolders.Count > 0)
-        {
-            IStorageFolder selected = selectedFolders.First();
-            string folder = selected.TryGetLocalPath();
-            settings.FileSystemFolder = folder;
-            await SettingsManager.Local.SaveAsync(settings);
-
-            TbFileSystemFolder.Text = settings.RagFolder;
-        }
     }
 
     private void BtnRestartNodeJs_OnClick(object sender, RoutedEventArgs e)

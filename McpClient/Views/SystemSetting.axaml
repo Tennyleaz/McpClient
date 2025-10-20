@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:view="clr-namespace:McpClient.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              Loaded="Control_OnLoaded" Unloaded="Control_OnUnloaded"
              x:Class="McpClient.Views.SystemSetting">
@@ -41,12 +42,7 @@
                 </Grid>
             </Border>
             <Border Classes="CardFix" DockPanel.Dock="Right" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
-				<Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,40">
-                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">MCP 設定</TextBlock>
-					<TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">MCP FileSystem Folder:</TextBlock>
-                    <Button Grid.Column="1" Grid.Row="1" Name="BtnChangeFileSystem" VerticalAlignment="Center" Click="BtnChangeFileSystem_OnClick">Change Folder</Button>
-                    <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="TbFileSystemFolder" VerticalAlignment="Center">C:\\users\tenny\documents\MCP File System</TextBlock>
-				</Grid>
+				<view:McpShareFolderSetting Name="McpShareFolderSetting"/>
             </Border>
         </WrapPanel>
         <Label HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="18" Margin="20" Foreground="{DynamicResource SystemAccentColor}">[ Under Construction ]</Label>

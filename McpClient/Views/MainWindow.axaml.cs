@@ -268,26 +268,6 @@ public partial class MainWindow : Window
 
     private static async Task CreateMcpFileSytemFolder()
     {
-        Settings settings = SettingsManager.Local.Load();
-        if (string.IsNullOrEmpty(settings.FileSystemFolder))
-        {
-            settings.FileSystemFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "McpFileSystem");
-            await SettingsManager.Local.SaveAsync(settings);
-        }
-        if (!Directory.Exists(settings.FileSystemFolder))
-        {
-            try
-            {
-                Directory.CreateDirectory(settings.FileSystemFolder);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-
         // Update this setting to MCP host config
         try
         {
@@ -295,32 +275,36 @@ public partial class MainWindow : Window
             string json = await File.ReadAllTextAsync(path);
             McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
 
-            bool isSave = false;
             foreach (McpServer server in config.mcp_servers)
             {
                 if (server.server_name == "filesystem" && server.type == McpServerType.Stdio)
                 {
+                    GlobalService.FileSystemFolders.Clear();
+                    // "npx"
+                    // "-y","@modelcontextprotocol/server-filesystem", "/path/to/allowed/dir", ...
                     // Update the 3rd parameter
-                    int index = 2;
-                    if (server.args.Count > index)
+                    const int index = 2;
+                    if (server.args.Count <= index)
                     {
-                        if (Path.IsPathFullyQualified(server.args[index]))
+                        // Create default folder and save to it
+                        string defaultDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpFileSystem");
+                        Directory.CreateDirectory(defaultDir);
+                        server.args.Add(defaultDir);
+                        // Update to global variable
+                        GlobalService.FileSystemFolders.Add(defaultDir);
+                    }
+                    else
+                    {
+                        // Update to global variable
+                        for (int i = index; i < server.args.Count; i++)
                         {
-                            if (server.args[index] != settings.FileSystemFolder)
+                            if (Path.IsPathFullyQualified(server.args[i]))
                             {
-                                server.args[index] = settings.FileSystemFolder;
-                                isSave = true;
+                                GlobalService.FileSystemFolders.Add(server.args[i]);
                             }
-                            break;
                         }
                     }
                 }
-            }
-
-            if (isSave)
-            {
-                json = JsonSerializer.Serialize(config);
-                await File.WriteAllTextAsync(path, json);
             }
         }
         catch (Exception ex)

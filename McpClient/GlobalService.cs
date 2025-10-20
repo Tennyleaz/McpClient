@@ -25,6 +25,8 @@ internal static class GlobalService
         DispatcherFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpBackend");
 
         ChatFrontendFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dist");
+
+        FileSystemFolders = new List<string>();
     }
 
     public static readonly string LlamaInstallFolder;
@@ -45,5 +47,7 @@ internal static class GlobalService
     public static MainViewModel MainViewModel { get; set; }
 
     public static List<string> KnownCommands { get; set; }
+
+    public static List<string> FileSystemFolders { get; set; }
 }
 
