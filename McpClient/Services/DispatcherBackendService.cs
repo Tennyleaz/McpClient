@@ -16,7 +16,7 @@ internal class DispatcherBackendService : CliService
     public static DispatcherBackendService CreateBackendService()
     {
         // Check for "mcp_servers.config.json"
-        string jsonPath = Path.Combine(GlobalService.McpHostFolder, "mcp_servers.config.json");
+        string jsonPath = GlobalService.McpHostConfigFile;
         // Add as "config-file" ASP.NET argument
         string arguments = $"--config-file \"{jsonPath}\"";
 

@@ -19,13 +19,18 @@ internal class McpNodeJsService : CliService
 
     public static McpNodeJsService CreateMcpNodeJsService()
     {
+        // Check for "mcp_servers.config.json"
+        string jsonPath = GlobalService.McpHostConfigFile;
+        // Add as "config-file" ASP.NET argument
+        string arguments = $"--config-file \"{jsonPath}\"";
+
         string path = Path.Combine(GlobalService.McpHostFolder, "mcp-host-use.exe");
         if (File.Exists(path))
-            return new McpNodeJsService(path);
+            return new McpNodeJsService(path, arguments);
         return null;
     }
 
-    private McpNodeJsService(string binaryPath) : base(binaryPath, null, 50, MCP_HOST_PORT)
+    private McpNodeJsService(string binaryPath, string arguments) : base(binaryPath, arguments, 50, MCP_HOST_PORT)
     {
 
     }

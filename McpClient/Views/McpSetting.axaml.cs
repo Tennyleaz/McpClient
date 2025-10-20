@@ -33,7 +33,7 @@ public partial class McpSetting : UserControl
         InitializeComponent();
 
         updateStatusTimer = new DispatcherTimer();
-        updateStatusTimer.Interval = TimeSpan.FromSeconds(4);
+        updateStatusTimer.Interval = TimeSpan.FromSeconds(3);
         updateStatusTimer.Tick += UpdateStatusTimer_Tick;
     }
 

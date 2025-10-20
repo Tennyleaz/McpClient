@@ -88,7 +88,7 @@ public partial class RunOfflineWindow : Window
         {
             var vm = new ModelViewModel(modelItem);
             viewModels.Add(vm);
-            if (vm.Name == "Qwen2.5-72B")
+            if (vm.Name == "Qwen3-14B")
                 qwen = vm;
         }
         CbModelName.ItemsSource = viewModels;

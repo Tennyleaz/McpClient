@@ -1,12 +1,14 @@
 ﻿using McpClient.Services;
+using McpClient.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using McpClient.ViewModels;
 
 namespace McpClient;
 
@@ -20,11 +22,30 @@ internal static class GlobalService
             name += ".exe";
         LlamaServerBin = Path.Combine(LlamaInstallFolder, name);
 
-        McpHostFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpNodeJs");
+        if (Debugger.IsAttached)
+        {
+            McpHostFolder = "D:\\tenny_lu\\Documents\\McpNodeJs";
+            DispatcherFolder = "D:\\workspace\\output\\McpBackend-win-x64";
+            ChatFrontendFolder = "D:\\tenny_lu\\Documents\\dist";
+        }
+        else
+        {
+            // Get current app folder
+            string baseAppFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            McpHostFolder = Path.Combine(baseAppFolder, "McpNodeJs");
+            DispatcherFolder = Path.Combine(baseAppFolder, "McpBackend");
+            ChatFrontendFolder = Path.Combine(baseAppFolder, "dist");
+        }
 
-        DispatcherFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpBackend");
-
-        ChatFrontendFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dist");
+        // Copy default config file to local setting path if not exist
+        const string configFileName = "mcp_servers.config.json";
+        string settingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient");
+        McpHostConfigFile = Path.Combine(settingFolder, configFileName);
+        if (!File.Exists(McpHostConfigFile))
+        {
+            string defaultConfigFile = Path.Combine(McpHostFolder, configFileName);
+            File.Copy(defaultConfigFile, McpHostConfigFile);
+        }
 
         FileSystemFolders = new List<string>();
     }
@@ -33,6 +54,7 @@ internal static class GlobalService
     public static readonly string LlamaServerBin;
 
     public static readonly string McpHostFolder;
+    public static readonly string McpHostConfigFile;
 
     public static readonly string DispatcherFolder;
 

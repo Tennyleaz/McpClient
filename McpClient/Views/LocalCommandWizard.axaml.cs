@@ -67,7 +67,7 @@ public partial class LocalCommandWizard : Window
     public List<string> ReadMcpConfigList()
     {
         // read the config file
-        string path = System.IO.Path.Combine(GlobalService.McpHostFolder, "mcp_servers.config.json");
+        string path = GlobalService.McpHostConfigFile;
         string json = System.IO.File.ReadAllText(path);
         McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
 

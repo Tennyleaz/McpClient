@@ -271,7 +271,7 @@ public partial class MainWindow : Window
         // Update this setting to MCP host config
         try
         {
-            string path = Path.Combine(GlobalService.McpHostFolder, "mcp_servers.config.json");
+            string path = GlobalService.McpHostConfigFile;
             string json = await File.ReadAllTextAsync(path);
             McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
 

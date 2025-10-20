@@ -1,0 +1,12 @@
+{
+    "mcp_servers": [{
+            "enabled": true,
+            "type": "Stdio",
+            "server_name": "filesystem",
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-filesystem", "D:\\tenny_lu\\Documents\\McpFileSystem", "D:\\tenny_lu\\Documents\\rag docs"],
+            "env": {},
+            "http_headers": {}
+        }
+    ]
+}
