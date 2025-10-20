@@ -2,9 +2,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace McpClient.Services;
 
@@ -18,13 +20,20 @@ internal enum CliServiceState
     Error
 }
 
-internal abstract class CliService
+internal abstract class CliService : IDisposable
 {
     internal Process _process;
     internal readonly ConcurrentQueue<string> _stdoutQueue;
     internal readonly ConcurrentQueue<string> _stderrQueue;
     internal CancellationTokenSource _cts;
     private readonly string _serviceName;
+
+    // For HTTP services only
+    private readonly HttpClient _httpClient;
+    internal readonly string _base_url;
+    private readonly int _healthCheckIntervalMs;
+    private readonly bool _allowShutdown;
+    private Task _healthTask;
 
     // EVENTS
     public event Action<CliServiceState, CliServiceState> OnStateChanged;
@@ -40,7 +49,7 @@ internal abstract class CliService
     internal readonly string _arguments;
     internal readonly int _maxLogLines;
 
-    internal CliService(string binaryPath, string arguments, int maxLogLines)
+    internal CliService(string binaryPath, string arguments, int maxLogLines, int port = 0, bool allowShutdown = false)
     {
         _binaryPath = binaryPath;
         _arguments = arguments;
@@ -50,6 +59,19 @@ internal abstract class CliService
 
         // save service name, used for PID
         _serviceName = Path.GetFileNameWithoutExtension(binaryPath);
+
+        // For http services
+        if (port > 0)
+        {
+            _base_url= "http://localhost:" + port;
+
+            _httpClient = new HttpClient();
+            _httpClient.Timeout = TimeSpan.FromSeconds(5);
+            _httpClient.BaseAddress = new Uri(_base_url);
+
+            _healthCheckIntervalMs = 5000;
+        }
+        _allowShutdown = allowShutdown;
     }
 
     public bool Start()
@@ -98,11 +120,16 @@ internal abstract class CliService
                 _process.BeginErrorReadLine();
                 Pid = _process.Id;
 
-                //_healthTask = Task.Run(() => HealthLoop(_cts!.Token));
                 SetState(CliServiceState.Starting);
 
                 // Save the PID to file
                 SettingsManager.Local.SavePid(_serviceName, Pid);
+
+                // Only start health check if it has HTTP url
+                if (_httpClient != null)
+                {
+                    _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
+                }
 
                 return true;
             }
@@ -279,4 +306,91 @@ internal abstract class CliService
         ps.WaitForExit();
         return outPath;
     }
+
+    public void Dispose()
+    {
+        Stop();
+        _httpClient?.Dispose();
+    }
+
+    #region Http service health check
+
+    public async Task<bool> CheckHealth()
+    {
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync("/health");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return false;
+        }
+    }
+
+    private async Task HealthLoop(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            if (_process == null || _process.HasExited)
+            {
+                SetState(CliServiceState.Crashed);
+                break;
+            }
+            // Optional: ping HTTP /health endpoint here for deeper checks
+            bool isUp = await CheckHealth();
+            if (!isUp)
+            {
+                if (State == CliServiceState.Running)
+                {
+                    SetState(CliServiceState.Crashed);
+                    break;
+                }
+                else if (State == CliServiceState.Starting)
+                {
+                    // Do nothing, wait for start finish
+                }
+                else if (State == CliServiceState.Stopping || State == CliServiceState.Stopped)
+                {
+                    SetState(CliServiceState.Stopped);
+                    break;
+                }
+                else
+                {
+                    SetState(CliServiceState.Crashed);
+                    break;
+                }
+            }
+            else
+            {
+                SetState(CliServiceState.Running);
+            }
+
+            await Task.Delay(_healthCheckIntervalMs, cancellationToken).ContinueWith(_ => { }, cancellationToken);
+        }
+    }
+
+    private bool SendShutdown()
+    {
+        if (!_allowShutdown)
+            return true;
+
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "/shutdown");
+        request.Headers.Add("X-Shutdown-Token", "AI_NEXUS_CLIENT");
+
+        try
+        {
+            using HttpResponseMessage response = _httpClient.Send(request);
+            if (response.IsSuccessStatusCode)
+                return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        return false;
+    }
+
+    #endregion
 }

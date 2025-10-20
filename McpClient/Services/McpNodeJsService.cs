@@ -13,13 +13,9 @@ using System.Threading.Tasks;
 namespace McpClient.Services;
 
 
-internal class McpNodeJsService : CliService, IDisposable
+internal class McpNodeJsService : CliService
 {
-    private readonly HttpClient _httpClient;
-    private const int PORT = 17925;
-    private static readonly string BASE_URL = "http://localhost:" + PORT;
-    private readonly int _healthCheckIntervalMs;
-    private Task _healthTask;
+    private const int MCP_HOST_PORT = 17925;
 
     public static McpNodeJsService CreateMcpNodeJsService()
     {
@@ -29,86 +25,8 @@ internal class McpNodeJsService : CliService, IDisposable
         return null;
     }
 
-    private McpNodeJsService(string binaryPath) : base(binaryPath, null, 50)
+    private McpNodeJsService(string binaryPath) : base(binaryPath, null, 50, MCP_HOST_PORT)
     {
-        _httpClient = new HttpClient();
-        _httpClient.Timeout = TimeSpan.FromSeconds(5);
-        _httpClient.BaseAddress = new Uri(BASE_URL);
 
-        _healthCheckIntervalMs = 2000;
-    }
-
-
-    public async Task<bool> CheckHealth()
-    {
-        try
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync("/health");
-            return response.IsSuccessStatusCode;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return false;
-        }
-    }
-
-    private async Task HealthLoop(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            if (_process == null || _process.HasExited)
-            {
-                SetState(CliServiceState.Crashed);
-                break;
-            }
-            // Optional: ping HTTP /health endpoint here for deeper checks
-            bool isUp = await CheckHealth();
-            if (!isUp)
-            {
-                if (State == CliServiceState.Running)
-                {
-                    SetState(CliServiceState.Crashed);
-                    break;
-                }
-                else if (State == CliServiceState.Starting)
-                {
-                    // Do nothing, wait for start finish
-                }
-                else if (State == CliServiceState.Stopping || State == CliServiceState.Stopped)
-                {
-                    SetState(CliServiceState.Stopped);
-                    break;
-                }
-                else
-                {
-                    SetState(CliServiceState.Crashed);
-                    break;
-                }
-            }
-            else
-            {
-                SetState(CliServiceState.Running);
-            }
-
-            await Task.Delay(_healthCheckIntervalMs, cancellationToken).ContinueWith(_ => { }, cancellationToken);
-        }
-    }
-
-    public new bool Start()
-    {
-        if (base.Start())
-        {
-            _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
-            return true;
-        }
-
-        return false;
-    }
-
-    public void Dispose()
-    {
-        Stop();
-        _httpClient.Dispose();
     }
 }

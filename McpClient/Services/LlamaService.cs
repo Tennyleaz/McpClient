@@ -26,20 +26,16 @@ internal struct LlamaParam
     public int maxLogLines;
 }
 
-internal class LlamaService : CliService, IDisposable
+internal class LlamaService : CliService
 {
-    private readonly HttpClient _httpClient;
-    private const int PORT = 2200;
-    private static readonly string BASE_URL = "http://localhost:" + PORT;
-    private Task _healthTask;
+    private const int LLAMA_PORT = 2200;
 
     // EVENTS
 
     // PROPERTIES
-    public string Address => BASE_URL + "/v1";
+    public string Address => _base_url + "/v1";
 
     // CONFIG
-    private readonly int _healthCheckIntervalMs;
     private readonly string _modelType;
 
     public static LlamaService CreateLlamaService(string modelPath, string modelType, int deviceIndex, bool isOffloadKvCache, int contextSize)
@@ -48,7 +44,7 @@ internal class LlamaService : CliService, IDisposable
         string binaryPath = GlobalService.LlamaServerBin;
 
         // arguments
-        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {PORT} --jinja";
+        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {LLAMA_PORT} --jinja";
         if (!isOffloadKvCache)
             arguments += " --no-kv-offload";
 
@@ -71,16 +67,10 @@ internal class LlamaService : CliService, IDisposable
         return new LlamaService(param);
     }
 
-    private LlamaService(LlamaParam param) : base(param.binaryPath, param.arguments, param.maxLogLines)
+    private LlamaService(LlamaParam param) : base(param.binaryPath, param.arguments, param.maxLogLines, LLAMA_PORT)
     {
-        _httpClient = new HttpClient();
-        _httpClient.Timeout = TimeSpan.FromSeconds(5);
-        _httpClient.BaseAddress = new Uri(BASE_URL);
-
         _modelType = param.modelType;
         SetToolCallParam();
-
-        _healthCheckIntervalMs = 5000;
     }
 
     private void SetToolCallParam()
@@ -109,81 +99,6 @@ internal class LlamaService : CliService, IDisposable
             default:
                 // unsupported model?
                 break;
-        }
-    }
-
-    public async Task<bool> CheckHealth()
-    {
-        try
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync("/health");
-            return response.IsSuccessStatusCode;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return false;
-        }
-    }
-
-    // LAUNCH
-    public new bool Start()
-    {
-        if (base.Start())
-        {
-            _healthTask = Task.Run(() => HealthLoop(_cts!.Token));
-            return true;
-        }
-
-        return false;
-    }
-
-    // For cleaning up on shutdown
-    public void Dispose()
-    {
-        Stop();
-        _httpClient.Dispose();
-    }
-
-    private async Task HealthLoop(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            if (_process == null || _process.HasExited)
-            {
-                SetState(CliServiceState.Crashed);
-                break;
-            }
-            // Optional: ping HTTP /health endpoint here for deeper checks
-            bool isUp = await CheckHealth();
-            if (!isUp)
-            {
-                if (State == CliServiceState.Running)
-                {
-                    SetState(CliServiceState.Crashed);
-                    break;
-                }
-                else if (State == CliServiceState.Starting)
-                {
-                    // Do nothing, wait for start finish
-                }
-                else if (State == CliServiceState.Stopping || State == CliServiceState.Stopped)
-                {
-                    SetState(CliServiceState.Stopped);
-                    break;
-                }
-                else
-                {
-                    SetState(CliServiceState.Crashed);
-                    break;
-                }
-            }
-            else
-            {
-                SetState(CliServiceState.Running);
-            }
-
-            await Task.Delay(_healthCheckIntervalMs, cancellationToken).ContinueWith(_ => { }, cancellationToken);
         }
     }
 }
