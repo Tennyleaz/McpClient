@@ -86,6 +86,7 @@ public partial class StoreItemWindow : Window
             }
             LabelInvalidJson.IsVisible = true;
             TbMcpSetting.Text = detailBase.ServerConfig;
+            BtnInstall.Content = "Not Competible";
             BtnInstall.IsEnabled = false;
         }
         else

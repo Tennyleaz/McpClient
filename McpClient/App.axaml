@@ -229,7 +229,7 @@
 		<Style Selector="Button.Primary:disabled">
 			<Setter Property="Background" Value="{DynamicResource AccentFillColorDisabled}" />
 			<Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabled}" />
-			<Setter Property="Opacity" Value="0.6" />
+			<Setter Property="Opacity" Value="0.8" />
 		</Style>
 
 		<!-- 次要按鈕樣式 -->
