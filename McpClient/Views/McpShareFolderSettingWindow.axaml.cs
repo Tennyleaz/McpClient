@@ -12,11 +12,12 @@ public partial class McpShareFolderSettingWindow : Window
         InitializeComponent();
     }
 
-    private void Window_OnLoaded(object sender, RoutedEventArgs e)
+    private async void Window_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (Design.IsDesignMode)
             return;
 
-        ShareFolderSetting.UpdateShareFolderToUi();
+        //ShareFolderSetting.UpdateShareFolderToUi();
+        await ShareFolderSetting.UpdateShareFolderToUiFromServer();
     }
 }

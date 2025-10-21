@@ -9,7 +9,7 @@
         Icon="/Assets/avalonia-logo.ico"
         MinWidth="960" MinHeight="400"
         WindowStartupLocation="CenterScreen"
-        Title="AI Nexus Client" Loaded="Control_OnLoaded" Closing="Window_OnClosing">
+        Title="AI Nexus Client" Loaded="Window_OnLoaded" Closing="Window_OnClosing">
     <Panel>
         <StackPanel Orientation="Vertical" Name="LoginPanel" IsVisible="False" VerticalAlignment="Center">
             <views:Logo Height="80" Margin="16,16,16,20" HorizontalAlignment="Center" Width="200"/>

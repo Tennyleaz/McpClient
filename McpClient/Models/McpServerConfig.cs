@@ -31,6 +31,11 @@ internal class McpServer
     {
         return $"{server_name} ({type})";
     }
+
+    public bool IsFileSystem()
+    {
+        return server_name == "filesystem" && type == McpServerType.Stdio && command == "npx";
+    }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

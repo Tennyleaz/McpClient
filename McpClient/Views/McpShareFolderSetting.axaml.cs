@@ -37,6 +37,24 @@ public partial class McpShareFolderSetting : UserControl
         ShareFoldersControl.ItemsSource = _shareFolders;
     }
 
+    internal async Task UpdateShareFolderToUiFromServer()
+    {
+        _shareFolders.Clear();
+
+        McpServerConfig config = await _mcpConfigService.GetConfig();
+        McpServer fsServer = config.mcp_servers.FirstOrDefault(x => x.IsFileSystem());
+        if (fsServer != null)
+        {
+            const int startIndex = 2;
+            for (int i = startIndex; i < fsServer.args.Count; i++)
+            {
+                _shareFolders.Add(new FileSystemFolderViewModel { Folder = fsServer.args[i] }); 
+            }
+        }
+
+        ShareFoldersControl.ItemsSource = _shareFolders;
+    }
+
     private async void BtnChangeFileSystem_OnClick(object sender, RoutedEventArgs e)
     {
         IStorageProvider storage = TopLevel.GetTopLevel(this).StorageProvider;
@@ -78,7 +96,7 @@ public partial class McpShareFolderSetting : UserControl
     private async Task<bool> UpdateShareFoldersToServer(List<string> folders)
     {
         McpServerConfig config = await _mcpConfigService.GetConfig();
-        McpServer fsServer = config.mcp_servers.FirstOrDefault(x => x.server_name == "filesystem");
+        McpServer fsServer = config.mcp_servers.FirstOrDefault(x => x.IsFileSystem());
         if (fsServer != null)
         {
             int startIndex = 2;

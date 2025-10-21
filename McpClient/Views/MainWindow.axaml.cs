@@ -33,7 +33,7 @@ public partial class MainWindow : Window
         MainView.IsVisible = false;
     }
 
-    private async void Control_OnLoaded(object sender, RoutedEventArgs e)
+    private async void Window_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (Design.IsDesignMode)
             return;
@@ -69,6 +69,9 @@ public partial class MainWindow : Window
             await wizard.ShowDialog(this);
         }
 
+        // Start MCP service after dependencies installed
+        StartMcpServices();
+
         // start upload docments in background
         ragWorker = new BackgroundWorker();
         ragWorker.WorkerSupportsCancellation = true;
@@ -92,7 +95,7 @@ public partial class MainWindow : Window
             RelaunchAfterUpdate = false, // set to true if needed
         };
         sparkle.UpdateDetected += Sparkle_UpdateDetected;
-        await sparkle.StartLoop(true, true);
+        //await sparkle.StartLoop(true, true);
     }
 
     private void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
@@ -100,15 +103,23 @@ public partial class MainWindow : Window
         MainView.BtnUpdate.IsVisible = true;
     }
 
-    private void StartServices()
+    private static void StartServices()
     {
-        // Start MCP host service
-        GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
-        GlobalService.NodeJsService.Start();
-
         // Start .net backend
         GlobalService.BackendService = DispatcherBackendService.CreateBackendService();
         GlobalService.BackendService.Start();
+    }
+
+    private static void StartMcpServices()
+    {
+        // TODO: start RAG services
+        // Embedding backend
+        // ChromaDB python CLI
+        // .Net http API
+
+        // Start MCP host service
+        GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
+        GlobalService.NodeJsService.Start();
     }
 
     private void Window_OnClosing(object sender, WindowClosingEventArgs e)
@@ -122,7 +133,9 @@ public partial class MainWindow : Window
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
         GlobalService.NodeJsService?.Stop();
+        GlobalService.NodeJsService?.Dispose();
         GlobalService.BackendService?.Stop();
+        GlobalService.BackendService?.Dispose();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
