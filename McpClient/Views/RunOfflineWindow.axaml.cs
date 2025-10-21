@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using McpClient.ViewModels;
 
 namespace McpClient.Views;
@@ -24,6 +25,7 @@ public partial class RunOfflineWindow : Window
     private bool isRunning;
     private const int STREAM_CHUNK_SIZE = 10;
     private List<ModelItem> availableModels;
+    private List<string> usedTools, missingTools;
 
     public RunOfflineWindow()
     {
@@ -52,10 +54,20 @@ public partial class RunOfflineWindow : Window
             try
             {
                 jsonNode = JsonNode.Parse(_workflow.Payload);
-                if (jsonNode != null && jsonNode["message"] != null)
+                if (jsonNode != null)
                 {
-                    TbPayload.Text = jsonNode["message"].ToString().Trim();
-                    TbPayload.IsVisible = true;
+                    // Parse user message, let user to modify
+                    if (jsonNode["message"] != null)
+                    {
+                        TbPayload.Text = jsonNode["message"].ToString().Trim();
+                        TbPayload.IsVisible = true;
+                    }
+                    
+                    // Parse used MCP tool list
+                    if (jsonNode["tools"] != null)
+                    {
+                        usedTools = jsonNode["tools"].Deserialize<List<string>>();
+                    }
                 }
             }
             catch (Exception ex)
@@ -70,6 +82,18 @@ public partial class RunOfflineWindow : Window
     {
         if (Design.IsDesignMode)
             return;
+
+        // Check for MCP tools before execute
+        BtnRun.IsEnabled = false;
+        if (!await IsMcpToolsExist())
+        {
+            TbOutput.Text = "Error:\n" +
+                            "The workflow needs these MCP tools to run:\n\n" +
+                            $"{string.Join(",\n", missingTools)}\n\n" +
+                            "Please enable or install them first.";
+            TbOutput.Foreground = new SolidColorBrush(Color.Parse("#F44336"));
+            return;
+        }
 
         // Load online model list
         ModelData data = await _mcpService.ListModels();
@@ -96,6 +120,7 @@ public partial class RunOfflineWindow : Window
             CbModelName.SelectedItem = qwen;
         else
             CbModelName.SelectedIndex = availableModels.Count - 1;
+        BtnRun.IsEnabled = true;
     }
 
     private async void BtnRun_OnClick(object sender, RoutedEventArgs e)
@@ -183,5 +208,29 @@ public partial class RunOfflineWindow : Window
         {
             e.Cancel = true;
         }
+    }
+
+    private async Task<bool> IsMcpToolsExist()
+    {
+        if (usedTools == null || usedTools.Count == 0)
+            return true;
+
+        missingTools = new List<string>();
+
+        // Get all enabled tools
+        McpServerListResponse response = await _mcpService.ListCurrent();
+        if (response?.data?.Count > 0)
+        {
+            foreach (string tool in usedTools)
+            {
+                if (!response.data.Exists(x => x.server_name == tool))
+                {
+                    // Not found
+                    missingTools.Add(tool);
+                }
+            }
+        }
+
+        return missingTools.Count == 0;
     }
 }
