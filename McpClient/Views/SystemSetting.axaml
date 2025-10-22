@@ -11,7 +11,7 @@
         <TextBlock Text="監控系統服務和資源使用情況" Margin="0,40,0,0"/>
 		<WrapPanel Margin="0,80,0,20" Orientation="Vertical">
             <Border Classes="CardFix" DockPanel.Dock="Top" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
-				<Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="40,40,40,40">
+				<Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="40,40,40,40,40,40">
                     <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">系統服務</TextBlock>
 
                     <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">MCP NodeJS server</TextBlock>
@@ -22,19 +22,27 @@
                     <TextBlock Grid.Column="1" Grid.Row="2" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbDotnetBackendStatus" Foreground="Red">Stopped</TextBlock>
                     <Button Grid.Column="2" Grid.Row="2" Name="BtnRestartDotNet" VerticalAlignment="Center" Click="BtnRestartDotNet_OnClick">Restart</Button>
 
-                    <TextBlock Grid.Column="0" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center">LLM server</TextBlock>
-                    <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbllmStatus" Foreground="Green">Running</TextBlock>
-                    <Button Grid.Column="2" Grid.Row="3" Name="BtnLlmConfig" Click="BtnLlmConfig_OnClick" VerticalAlignment="Center">Configure</Button>
+                    <TextBlock Grid.Column="0" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center">RAG server</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="3" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbRagBackendStatus" Foreground="Red">Stopped</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="3" Name="BtnResutartRagBackend" Click="BtnResutartRagBackend_OnClick" VerticalAlignment="Center">Restart</Button>
+
+                    <TextBlock Grid.Column="0" Grid.Row="4" Margin="0,0,20,0" VerticalAlignment="Center">ChromaDB</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="4" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbChromaDbStatus" Foreground="Red">Stopped</TextBlock>
+
+                    <TextBlock Grid.Column="0" Grid.Row="5" Margin="0,0,20,0" VerticalAlignment="Center">LLM server</TextBlock>
+                    <TextBlock Grid.Column="1" Grid.Row="5" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbllmStatus" Foreground="Green">Running</TextBlock>
+                    <Button Grid.Column="2" Grid.Row="5" Name="BtnLlmConfig" Click="BtnLlmConfig_OnClick" VerticalAlignment="Center">Configure</Button>
                 </Grid>
             </Border>
             <Border Classes="CardFix" DockPanel.Dock="Top" MinWidth="400" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,40,40">
-                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">RAG 設定</TextBlock>
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,40,40,40">
+                    <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">RAG 資料夾設定</TextBlock>
                     <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center">Local Document</TextBlock>
                     <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,0,20,0" VerticalAlignment="Center" Name="TbRagStatus" Foreground="Green">Running</TextBlock>
                     <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" >RAG Folder:</TextBlock>
                     <Button Grid.Column="1" Grid.Row="2" Name="BtnChangeRag" VerticalAlignment="Center" Click="BtnChangeRag_OnClick">Change Folder</Button>
-                    <TextBlock Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Name="TbRagFolder" VerticalAlignment="Center">C:\\users\tenny\documents\RAG\documents</TextBlock>
+                    <TextBlock Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Name="TbRagFolder" VerticalAlignment="Center">C:\users\tenny\documents\RAG\documents</TextBlock>
+                    <Button Grid.Column="0" Grid.Row="4" Name="BtnManageDocuments" Click="BtnManageDocuments_OnClick">Manage Docuemnts</Button>
                     <!--<Panel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
                         <Button Name="BtnStartRecord" Click="BtnStartRecord_OnClick">Start Record</Button>
                         <Button Name="BtnStopRecord" Click="BtnStopRecord_OnClick" Margin="120,0,0,0">Stop Record</Button>

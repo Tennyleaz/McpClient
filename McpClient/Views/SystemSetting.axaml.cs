@@ -11,6 +11,8 @@ using McpClient.Models;
 using McpClient.Services;
 using McpClient.Utils;
 using McpClient.ViewModels;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -70,6 +72,8 @@ public partial class SystemSetting : UserControl
         UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
         UpdateCliServiceStatus(GlobalService.NodeJsService, TbNodeJsStatus);
         UpdateCliServiceStatus(GlobalService.BackendService, TbDotnetBackendStatus);
+        UpdateCliServiceStatus(GlobalService.RagBackendService, TbRagBackendStatus);
+        UpdateCliServiceStatus(GlobalService.ChromaDbService, TbChromaDbStatus);
         StartMonitorServices();
     }
 
@@ -231,6 +235,8 @@ public partial class SystemSetting : UserControl
         UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);
         UpdateCliServiceStatus(GlobalService.NodeJsService, TbNodeJsStatus);
         UpdateCliServiceStatus(GlobalService.BackendService, TbDotnetBackendStatus);
+        UpdateCliServiceStatus(GlobalService.RagBackendService, TbRagBackendStatus);
+        UpdateCliServiceStatus(GlobalService.ChromaDbService, TbChromaDbStatus);
     }
 
     private async void BtnLlmConfig_OnClick(object sender, RoutedEventArgs e)
@@ -255,5 +261,56 @@ public partial class SystemSetting : UserControl
     private void Control_OnUnloaded(object sender, RoutedEventArgs e)
     {
         StopMonitorServices();
+    }
+
+    private async void BtnResutartRagBackend_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (GlobalService.RagBackendService == null || GlobalService.RagBackendService.State != CliServiceState.Running)
+        {
+            // If there is no service, check if chroma DB runtime is not installed
+            const string command = "chroma";
+            if (!LocalServiceUtils.FindCommand(command))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("RAG Setting", 
+                    "You don't have ChromaDB installed yet.\nIn order to use RAG, ChromaDB is required.\nDo you want to install now?",
+                    ButtonEnum.YesNo, Icon.Question);
+                Window owner = TopLevel.GetTopLevel(this) as Window;
+                var messageBoxResult = await box.ShowWindowDialogAsync(owner);
+                if (messageBoxResult != ButtonResult.Yes)
+                {
+                    // Do not restart
+                    return;
+                }
+
+                // Show install wizard
+                LocalCommandWizard wizard = new LocalCommandWizard();
+                wizard.GenerateMcpStoreRuntimeViewModel(command);
+                await wizard.ShowDialog(owner);
+                if (!wizard.IsAllRuntimeInstalled)
+                {
+                    // Do not restart
+                    return;
+                }
+            }
+
+            GlobalService.ChromaDbService?.Dispose();
+            GlobalService.RagBackendService?.Dispose();
+            GlobalService.ChromaDbService = ChromaDbService.CreateChromaDbService();
+            GlobalService.RagBackendService = RagBackendService.CreateBackendService();
+        }
+        else
+        {
+            GlobalService.ChromaDbService.Stop();
+            GlobalService.RagBackendService.Stop();
+        }
+
+        GlobalService.ChromaDbService.Start();
+        GlobalService.RagBackendService.Start();
+    }
+
+    private async void BtnManageDocuments_OnClick(object sender, RoutedEventArgs e)
+    {
+        RagManageWindow manager = new RagManageWindow();
+        await manager.ShowDialog(TopLevel.GetTopLevel(this) as Window);
     }
 }

@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:McpClient.ViewModels"
+        mc:Ignorable="d"
+        x:Class="McpClient.Views.RagManageWindow"
+        Width="640" Height="480" WindowStartupLocation="CenterOwner"
+        Loaded="Window_OnLoaded"
+        Title="Manage RAG Documents">
+    <DockPanel Margin="20">
+        <TextBlock Name="TbWinTitle" Text="Manage RAG Documents" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" DockPanel.Dock="Top"/>
+        <Grid Name="HeaderGrid" ColumnDefinitions="*,Auto" Margin="0,20,0,0" DockPanel.Dock="Top">
+            <TextBlock Grid.Column="0" Text="Document Name" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1" Text="Upload Time" VerticalAlignment="Center" Margin="12,0,100,0"/>
+        </Grid>
+        <ScrollViewer Margin="0,4,0,0" DockPanel.Dock="Top">
+            <ItemsControl Name="DocumentList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RagDocuemntViewModel">
+                        <Grid ColumnDefinitions="*,Auto,Auto" Height="36">
+                            <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CreatedTime}" VerticalAlignment="Center" Margin="12,0,12,0"/>
+                            <Button Grid.Column="2" Content="Delete" Name="BtnDelete" Click="BtnDelete_OnClick"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <TextBlock Name="TbStatus" Margin="0,20,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+    </DockPanel>
+</Window>
