@@ -16,7 +16,8 @@ internal static class GlobalService
 {
     static GlobalService()
     {
-        LlamaInstallFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient", "Llama");
+        string settingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient");
+        LlamaInstallFolder = Path.Combine(settingFolder, "Llama");
         string name = "llama-server";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             name += ".exe";
@@ -27,6 +28,7 @@ internal static class GlobalService
             McpHostFolder = "D:\\tenny_lu\\Documents\\McpNodeJs";
             DispatcherFolder = "D:\\workspace\\output\\McpBackend-win-x64";
             ChatFrontendFolder = "D:\\tenny_lu\\Documents\\dist";
+            RagBackendFolder = "D:\\workspace\\output\\RagBackend-win-x64";
         }
         else
         {
@@ -35,6 +37,7 @@ internal static class GlobalService
             McpHostFolder = Path.Combine(baseAppFolder, "McpNodeJs");
             DispatcherFolder = Path.Combine(baseAppFolder, "McpBackend");
             ChatFrontendFolder = Path.Combine(baseAppFolder, "dist");
+            RagBackendFolder = Path.Combine(baseAppFolder, "RagBackend");
         }
 
         ChromaDbFolder = Path.Combine(settingFolder, "ChromaDb");
@@ -43,7 +46,6 @@ internal static class GlobalService
 
         // Copy default config file to local setting path if not exist
         const string configFileName = "mcp_servers.config.json";
-        string settingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient");
         McpHostConfigFile = Path.Combine(settingFolder, configFileName);
         if (!File.Exists(McpHostConfigFile))
         {
@@ -66,6 +68,8 @@ internal static class GlobalService
 
     public static readonly string ChromaDbFolder;
 
+    public static readonly string RagBackendFolder;
+
     public static LlamaService LlamaService { get; set; }
 
     public static McpNodeJsService NodeJsService { get; set; }
@@ -73,6 +77,8 @@ internal static class GlobalService
     public static DispatcherBackendService BackendService { get; set; }
 
     public static ChromaDbService ChromaDbService { get; set; }
+
+    public static RagBackendService RagBackendService { get; set; }
 
     public static MainViewModel MainViewModel { get; set; }
 

@@ -147,6 +147,8 @@ public partial class MainWindow : Window
         GlobalService.BackendService?.Dispose();
         GlobalService.ChromaDbService?.Stop();
         GlobalService.ChromaDbService?.Dispose();
+        GlobalService.RagBackendService?.Stop();
+        GlobalService.RagBackendService?.Dispose();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
