@@ -10,11 +10,9 @@ internal class RagBackendService : CliService
 
     public static RagBackendService CreateBackendService()
     {
-        // Check for "mcp_servers.config.json"
-        string jsonPath = GlobalService.McpHostConfigFile;
         string databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient", "rag_documents.db");
-        // Add as "config-file" ASP.NET argument
-        string arguments = $"--config-file \"{jsonPath}\" --database {databasePath} --urls \"http://+:{RAG_API_PORT}\"";
+        // Add as "database" ASP.NET argument
+        string arguments = $"--database {databasePath} --urls \"http://+:{RAG_API_PORT}\"";
 
         string path = Path.Combine(GlobalService.RagBackendFolder, "AiNexusRagService.exe");
         if (File.Exists(path))

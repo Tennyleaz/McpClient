@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,10 +16,17 @@ internal class ChromaDbService : CliService
     public static ChromaDbService CreateChromaDbService()
     {
         // Use CMD to run python script
-        const string binaryPath = "chroma.exe";
+        string binaryPath;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            binaryPath = "chroma.exe";
+        else
+            binaryPath = "chroma";
         // Get database path from settings
         string arguments = $"run --path \"{GlobalService.ChromaDbFolder}\" --port {CHROMA_PORT}";
-        return new ChromaDbService(binaryPath, arguments);
+        return new ChromaDbService(binaryPath, arguments)
+        {
+            SkipBinaryCheck = true  // Because this is not an absolute path
+        };
     }
 
     private ChromaDbService(string binaryPath, string arguments) : base("ChromaDB", binaryPath, arguments, 50, CHROMA_PORT, true)

@@ -44,6 +44,7 @@ internal abstract class CliService : IDisposable
     public string[] LastStdErr => _stderrQueue.ToArray();
     public int Pid { get; private set; }
     public string Url => _base_url;
+    public bool SkipBinaryCheck { get; set; }
 
     // CONFIG
     protected readonly string _binaryPath;
@@ -84,8 +85,10 @@ internal abstract class CliService : IDisposable
             if (State == CliServiceState.Running || State == CliServiceState.Starting)
                 return false;
             // Special case: ignore cmd.exe check
-            if (_binaryPath != "cmd.exe" && _binaryPath != "chroma.exe" && !File.Exists(_binaryPath))
+            if (!SkipBinaryCheck && !File.Exists(_binaryPath))
+            {
                 return false;
+            }
 
             SetState(CliServiceState.Starting);
 
@@ -243,12 +246,21 @@ internal abstract class CliService : IDisposable
         }
     }
 
-    private static bool IsExpectedBackend(int pid, string expectedBinary)
+    private bool IsExpectedBackend(int pid, string expectedBinary)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             using var proc = Process.GetProcessById(pid);
-            return Path.GetFullPath(proc.MainModule.FileName).Equals(Path.GetFullPath(expectedBinary), StringComparison.OrdinalIgnoreCase);
+            if (SkipBinaryCheck)
+            {
+                // Just compare the file name (Ex: chroma.exe)
+                return proc.MainModule.FileName.Contains(expectedBinary);
+            }
+            else
+            {
+                // Compare the full path
+                return string.Equals(Path.GetFullPath(proc.MainModule.FileName), Path.GetFullPath(expectedBinary), StringComparison.OrdinalIgnoreCase);
+            }
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
