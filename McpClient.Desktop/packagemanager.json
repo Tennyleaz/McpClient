@@ -154,5 +154,42 @@
       }
     ],
     "url": "https://bun.com/docs/installation#installing"
+  },
+  "chroma": {
+    "macos": [
+      {
+        "manager": "brew",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "chromadb"
+      }
+    ],
+    "debian": [
+      {
+        "manager": "apt",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "chromadb"
+      }
+    ],
+    "windows": [
+      {
+        "manager": "winget",
+        "package": "python3"
+      },
+      {
+        "manager": "pip",
+        "package": "pipx"
+      },
+      {
+        "manager": "pipx",
+        "package": "chromadb"
+      }
+    ],
+    "url": "https://docs.trychroma.com/docs/cli/install"
   }
 }

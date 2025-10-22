@@ -64,7 +64,11 @@ public partial class LocalCommandWizard : Window
         ShowNextStep();
     }
 
-    public List<string> ReadMcpConfigList()
+    /// <summary>
+    /// Read config file and get all required runtimes.
+    /// </summary>
+    /// <returns></returns>
+    private List<string> ReadMcpConfigList()
     {
         // read the config file
         string path = GlobalService.McpHostConfigFile;
@@ -80,6 +84,11 @@ public partial class LocalCommandWizard : Window
                 commands.Add(LocalServiceUtils.FindRuntimeByCommand(mcpServer.command));
             }
         }
+
+        // Special case:
+        // Add chroma db for RAG service
+        commands.Add("chroma");
+
         return commands.ToList();
     }
 

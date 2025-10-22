@@ -67,7 +67,7 @@ internal class LlamaService : CliService
         return new LlamaService(param);
     }
 
-    private LlamaService(LlamaParam param) : base(param.binaryPath, param.arguments, param.maxLogLines, LLAMA_PORT)
+    private LlamaService(LlamaParam param) : base("Llama.cpp", param.binaryPath, param.arguments, param.maxLogLines, LLAMA_PORT)
     {
         _modelType = param.modelType;
         SetToolCallParam();

@@ -142,6 +142,9 @@ internal static class LocalServiceUtils
             case "bun":
             case "bunx":
                 return "bun";
+            case "chroma":
+            case "chromadb":
+                return "chroma";
             default:
                 return command;
         }

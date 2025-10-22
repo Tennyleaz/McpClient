@@ -26,7 +26,7 @@ internal class DispatcherBackendService : CliService
         return null;
     }
 
-    private DispatcherBackendService(string binaryPath, string arguments) : base(binaryPath, arguments, 50, DISPATCHER_PORT, true)
+    private DispatcherBackendService(string binaryPath, string arguments) : base("Backend", binaryPath, arguments, 50, DISPATCHER_PORT, true)
     {
 
     }

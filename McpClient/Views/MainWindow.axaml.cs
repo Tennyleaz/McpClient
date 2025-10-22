@@ -112,10 +112,19 @@ public partial class MainWindow : Window
 
     private static void StartMcpServices()
     {
-        // TODO: start RAG services
-        // Embedding backend
-        // ChromaDB python CLI
-        // .Net http API
+        // Start RAG services only if all dependencies are installed
+        if (LocalServiceUtils.FindCommand("chroma"))
+        {
+            // ChromaDB python CLI
+            GlobalService.ChromaDbService = ChromaDbService.CreateChromaDbService();
+            GlobalService.ChromaDbService.Start();
+
+            // .Net http API
+            GlobalService.RagBackendService = RagBackendService.CreateBackendService();
+            GlobalService.RagBackendService.Start();
+
+            // TODO: Embedding LLM model
+        }
 
         // Start MCP host service
         GlobalService.NodeJsService = McpNodeJsService.CreateMcpNodeJsService();
@@ -136,6 +145,8 @@ public partial class MainWindow : Window
         GlobalService.NodeJsService?.Dispose();
         GlobalService.BackendService?.Stop();
         GlobalService.BackendService?.Dispose();
+        GlobalService.ChromaDbService?.Stop();
+        GlobalService.ChromaDbService?.Dispose();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
@@ -221,6 +232,13 @@ public partial class MainWindow : Window
 
         do
         {
+            // Check if chroma db and backend is ready
+            if (GlobalService.ChromaDbService?.State != CliServiceState.Running)
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1));
+                continue;
+            }
+
             Settings settings = SettingsManager.Local.Load();
             string folder = settings.RagFolder;
             if (Directory.Exists(folder) && !string.IsNullOrEmpty(settings.McpConfigToken))
@@ -249,11 +267,14 @@ public partial class MainWindow : Window
                         bool succss = await service.UploadDocument(dto);
 
                         // save in history
-                        histories.Add(new DocumentHistory
+                        if (succss)
                         {
-                            FullPath = file,
-                            UploadTime = time
-                        });
+                            histories.Add(new DocumentHistory
+                            {
+                                FullPath = file,
+                                UploadTime = time
+                            });
+                        }
                     }
                 }
             }

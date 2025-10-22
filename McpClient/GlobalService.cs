@@ -37,6 +37,10 @@ internal static class GlobalService
             ChatFrontendFolder = Path.Combine(baseAppFolder, "dist");
         }
 
+        ChromaDbFolder = Path.Combine(settingFolder, "ChromaDb");
+        if (!Directory.Exists(ChromaDbFolder))
+            Directory.CreateDirectory(ChromaDbFolder);
+
         // Copy default config file to local setting path if not exist
         const string configFileName = "mcp_servers.config.json";
         string settingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient");
@@ -60,11 +64,15 @@ internal static class GlobalService
 
     public static readonly string ChatFrontendFolder;
 
+    public static readonly string ChromaDbFolder;
+
     public static LlamaService LlamaService { get; set; }
 
     public static McpNodeJsService NodeJsService { get; set; }
 
     public static DispatcherBackendService BackendService { get; set; }
+
+    public static ChromaDbService ChromaDbService { get; set; }
 
     public static MainViewModel MainViewModel { get; set; }
 

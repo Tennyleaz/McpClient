@@ -22,15 +22,15 @@ internal enum CliServiceState
 
 internal abstract class CliService : IDisposable
 {
-    internal Process _process;
-    internal readonly ConcurrentQueue<string> _stdoutQueue;
-    internal readonly ConcurrentQueue<string> _stderrQueue;
-    internal CancellationTokenSource _cts;
+    protected Process _process;
+    protected readonly ConcurrentQueue<string> _stdoutQueue;
+    protected readonly ConcurrentQueue<string> _stderrQueue;
+    protected CancellationTokenSource _cts;
     private readonly string _serviceName;
 
     // For HTTP services only
-    private readonly HttpClient _httpClient;
-    internal readonly string _base_url;
+    protected readonly HttpClient _httpClient;
+    protected readonly string _base_url;
     private readonly int _healthCheckIntervalMs;
     private readonly bool _allowShutdown;
     private Task _healthTask;
@@ -43,13 +43,15 @@ internal abstract class CliService : IDisposable
     public string[] LastStdOut => _stdoutQueue.ToArray();
     public string[] LastStdErr => _stderrQueue.ToArray();
     public int Pid { get; private set; }
+    public string Url => _base_url;
 
     // CONFIG
-    internal readonly string _binaryPath;
-    internal readonly string _arguments;
-    internal readonly int _maxLogLines;
+    protected readonly string _binaryPath;
+    protected readonly string _arguments;
+    protected readonly int _maxLogLines;
+    protected readonly string _friendlyName;
 
-    internal CliService(string binaryPath, string arguments, int maxLogLines, int port = 0, bool allowShutdown = false)
+    internal CliService(string friendlyName, string binaryPath, string arguments, int maxLogLines, int port = 0, bool allowShutdown = false)
     {
         _binaryPath = binaryPath;
         _arguments = arguments;
@@ -59,6 +61,7 @@ internal abstract class CliService : IDisposable
 
         // save service name, used for PID
         _serviceName = Path.GetFileNameWithoutExtension(binaryPath);
+        _friendlyName = friendlyName;
 
         // For http services
         if (port > 0)
@@ -80,7 +83,8 @@ internal abstract class CliService : IDisposable
         {
             if (State == CliServiceState.Running || State == CliServiceState.Starting)
                 return false;
-            if (!File.Exists(_binaryPath))
+            // Special case: ignore cmd.exe check
+            if (_binaryPath != "cmd.exe" && _binaryPath != "chroma.exe" && !File.Exists(_binaryPath))
                 return false;
 
             SetState(CliServiceState.Starting);
@@ -194,7 +198,7 @@ internal abstract class CliService : IDisposable
         if (string.IsNullOrEmpty(data))
             return;
 
-        Debug.WriteLine(data);
+        Debug.WriteLine($"[{_friendlyName}] {data}");
 
         queue.Enqueue(data);
         while (queue.Count > _maxLogLines)
@@ -315,7 +319,7 @@ internal abstract class CliService : IDisposable
 
     #region Http service health check
 
-    public async Task<bool> CheckHealth()
+    public virtual async Task<bool> CheckHealth()
     {
         try
         {

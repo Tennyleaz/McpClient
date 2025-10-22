@@ -30,7 +30,7 @@ internal class McpNodeJsService : CliService
         return null;
     }
 
-    private McpNodeJsService(string binaryPath, string arguments) : base(binaryPath, arguments, 50, MCP_HOST_PORT)
+    private McpNodeJsService(string binaryPath, string arguments) : base("McpNodeJs", binaryPath, arguments, 50, MCP_HOST_PORT)
     {
 
     }
