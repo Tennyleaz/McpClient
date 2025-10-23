@@ -29,7 +29,7 @@ internal class ChromaDbService : CliService
         };
     }
 
-    private ChromaDbService(string binaryPath, string arguments) : base("ChromaDB", binaryPath, arguments, 50, CHROMA_PORT, true)
+    private ChromaDbService(string binaryPath, string arguments) : base("ChromaDB", binaryPath, arguments, 50, CHROMA_PORT)
     {
 
     }

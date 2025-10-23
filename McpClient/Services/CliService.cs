@@ -164,7 +164,7 @@ internal abstract class CliService : IDisposable
             try
             {
                 _cts?.Cancel();
-
+                SendShutdown();
                 if (!_process.HasExited)
                 {
                     _process.CloseMainWindow();
@@ -408,7 +408,10 @@ internal abstract class CliService : IDisposable
         {
             using HttpResponseMessage response = _httpClient.Send(request);
             if (response.IsSuccessStatusCode)
+            {
+                Thread.Sleep(300);
                 return true;
+            }
         }
         catch (Exception ex)
         {
