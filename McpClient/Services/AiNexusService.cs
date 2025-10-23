@@ -554,4 +554,85 @@ internal class AiNexusService
     }
 
     #endregion
+
+    #region App store
+
+    public async Task<AppStoreResponse> GetStoreApps(int page, int limit = 12, string search = null, int? category = null, int? status = null, AppStoreSortBy sortBy = AppStoreSortBy.updatedAt, AppStoreOrder orderBy = AppStoreOrder.desc)
+    {
+        string url = $"/api/v1/apps?page={page}&limit={limit}&sortBy={sortBy}&sortOrder={orderBy}";
+        if (!string.IsNullOrWhiteSpace(search))
+            url += $"&search={search}";
+        if (category.HasValue)
+            url += $"&category={category}";
+        if (status.HasValue)
+            url += $"&status={status}";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                AppStoreResponse result = JsonSerializer.Deserialize<AppStoreResponse>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region Agents
+
+    public async Task<List<Agent>> GetAgents(bool isPublic = false)
+    {
+        string url = "/api/v1/Agents";
+        if (isPublic)
+            url += "/public";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                List<Agent> result = JsonSerializer.Deserialize<List<Agent>>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    public async Task<Agent> GetAgentById(int id)
+    {
+        string url = $"/api/v1/Agent/{id}";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                Agent result = JsonSerializer.Deserialize<Agent>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+    #endregion
 }
