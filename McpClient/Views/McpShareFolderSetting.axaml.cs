@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -5,16 +6,22 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using McpClient.Models;
 using McpClient.Services;
+using McpClient.Utils;
 using McpClient.ViewModels;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace McpClient.Views;
 
+/// <summary>
+/// See:
+/// https://modelcontextprotocol.io/specification/2025-06-18/client/roots
+/// </summary>
 public partial class McpShareFolderSetting : UserControl
 {
-    private readonly List<FileSystemFolderViewModel> _shareFolders = new();
+    private readonly ObservableCollection<FileSystemFolderViewModel> _shareFolders = new();
     private McpConfigService _mcpConfigService;
 
     public McpShareFolderSetting()
@@ -27,6 +34,7 @@ public partial class McpShareFolderSetting : UserControl
         _mcpConfigService = mcpConfigService;
     }
 
+    [Obsolete("Use UpdateShareFolderToUiFromSetting", true)]
     internal void UpdateShareFolderToUi()
     {
         _shareFolders.Clear();
@@ -37,6 +45,7 @@ public partial class McpShareFolderSetting : UserControl
         ShareFoldersControl.ItemsSource = _shareFolders;
     }
 
+    [Obsolete("Use UpdateShareFolderToUiFromSetting", true)]
     internal async Task UpdateShareFolderToUiFromServer()
     {
         _shareFolders.Clear();
@@ -52,6 +61,19 @@ public partial class McpShareFolderSetting : UserControl
             }
         }
 
+        ShareFoldersControl.ItemsSource = _shareFolders;
+    }
+
+    internal async Task UpdateShareFolderToUiFromSetting()
+    {
+        _shareFolders.Clear();
+        List<string> roots = await McpFileSystemRootUtils.GetRootsFromSetting();
+        foreach (string f in roots)
+        {
+            _shareFolders.Add(new FileSystemFolderViewModel { Folder = f });
+        }
+
+        GlobalService.FileSystemFolders = roots;
         ShareFoldersControl.ItemsSource = _shareFolders;
     }
 
@@ -75,7 +97,7 @@ public partial class McpShareFolderSetting : UserControl
             _shareFolders.Add(new FileSystemFolderViewModel { Folder = folder });
 
             // Update to MCP host
-            await UpdateShareFoldersToServer(GlobalService.FileSystemFolders);
+            await UpdateShareFoldersToSetting(GlobalService.FileSystemFolders);
         }
     }
 
@@ -86,13 +108,14 @@ public partial class McpShareFolderSetting : UserControl
             string removed = vm.Folder;
 
             GlobalService.FileSystemFolders.RemoveAll(x => x == removed);
-            _shareFolders.RemoveAll(x => x.Folder == removed);
+            _shareFolders.Remove(vm);
 
             // Update to MCP host
-            await UpdateShareFoldersToServer(GlobalService.FileSystemFolders);
+            await UpdateShareFoldersToSetting(GlobalService.FileSystemFolders);
         }
     }
 
+    [Obsolete("Use UpdateShareFoldersToSetting", true)]
     private async Task<bool> UpdateShareFoldersToServer(List<string> folders)
     {
         McpServerConfig config = await _mcpConfigService.GetConfig();
@@ -115,6 +138,16 @@ public partial class McpShareFolderSetting : UserControl
 
             fsServer.enabled = true;
             return await _mcpConfigService.SetConfig(config);
+        }
+
+        return false;
+    }
+
+    private async Task<bool> UpdateShareFoldersToSetting(List<string> folders)
+    {
+        if (await McpFileSystemRootUtils.SetRootsToSetting(folders))
+        {
+            return await GlobalService.NodeJsService.NotifyFileSystemRootListChanged();
         }
 
         return false;

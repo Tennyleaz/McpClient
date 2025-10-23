@@ -34,4 +34,18 @@ internal class McpNodeJsService : CliService
     {
 
     }
+
+    public async Task<bool> NotifyFileSystemRootListChanged()
+    {
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsync("/api/filesystem/rootListChanged", null);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        return false;
+    }
 }

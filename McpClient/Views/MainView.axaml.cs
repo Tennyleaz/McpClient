@@ -161,7 +161,7 @@ public partial class MainView : UserControl
                 McpStore.IsVisible = false;
                 SystemSetting.IsVisible = true;
 
-                SystemSetting.LoadFromSettings();
+                await SystemSetting.LoadFromSettings();
                 break;
         }
 

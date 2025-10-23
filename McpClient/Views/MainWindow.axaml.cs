@@ -307,44 +307,14 @@ public partial class MainWindow : Window
         // Update this setting to MCP host config
         try
         {
-            string path = GlobalService.McpHostConfigFile;
-            string json = await File.ReadAllTextAsync(path);
-            McpServerConfig config = JsonSerializer.Deserialize<McpServerConfig>(json);
-
-            foreach (McpServer server in config.mcp_servers)
+            List<string> roots = await McpFileSystemRootUtils.GetRootsFromSetting();
+            if (roots.Count == 0)
             {
-                if (server.server_name == "filesystem" && server.type == McpServerType.Stdio)
-                {
-                    GlobalService.FileSystemFolders.Clear();
-                    // "npx"
-                    // "-y","@modelcontextprotocol/server-filesystem", "/path/to/allowed/dir", ...
-                    // Update the 3rd parameter
-                    const int index = 2;
-                    if (server.args.Count <= index)
-                    {
-                        // Create default folder and save to it
-                        string defaultDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "McpFileSystem");
-                        Directory.CreateDirectory(defaultDir);
-                        server.args.Add(defaultDir);
-                        // Update to global variable
-                        GlobalService.FileSystemFolders.Add(defaultDir);
-                        // Write back to config
-                        json = JsonSerializer.Serialize(config);
-                        await File.WriteAllTextAsync(path, json);
-                    }
-                    else
-                    {
-                        // Update to global variable
-                        for (int i = index; i < server.args.Count; i++)
-                        {
-                            if (Path.IsPathFullyQualified(server.args[i]))
-                            {
-                                GlobalService.FileSystemFolders.Add(server.args[i]);
-                            }
-                        }
-                    }
-                }
+                // Create if not exist
+                roots = await McpFileSystemRootUtils.ResetDefaults();
             }
+            // Update to global cache
+            GlobalService.FileSystemFolders = roots;
         }
         catch (Exception ex)
         {

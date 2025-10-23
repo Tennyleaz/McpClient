@@ -50,7 +50,7 @@ public partial class SystemSetting : UserControl
         McpShareFolderSetting.SetServices(mcpConfigService);
     }
 
-    internal void LoadFromSettings()
+    internal async Task LoadFromSettings()
     {
         settings = SettingsManager.Local.Load();
         TbRagFolder.Text = settings.RagFolder;
@@ -66,7 +66,7 @@ public partial class SystemSetting : UserControl
             TbRagFolder.Text = "RAG folder not set.";
         }
 
-        McpShareFolderSetting.UpdateShareFolderToUi();
+        await McpShareFolderSetting.UpdateShareFolderToUiFromSetting();
 
         // llama service status
         UpdateCliServiceStatus(GlobalService.LlamaService, TbllmStatus);

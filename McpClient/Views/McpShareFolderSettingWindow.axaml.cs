@@ -18,6 +18,6 @@ public partial class McpShareFolderSettingWindow : Window
             return;
 
         //ShareFolderSetting.UpdateShareFolderToUi();
-        await ShareFolderSetting.UpdateShareFolderToUiFromServer();
+        await ShareFolderSetting.UpdateShareFolderToUiFromSetting();
     }
 }
