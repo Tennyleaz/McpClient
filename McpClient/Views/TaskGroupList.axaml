@@ -11,8 +11,8 @@
         <vm:DesignGroupList/>
     </Design.DataContext>
     <Panel Margin="20,20,0,0">
-        <TextBlock Text="My Apps" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
-        <TextBlock Text="管理您的智慧代理群組和工作流程" Margin="0,40,0,0"/>
+        <TextBlock Text="我的應用程式" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="瀏覽和執行您的所有應用程式" Margin="0,40,0,0"/>
         <ItemsControl Name="TaskList" ItemsSource="{Binding Groups}" Margin="0,60,0,0">
             <!-- use wrappanel as the template-->
             <ItemsControl.ItemsPanel>

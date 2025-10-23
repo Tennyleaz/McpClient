@@ -14,7 +14,7 @@
         <vm:DesignStoreMcpViewModel/>
     </Design.DataContext>
 	<Panel Margin="20,20,0,8">
-        <TextBlock Text="MCP 市集" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="AI 工具市集" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
         <TextBlock Text="探索和安裝 MCP 擴展" Margin="0,40,0,0"/>
 
         <TabStrip Name="TabTypes" SelectionChanged="TabTypes_OnSelectionChanged" Margin="10,64,0,0">

@@ -16,8 +16,8 @@
 		<vm:DesignMcpServerConfigViewModel />
 	</Design.DataContext>
 	<Grid Margin="20">
-        <TextBlock Text="My Agents" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
-        <TextBlock Text="管理您的智能代理配置" Margin="0,40,0,0"/>
+        <TextBlock Text="我的 AI 工具" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"/>
+        <TextBlock Text="管理您的 AI 工具與設定" Margin="0,40,0,0"/>
         <Button Name="BtnAdd" Classes="Primary" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,90,0" Click="BtnAdd_OnClick">Add+</Button>
 
         <Border Classes="LoginCard" Margin="0,80,0,0" Padding="0" ClipToBounds="True">

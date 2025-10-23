@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="McpClient.Views.McpShareFolderSetting">
     <Grid ColumnDefinitions="*,Auto" RowDefinitions="40,40,Auto">
-        <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">MCP 設定</TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="0" FontSize="{StaticResource FontSizeMedium}">共享資料夾設定</TextBlock>
         <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">MCP FileSystem Folder:</TextBlock>
         <Button Grid.Column="1" Grid.Row="1" Name="BtnChangeFileSystem" VerticalAlignment="Center" Click="BtnChangeFileSystem_OnClick">Add Folder</Button>
         <ItemsControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Name="ShareFoldersControl">

@@ -32,32 +32,32 @@ public class MainViewModel : ViewModelBase
     {
         new MainListboxItem
         {
-            Text = "My Apps",
+            Text = "我的應用程式",
             Icon = "🔥"
         },
         new MainListboxItem
         {
-            Text = "Local Workflows",
+            Text = "工作流程",
             Icon = "🏠"
         },
         new MainListboxItem
         {
-            Text = "Agents",
+            Text = "AI 工具",
             Icon = "🤖"
         },
         new MainListboxItem
         {
-            Text = "Chat",
+            Text = "智能聊天",
             Icon = "📣"
         },
         new MainListboxItem
         {
-            Text = "Store",
+            Text = "工具市集",
             Icon = "🏪"
         },
         new MainListboxItem
         {
-            Text = "Services",
+            Text = "系統服務",
             Icon = "⚙️"
         }
     };
