@@ -26,7 +26,7 @@ internal abstract class CliService : IDisposable
     protected readonly ConcurrentQueue<string> _stdoutQueue;
     protected readonly ConcurrentQueue<string> _stderrQueue;
     protected CancellationTokenSource _cts;
-    private readonly string _serviceName;
+    private readonly string _serviceName;  // Name of the executable/script file
 
     // For HTTP services only
     protected readonly HttpClient _httpClient;
@@ -43,14 +43,14 @@ internal abstract class CliService : IDisposable
     public string[] LastStdOut => _stdoutQueue.ToArray();
     public string[] LastStdErr => _stderrQueue.ToArray();
     public int Pid { get; private set; }
-    public string Url => _base_url;
-    public bool SkipBinaryCheck { get; set; }
+    public string Url => _base_url;  // Only exist for HTTP services
+    public bool SkipBinaryCheck { get; set; }  // True for non-absolute path executables
 
     // CONFIG
-    protected readonly string _binaryPath;
-    protected readonly string _arguments;
-    protected readonly int _maxLogLines;
-    protected readonly string _friendlyName;
+    private readonly string _binaryPath;
+    private readonly string _arguments;
+    private readonly int _maxLogLines;
+    private readonly string _friendlyName;
 
     internal CliService(string friendlyName, string binaryPath, string arguments, int maxLogLines, int port = 0, bool allowShutdown = false)
     {
@@ -256,11 +256,8 @@ internal abstract class CliService : IDisposable
                 // Just compare the file name (Ex: chroma.exe)
                 return proc.MainModule.FileName.Contains(expectedBinary);
             }
-            else
-            {
-                // Compare the full path
-                return string.Equals(Path.GetFullPath(proc.MainModule.FileName), Path.GetFullPath(expectedBinary), StringComparison.OrdinalIgnoreCase);
-            }
+            // Compare the full path
+            return string.Equals(Path.GetFullPath(proc.MainModule.FileName), Path.GetFullPath(expectedBinary), StringComparison.OrdinalIgnoreCase);
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
@@ -272,6 +269,12 @@ internal abstract class CliService : IDisposable
                 {
                     // Use bash to get symlink target (no native API yet)
                     string targetExe = GetProcessNameLinux(pid);
+                    if (SkipBinaryCheck)
+                    {
+                        // Just compare the file name (Ex: chroma)
+                        return targetExe.Contains(expectedBinary);
+                    }
+                    // Compare the full path
                     return Path.GetFullPath(targetExe).Equals(Path.GetFullPath(expectedBinary), StringComparison.Ordinal);
                 }
                 catch { return false; } // No permission or process gone
@@ -283,6 +286,12 @@ internal abstract class CliService : IDisposable
             try
             {
                 string targetExe = GetProcessNameMacOs(pid);
+                if (SkipBinaryCheck)
+                {
+                    // Just compare the file name (Ex: chroma)
+                    return targetExe.Contains(expectedBinary);
+                }
+                // Compare the full path
                 return Path.GetFullPath(targetExe).Equals(Path.GetFullPath(expectedBinary), StringComparison.Ordinal);
             }
             catch { return false; }
