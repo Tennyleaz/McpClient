@@ -1,6 +1,7 @@
 ﻿using McpClient.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -531,6 +532,78 @@ internal class AiNexusService
 
     #endregion
 
+    #region MCP Registry
+
+    public async Task<McpRegistryResponse> ListMcpRegistry(string type, bool isLatest, int page)
+    {
+        string url = $"/api/v1/mcpRegistry/list?latestOnly={isLatest}&page={page}";
+        if (!string.IsNullOrWhiteSpace(type))
+            url += $"&type={type}";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                McpRegistryResponse result = JsonSerializer.Deserialize<McpRegistryResponse>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    public async Task<McpRegistryResponse> SearchMcpRegistry(string query, bool isLatest, int page)
+    {
+        string url = $"/api/v1/mcpRegistry/search?query={Uri.EscapeDataString(query)}&latestOnly={isLatest}&page={page}";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                McpRegistryResponse result = JsonSerializer.Deserialize<McpRegistryResponse>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    public async Task<McpRegistryDetail> GetMcpRegistryDetail(string name)
+    {
+        string url = $"/api/v1/mcpRegistry/detail?name={Uri.EscapeDataString(name)}";
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                McpRegistryDetail result = JsonSerializer.Deserialize<McpRegistryDetail>(json, _options);
+                return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
+    #endregion
+
     #region Chat
 
     public async Task<TranscriptResponse> PostTranscriptAsync(string fileName)
@@ -561,7 +634,7 @@ internal class AiNexusService
     {
         string url = $"/api/v1/apps?page={page}&limit={limit}&sortBy={sortBy}&sortOrder={orderBy}";
         if (!string.IsNullOrWhiteSpace(search))
-            url += $"&search={search}";
+            url += $"&search={Uri.EscapeDataString(search)}";
         if (category.HasValue)
             url += $"&category={category}";
         if (status.HasValue)
