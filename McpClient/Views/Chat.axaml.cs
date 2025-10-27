@@ -29,6 +29,7 @@ public partial class Chat : UserControl
     public bool IsNeedRefreshWorkflow { get; private set; }
 
     public event EventHandler TokenExpired;
+    public event EventHandler<string> ReDirectMcpStore;
 
     public Chat()
     {
@@ -126,6 +127,14 @@ public partial class Chat : UserControl
             {
                 // Tell main window to logout
                 TokenExpired?.Invoke(this, EventArgs.Empty);
+            });
+        };
+        tennyObject.OnRedirectMcpStore += (o, url) =>
+        {
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                // Tell main window go to MCP store
+                ReDirectMcpStore?.Invoke(this, url);
             });
         };
     }
@@ -229,7 +238,7 @@ public partial class Chat : UserControl
     internal class TennyObject
     {
         public event EventHandler OnRefresh, OnTokenExpired;
-        public event EventHandler<string> OnDownload;
+        public event EventHandler<string> OnDownload, OnRedirectMcpStore;
 
         public void NotifyRefreshMcp()
         {
@@ -244,6 +253,11 @@ public partial class Chat : UserControl
         public void NotifyTokenExpired()
         {
             OnTokenExpired?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void NotifyReDirectMcpStore(string url)
+        {
+            OnRedirectMcpStore?.Invoke(this, url);
         }
     }
 

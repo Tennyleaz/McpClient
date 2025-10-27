@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using McpClient.Services;
+using McpClient.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -209,5 +210,12 @@ public partial class MainView : UserControl
     {
         // Tell main window to logout
         LogoutClick?.Invoke(this, EventArgs.Empty);
+    }
+
+    private async void Chat_OnReDirectMcpStore(object sender, string url)
+    {
+        // Invoke when chat webview recommend a MCP to download
+        SelectMainList(MainListType.McpStore);
+        await McpStore.GoToRecommend(url);
     }
 }

@@ -9,6 +9,7 @@ using DynamicData;
 using McpClient.Models;
 using McpClient.Services;
 using McpClient.ViewModels;
+using ModelContextProtocol.Server;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using System.Collections.Generic;
@@ -287,5 +288,36 @@ public partial class McpStore : UserControl
         {
             await Search();
         }
+    }
+
+    /// <summary>
+    /// Called by chat webview recommend event.
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    public async Task GoToRecommend(string url)
+    {
+        // Get item from url
+        StoreMcpServerDetailBase detailBase = await _service.GetStoreMcpServerDetail(url);
+        StoreMcpServer storeMcpServer = new StoreMcpServer
+        {
+            Name = detailBase.Title,
+            Author = detailBase.Author,
+            Description = detailBase.Description,
+            PublishedAt = detailBase.PublishedAt,
+            TimestampText = detailBase.TimestampText,
+            Type = detailBase.Type,
+            TypeId = (int)detailBase.TypeId,
+            Url = url,
+            Logo = null,
+            IsInstalled = false
+        };
+        // Show install window
+        StoreItemWindow window = new StoreItemWindow(storeMcpServer, _service, installedMcpServers);
+        Window owner = TopLevel.GetTopLevel(this) as Window;
+        if (owner.WindowState == WindowState.Maximized)
+            window.WindowState = WindowState.Maximized;
+        await window.ShowDialog(owner);
+        IsUpdateNeeded = window.IsInstalled;
     }
 }

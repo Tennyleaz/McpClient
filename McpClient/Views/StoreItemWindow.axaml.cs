@@ -79,6 +79,12 @@ public partial class StoreItemWindow : Window
                     else
                     {
                         BtnInstall.IsEnabled = true;
+                        // Special case: Check default MCP servers
+                        if (_mcpServer.Url == "https://mcp.so/server/filesystem")
+                        {
+                            BtnInstall.Content = "Installed";
+                            BtnInstall.IsEnabled = false;
+                        }
                     }
 
                     return;
@@ -88,6 +94,12 @@ public partial class StoreItemWindow : Window
             TbMcpSetting.Text = detailBase.ServerConfig;
             BtnInstall.Content = "Not Competible";
             BtnInstall.IsEnabled = false;
+            // Special case: Check default MCP servers
+            if (_mcpServer.Url == "https://mcp.so/server/filesystem")
+            {
+                BtnInstall.Content = "Installed";
+                BtnInstall.IsEnabled = false;
+            }
         }
         else
         {
