@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using McpClient.Services;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace McpClient.Views;
@@ -71,12 +72,19 @@ public partial class MainView : UserControl
             AgentList.SetServices(_nexusService, _mcpService);
             SystemSetting.SetServices(_mcpService);
             // Trigger RefreshCurrentTab()
-            MainListbox.SelectedIndex = 0;
+            //MainListbox.SelectedIndex = 0;
+            SelectMainList(MainListType.Apps);
         }
         else
         {
-            await RefreshCurrentTab(MainListbox.SelectedIndex);
+            await RefreshCurrentTab();
         }
+    }
+
+    private void SelectMainList(MainListType listType)
+    {
+        MainListboxItem select = GlobalService.MainViewModel.MainItems.FirstOrDefault(x => x.ItemType == listType);
+        MainListbox.SelectedItem = select;
     }
 
     private void BtnShowMonitor_OnClick(object sender, RoutedEventArgs e)
@@ -90,14 +98,16 @@ public partial class MainView : UserControl
         if (Design.IsDesignMode || MainListbox == null)
             return;
 
-        await RefreshCurrentTab(MainListbox.SelectedIndex);
+        await RefreshCurrentTab();
     }
 
-    private async Task RefreshCurrentTab(int index)
+    private async Task RefreshCurrentTab()
     {
-        switch (index)
+        MainListboxItem selected = MainListbox.SelectedItem as MainListboxItem;
+        switch (selected.ItemType)
         {
-            case 0:
+            case MainListType.Apps:
+            default:
                 // My Apps
                 MyAppList.IsVisible = true;
                 OfflineWorkflowList.IsVisible = false;
@@ -108,7 +118,7 @@ public partial class MainView : UserControl
 
                 await MyAppList.LoadGroupList(true);
                 break;
-            case 1:
+            case MainListType.LocalWorkflow:
                 // Local Workflows
                 MyAppList.IsVisible = false;
                 OfflineWorkflowList.IsVisible = true;
@@ -119,7 +129,7 @@ public partial class MainView : UserControl
 
                 await OfflineWorkflowList.LoadOfflineList(true);
                 break;
-            case 2:
+            case MainListType.McpTools:
                 // Agents
                 MyAppList.IsVisible = false;
                 OfflineWorkflowList.IsVisible = false;
@@ -130,7 +140,7 @@ public partial class MainView : UserControl
 
                 await AgentList.LoadConfig();
                 break;
-            case 3:
+            case MainListType.Chat:
                 // Chat
                 MyAppList.IsVisible = false;
                 OfflineWorkflowList.IsVisible = false;
@@ -141,7 +151,7 @@ public partial class MainView : UserControl
 
                 Chat.LoadChatServer();
                 break;
-            case 4:
+            case MainListType.McpStore:
                 // Store
                 MyAppList.IsVisible = false;
                 OfflineWorkflowList.IsVisible = false;
@@ -152,7 +162,7 @@ public partial class MainView : UserControl
 
                 await McpStore.LoadDefault();
                 break;
-            case 5:
+            case MainListType.SystemService:
                 // Services
                 MyAppList.IsVisible = false;
                 OfflineWorkflowList.IsVisible = false;
@@ -166,13 +176,17 @@ public partial class MainView : UserControl
         }
 
         // stop monitoring
-        if (index != 5)
+        if (selected.ItemType != MainListType.SystemService)
         {
             SystemSetting.StopMonitorServices();
         }
-        if (index != 2)
+        if (selected.ItemType != MainListType.McpTools)
         {
             AgentList.StopUpdateStatus();
+        }
+        if (selected.ItemType != MainListType.Chat)
+        {
+            Chat.Deactivate();
         }
     }
 
@@ -181,7 +195,8 @@ public partial class MainView : UserControl
         // Tell MCP tool list to add those groups
         await AgentList.AddMcpFromGroup(e);
         // Switch to MCP tool tab
-        MainListbox.SelectedIndex = 2;
+        //MainListbox.SelectedIndex = 2;
+        SelectMainList(MainListType.McpTools);
     }
 
     private async void BtnUpdate_OnClick(object sender, RoutedEventArgs e)
