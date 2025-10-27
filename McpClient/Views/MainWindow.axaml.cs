@@ -13,6 +13,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace McpClient.Views;
 
@@ -91,16 +93,32 @@ public partial class MainWindow : Window
                 pubKey) // your base 64 public key
         )
         {
-            UIFactory = new NetSparkleUpdater.UI.Avalonia.UIFactory(Icon), // or null, or choose some other UI factory, or build your own IUIFactory implementation!
+            //UIFactory = new NetSparkleUpdater.UI.Avalonia.UIFactory(Icon), // or null, or choose some other UI factory, or build your own IUIFactory implementation!
             RelaunchAfterUpdate = false, // set to true if needed
         };
         sparkle.UpdateDetected += Sparkle_UpdateDetected;
-        //await sparkle.StartLoop(true, true);
+        await sparkle.StartLoop(true, true);
     }
 
-    private void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
+    private async void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
     {
+        if (!e.LatestVersion.IsWindowsUpdate)
+            return;
+
         MainView.BtnUpdate.IsVisible = true;
+        sparkle.StopLoop();
+
+        var currentVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        string message = $"There are new version detected: {e.LatestVersion.Version} on {e.LatestVersion.PublicationDate}\nYou are running version: {currentVersion.FileVersion}\nDo you want to download now?";
+        var box = MessageBoxManager.GetMessageBoxStandard("Info", message, ButtonEnum.YesNo, MsBox.Avalonia.Enums.Icon.Question);
+        var messageBoxResult = await box.ShowWindowDialogAsync(this);
+        if (messageBoxResult == ButtonResult.Yes)
+        {
+            // this is on my server
+            // TODO: use 192.168.41.133 official server
+            const string url = "http://192.168.41.173:8080/win-x64.zip";
+            await Launcher.LaunchUriAsync(new Uri(url));
+        }
     }
 
     private static void StartServices()

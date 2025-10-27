@@ -1,9 +1,9 @@
-[string] $outputDir = "D:\workspace\output\win-x64"
+[string] $outputDir = "D:\workspace\output\McpClient-win-x64"
 [string] $zipPath   = "D:\workspace\output\win-x64.zip"
 
 # clear output directory and build
 Remove-Item -Path $outputDir -Force -Recurse -ErrorAction SilentlyContinue
-dotnet publish --nologo --configuration Release --self-contained true --runtime win-x64 --output $outputDir
+dotnet publish --nologo --configuration Release --self-contained false --runtime win-x64 --output $outputDir
 if ($LASTEXITCODE -ne 0) {
     Write-Error "dotnet publish failed. Aborting."
     Read-Host
