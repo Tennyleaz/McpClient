@@ -17,6 +17,18 @@ internal static class GlobalService
     static GlobalService()
     {
         string settingFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "McpClient");
+        if (!Directory.Exists(settingFolder))
+        {
+            try
+            {
+                Directory.CreateDirectory(settingFolder);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to create setting folder: "+ ex);
+            }
+        }
+
         LlamaInstallFolder = Path.Combine(settingFolder, "Llama");
         string name = "llama-server";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -42,16 +54,34 @@ internal static class GlobalService
 
         ChromaDbFolder = Path.Combine(settingFolder, "ChromaDb");
         if (!Directory.Exists(ChromaDbFolder))
-            Directory.CreateDirectory(ChromaDbFolder);
+        {
+            try
+            {
+                Directory.CreateDirectory(ChromaDbFolder);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to create Chroma DB folder: " + ex);
+            }
+        }
 
         // Copy default config file to local setting path if not exist
         const string configFileName = "mcp_servers.config.json";
         McpHostConfigFile = Path.Combine(settingFolder, configFileName);
         if (!File.Exists(McpHostConfigFile))
         {
-            string defaultConfigFile = Path.Combine(McpHostFolder, configFileName);
-            File.Copy(defaultConfigFile, McpHostConfigFile);
+            try
+            {
+                string defaultConfigFile = Path.Combine(McpHostFolder, configFileName);
+                File.Copy(defaultConfigFile, McpHostConfigFile);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to copy default MCP config json to appdata: " + ex);
+            }
         }
+
+        DispatcherDbFile = Path.Combine(settingFolder, "dispatcher.db");
 
         FileSystemFolders = new List<string>();
     }
@@ -63,6 +93,7 @@ internal static class GlobalService
     public static readonly string McpHostConfigFile;
 
     public static readonly string DispatcherFolder;
+    public static readonly string DispatcherDbFile;
 
     public static readonly string ChatFrontendFolder;
 

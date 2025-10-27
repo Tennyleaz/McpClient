@@ -53,6 +53,17 @@ if (Test-Path $frontendSourceDir) {
     Write-Warning "Chat frontend source directory not found: $frontendSourceDir"
 }
 
+# copy RAG dotnet server
+[string] $ragSourceDir = "D:\workspace\output\RagBackend-win-x64"
+[string] $ragDestinationDir = Join-Path $outputDir "\RagBackend"
+Remove-Item -Path $ragDestinationDir -Force -Recurse -ErrorAction SilentlyContinue
+if (Test-Path $ragSourceDir) {
+    Copy-Item -Path $ragSourceDir -Destination $ragDestinationDir -Recurse
+    Write-Host "Copied RAG backend files."
+} else {
+    Write-Warning "RAG source directory not found: $ragSourceDir"
+}
+
 # make a zip file
 Write-Host "Compressing output..."
 if (Test-Path $zipPath)   { Remove-Item -Path $zipPath   -Force }
