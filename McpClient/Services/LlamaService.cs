@@ -44,7 +44,7 @@ internal class LlamaService : CliService
         string binaryPath = GlobalService.LlamaServerBin;
 
         // arguments
-        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {LLAMA_PORT} --jinja";
+        string arguments = $"--model {modelPath} --ctx-size {contextSize} --main-gpu {deviceIndex} --host 0.0.0.0 --port {LLAMA_PORT} --no-webui --jinja";
         if (!isOffloadKvCache)
             arguments += " --no-kv-offload";
 
