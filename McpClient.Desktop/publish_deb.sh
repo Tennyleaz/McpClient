@@ -52,7 +52,7 @@ chmod +x "$STAGING_DIR/usr/lib/$APP_NAME/$MAIN_EXECUTABLE"
 
 ##########################################
 # 1. Copy NodeJs MCP host files
-NODEJS_SRC="/path/to/nodejs/dist"                # <-- fill in
+NODEJS_SRC="${HOME}/workspace/phison_ai_nexus_mcphost/dist"
 NODEJS_DST="$STAGING_DIR/usr/lib/$APP_NAME/McpNodeJs"
 rm -rf "$NODEJS_DST"
 if [ -d "$NODEJS_SRC" ]; then
@@ -73,7 +73,7 @@ else
 fi
 
 # 3. Copy dispatcher backend files
-BACKEND_SRC="/path/to/McpBackend-linux-x64"      # <-- fill in
+BACKEND_SRC="${HOME}/workspace/output/McpBackend/linux-x64"
 BACKEND_DST="$STAGING_DIR/usr/lib/$APP_NAME/McpBackend"
 rm -rf "$BACKEND_DST"
 if [ -d "$BACKEND_SRC" ]; then
@@ -84,7 +84,7 @@ else
 fi
 
 # 4. Copy chat frontend dist files
-FRONTEND_SRC="/path/to/frontend/dist"            # <-- fill in
+FRONTEND_SRC="${HOME}/workspace/chat_frontend/dist"
 FRONTEND_DST="$STAGING_DIR/usr/lib/$APP_NAME/dist"
 rm -rf "$FRONTEND_DST"
 if [ -d "$FRONTEND_SRC" ]; then
