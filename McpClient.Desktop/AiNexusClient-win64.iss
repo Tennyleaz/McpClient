@@ -2,10 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AI Nexus Desktop"
+#define MyAppExeName "McpClient.Desktop.exe"
 #define MyAppVersion "0.0.2"
 #define MyAppPublisher "Phison"
+#define MyAppCopyright 'Copyright © Phison'
 #define MyAppURL "http://ainexus.phison.com/desktop"
-#define MyAppExeName "McpClient.Desktop.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -13,7 +14,10 @@
 AppId={{2B1FE680-6854-471E-9B4E-1304A2F67C29}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
+AppCopyright={#MyAppCopyright}
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany={#MyAppPublisher}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -31,7 +35,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputBaseFilename=AiNexusDesktopSetup
+OutputBaseFilename=AiNexusDesktopSetup-{#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern
 MinVersion=10.0.17763
