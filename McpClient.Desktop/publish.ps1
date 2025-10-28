@@ -10,7 +10,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# copy MCP host files
+# copy nodejs MCP host files
 [string] $nodeJsSourceDir = "E:\workspace\Phison_AI_Nexus_MCPHost\dist"
 [string] $nodeJsDestinationDir = Join-Path $outputDir "McpNodeJs"
 Remove-Item -Path $nodeJsDestinationDir -Force -Recurse -ErrorAction SilentlyContinue
@@ -21,7 +21,7 @@ if (Test-Path $nodeJsSourceDir) {
     Write-Warning "MCP host source directory not found: $nodeJsSourceDir"
 }
 
-# copy default MCP setting config
+# copy default MCP setting config from project root
 [string] $sourceConfigFile = Join-Path $PSScriptRoot "mcp_servers.config.json"
 [string] $destinationConfigFile = Join-Path $nodeJsDestinationDir "mcp_servers.config.json"
 if (Test-Path $sourceConfigFile) {

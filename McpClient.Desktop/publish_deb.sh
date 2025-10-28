@@ -50,6 +50,62 @@ cp -f -a "$PUBLISH_DIR/." "$STAGING_DIR/usr/lib/$APP_NAME/"
 chmod -R a+rX "$STAGING_DIR/usr/lib/$APP_NAME/"
 chmod +x "$STAGING_DIR/usr/lib/$APP_NAME/$MAIN_EXECUTABLE"
 
+##########################################
+# 1. Copy NodeJs MCP host files
+NODEJS_SRC="/path/to/nodejs/dist"                # <-- fill in
+NODEJS_DST="$STAGING_DIR/usr/lib/$APP_NAME/McpNodeJs"
+rm -rf "$NODEJS_DST"
+if [ -d "$NODEJS_SRC" ]; then
+    cp -r "$NODEJS_SRC" "$NODEJS_DST"
+    echo "Copied MCP host files."
+else
+    echo "Warning: NodeJs MCP host not found: $NODEJS_SRC"
+fi
+
+# 2. Copy default MCP setting config from project root
+CONFIG_SRC="./mcp_servers.config.json"
+CONFIG_DST="$NODEJS_DST/mcp_servers.config.json"
+if [ -f "$CONFIG_SRC" ]; then
+    cp "$CONFIG_SRC" "$CONFIG_DST"
+    echo "Copied MCP config."
+else
+    echo "Warning: MCP config not found: $CONFIG_SRC"
+fi
+
+# 3. Copy dispatcher backend files
+BACKEND_SRC="/path/to/McpBackend-linux-x64"      # <-- fill in
+BACKEND_DST="$STAGING_DIR/usr/lib/$APP_NAME/McpBackend"
+rm -rf "$BACKEND_DST"
+if [ -d "$BACKEND_SRC" ]; then
+    cp -r "$BACKEND_SRC" "$BACKEND_DST"
+    echo "Copied dispatcher backend files."
+else
+    echo "Warning: Backend source directory not found: $BACKEND_SRC"
+fi
+
+# 4. Copy chat frontend dist files
+FRONTEND_SRC="/path/to/frontend/dist"            # <-- fill in
+FRONTEND_DST="$STAGING_DIR/usr/lib/$APP_NAME/dist"
+rm -rf "$FRONTEND_DST"
+if [ -d "$FRONTEND_SRC" ]; then
+    cp -r "$FRONTEND_SRC" "$FRONTEND_DST"
+    echo "Copied chat frontend files."
+else
+    echo "Warning: Chat frontend source directory not found: $FRONTEND_SRC"
+fi
+
+# 5. Copy RAG dotnet server files
+RAG_SRC="/path/to/RagBackend-linux-x64"          # <-- fill in
+RAG_DST="$STAGING_DIR/usr/lib/$APP_NAME/RagBackend"
+rm -rf "$RAG_DST"
+if [ -d "$RAG_SRC" ]; then
+    cp -r "$RAG_SRC" "$RAG_DST"
+    echo "Copied RAG backend files."
+else
+    echo "Warning: RAG backend source directory not found: $RAG_SRC"
+fi
+##########################################
+
 # Desktop shortcut
 cp ./Debian/AI-Nexus-Client.desktop "$STAGING_DIR/usr/share/applications/AI-Nexus-Client.desktop"
 
