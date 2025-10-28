@@ -9,6 +9,7 @@ using McpClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -46,6 +47,8 @@ public partial class LocalCommandWizard : Window
 
         // prepare readonly fields
         string fileName = "packagemanager.json";
+        string baseAppFolder = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        fileName = System.IO.Path.Combine(baseAppFolder, fileName);
         string text = System.IO.File.ReadAllText(fileName);
         allDepConfig = JsonNode.Parse(text);
         platform = DetectPlatform();

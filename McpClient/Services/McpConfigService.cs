@@ -132,7 +132,7 @@ internal class McpConfigService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine("Login() error: " + ex.Message);
             return new LoginResponse { ErrorMessage = ex.Message };
         }
 
@@ -177,7 +177,7 @@ internal class McpConfigService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine("IsLogin() error: " + ex.Message);
         }
 
         return false;
