@@ -4,6 +4,8 @@ using McpClient.Models;
 using McpClient.Services;
 using McpClient.Utils;
 using McpClient.ViewModels;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.SignatureVerifiers;
@@ -11,10 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 
 namespace McpClient.Views;
 
@@ -41,6 +42,10 @@ public partial class MainWindow : Window
             return;
 
         IsEnabled = false;
+
+        // Add version to title
+        var currentVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+        Title += " " + currentVersion.FileVersion;
 
         // Create default MCP filesystem folder
         await CreateMcpFileSytemFolder();
@@ -100,14 +105,29 @@ public partial class MainWindow : Window
         await sparkle.StartLoop(true, true);
     }
 
+    #region Auto update
+
     private async void Sparkle_UpdateDetected(object sender, NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
     {
-        if (!e.LatestVersion.IsWindowsUpdate)
-            return;
-
         MainView.BtnUpdate.IsVisible = true;
         sparkle.StopLoop();
 
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && e.LatestVersion.IsWindowsUpdate)
+        {
+            await UpdateWindows(e);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && e.LatestVersion.IsMacOSUpdate)
+        {
+            await UpdateMacOS(e);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && e.LatestVersion.IsLinuxUpdate)
+        {
+            await UpdateLinux(e);
+        }
+    }
+
+    private async Task UpdateWindows(NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
+    {
         var currentVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
         string message = $"There are new version detected: {e.LatestVersion.Version} on {e.LatestVersion.PublicationDate}\nYou are running version: {currentVersion.FileVersion}\nDo you want to download now?";
         var box = MessageBoxManager.GetMessageBoxStandard("Info", message, ButtonEnum.YesNo, MsBox.Avalonia.Enums.Icon.Question);
@@ -120,6 +140,20 @@ public partial class MainWindow : Window
             await Launcher.LaunchUriAsync(new Uri(url));
         }
     }
+
+    private async Task UpdateMacOS(NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
+    {
+
+    }
+
+    private async Task UpdateLinux(NetSparkleUpdater.Events.UpdateDetectedEventArgs e)
+    {
+
+    }
+
+    #endregion
+
+    #region All services start/stop
 
     private static void StartServices()
     {
@@ -149,14 +183,8 @@ public partial class MainWindow : Window
         GlobalService.NodeJsService.Start();
     }
 
-    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    private static void StopAllServices()
     {
-        // hide main UI
-        Hide();
-
-        sparkle?.StopLoop();
-        sparkle?.Dispose();
-        ragWorker?.CancelAsync();
         GlobalService.LlamaService?.Stop();
         GlobalService.LlamaService?.Dispose();
         GlobalService.NodeJsService?.Stop();
@@ -167,6 +195,19 @@ public partial class MainWindow : Window
         GlobalService.ChromaDbService?.Dispose();
         GlobalService.RagBackendService?.Stop();
         GlobalService.RagBackendService?.Dispose();
+    }
+
+    #endregion
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        // hide main UI
+        Hide();
+
+        sparkle?.StopLoop();
+        sparkle?.Dispose();
+        ragWorker?.CancelAsync();
+        StopAllServices();
 
         // Save current darkmode state also
         bool isDark = GlobalService.MainViewModel.IsNightMode;
@@ -202,6 +243,8 @@ public partial class MainWindow : Window
             await MainView.ReloadMainView();
         }
     }
+
+    #region Login
 
     private async Task<bool> Login()
     {
@@ -244,6 +287,22 @@ public partial class MainWindow : Window
 
         return true;
     }
+
+    private static async Task<bool> IsMcpConfigTokenValid(string token)
+    {
+        McpConfigService service = new McpConfigService(token);
+        bool success = await service.IsLogin();
+        return success;
+    }
+
+    private static async Task<bool> IsAiNexusTokenValid(string token)
+    {
+        AiNexusService service = new AiNexusService(token);
+        var groups = await service.GetAllGroups();
+        return groups != null;
+    }
+
+    #endregion
 
     private async void RagWorker_DoWork(object sender, DoWorkEventArgs e)
     {
@@ -304,20 +363,6 @@ public partial class MainWindow : Window
         } while (!ragWorker.CancellationPending);
 
         await SettingsManager.Local.SaveDocumentHistoriesAsync(histories);
-    }
-
-    private static async Task<bool> IsMcpConfigTokenValid(string token)
-    {
-        McpConfigService service = new McpConfigService(token);
-        bool success = await service.IsLogin();
-        return success;
-    }
-
-    private static async Task<bool> IsAiNexusTokenValid(string token)
-    {
-        AiNexusService service = new AiNexusService(token);
-        var groups = await service.GetAllGroups();
-        return groups != null;
     }
 
     private static async Task CreateMcpFileSytemFolder()
