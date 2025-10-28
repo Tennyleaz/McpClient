@@ -262,12 +262,12 @@ public partial class LocalCommandWizard : Window
             if (RadioDownload.IsChecked == true)
             {
                 TbInstallUrl.IsVisible = true;
-                IbInstallProgress.Text = $"Please click \"next\" after you download and install {currentItem.Name}.";
+                TbInstallProgress.Text = $"Please click \"next\" after you download and install {currentItem.Name}.";
             }
             else
             {
                 TbInstallUrl.IsVisible = false;
-                IbInstallProgress.Text = "Please wait...";
+                TbInstallProgress.Text = "Please wait...";
                 BtnNext.IsEnabled = false;
             }
             // go to next step automatically after install success
@@ -410,7 +410,8 @@ public partial class LocalCommandWizard : Window
         // This event is fired on background
         Dispatcher.UIThread.Invoke(() =>
         {
-            IbInstallProgress.Text += $"\n[{e.Name}] {e.Data}";
+            TbInstallProgress.Text += $"\n[{e.Name}] {e.Data}";
+            InstallLogScrollViewer.ScrollToEnd();
         });
     }
 

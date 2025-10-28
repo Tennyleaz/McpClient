@@ -36,10 +36,12 @@
             <TextBlock Name="TbDownloadUrl" Text="https://nodejs.org/en/download" Margin="28,0,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
         </StackPanel>
 
-        <StackPanel Name="PanelInstall" Margin="20,60,0,0" IsVisible="False">
+        <StackPanel Name="PanelInstall" Margin="20,60,20,60" IsVisible="False">
             <TextBlock Name="TbInstallHeader" FontSize="{StaticResource FontSizeMedium}">Installing: nodejs</TextBlock>
             <TextBlock Name="TbInstallUrl" IsVisible="False" Cursor="Hand" PointerReleased="TbInstallUrl_OnPointerReleased" Foreground="{DynamicResource SystemAccentColor}" Margin="0,10,0,0"/>
-            <TextBlock Name="IbInstallProgress" Text="Please wait..." Margin="0,10,0,0" Foreground="{DynamicResource SystemAccentColor}"/>
+            <ScrollViewer Name="InstallLogScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <TextBlock Name="TbInstallProgress" Text="Please wait..." Margin="0,10,0,0" Foreground="{DynamicResource SystemAccentColor}" TextWrapping="Wrap"/>
+            </ScrollViewer>
         </StackPanel>
 
         <StackPanel Name="PanelVerify" Margin="20,60,0,0" IsVisible="False">

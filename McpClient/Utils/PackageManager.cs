@@ -317,7 +317,7 @@ internal class AptManager : PackageManager
         // Returns non-empty if installed
         !string.IsNullOrWhiteSpace(RunCommand("dpkg-query", $"-W -f='${{Status}}' {package}"));
 
-    public override string InstallCommand(string package) => $"sudo apt-get install -y {package}";
+    public override string InstallCommand(string package) => $"pkexec apt-get install -y {package}";
 }
 
 internal class DnfManager : PackageManager
@@ -329,7 +329,7 @@ public override bool IsAvailable() =>
 public override bool IsPackageInstalled(string package) =>
     !string.IsNullOrWhiteSpace(RunCommand("rpm", $"-q {package}"));
 
-public override string InstallCommand(string package) => $"sudo dnf install -y {package}";
+public override string InstallCommand(string package) => $"pkexec dnf install -y {package}";
 }
 
 internal class PipManager : PackageManager
