@@ -38,7 +38,7 @@ internal static class LocalServiceUtils
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            FileName = "where.exe"  // works for all unix like os
+            FileName = "which"  // works for all unix like os
         };
 
         using Process process = new Process();
@@ -51,7 +51,7 @@ internal static class LocalServiceUtils
 
         if (process.ExitCode == 0)
         {
-            // found in windows or linux
+            // found in linux or macos
             return true;
         }
 
