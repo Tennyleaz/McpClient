@@ -96,7 +96,8 @@ public partial class Chat : UserControl
         string file = Path.Combine(GlobalService.ChatFrontendFolder, "index.html");
         if (File.Exists(file))
         {
-            ChatWebView.LoadUrl(file);
+            string url = "file://" + file;  // Must prepend 'file://' for linux to work
+            ChatWebView.LoadUrl(url);
             Console.WriteLine("LoadChatServer() loaded URL:\n" + file);
         }
         else
