@@ -53,6 +53,15 @@ public partial class MainWindow : Window
         // Start the backend services
         StartServices();
 
+        // Wait some time for backend service to start
+        const int maxWait = 3;
+        int waitCount = 0;
+        do
+        {
+            await Task.Delay(200);
+            waitCount++;
+        } while (GlobalService.BackendService.State != CliServiceState.Running && waitCount <= maxWait);
+
         bool isLogin = await Login();
         IsEnabled = true;
         if (isLogin)

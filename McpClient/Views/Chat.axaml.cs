@@ -95,9 +95,15 @@ public partial class Chat : UserControl
         //ChatWebView.Address = "http://localhost:5174/";
         string file = Path.Combine(GlobalService.ChatFrontendFolder, "index.html");
         if (File.Exists(file))
+        {
             ChatWebView.LoadUrl(file);
+            Console.WriteLine("LoadChatServer() loaded URL:\n" + file);
+        }
         else
-            ChatWebView.Address = SERVER_URL;
+        {
+            //ChatWebView.Address = SERVER_URL;
+            Console.WriteLine("LoadChatServer() cannot load local website:\n" + file);
+        }
         //ChatWebView.Address = "http://myapp/index.html";
 
         tennyObject = new TennyObject();
@@ -181,7 +187,7 @@ public partial class Chat : UserControl
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex);
+            Console.WriteLine("SetToken() error: " + ex);
         }
     }
 
