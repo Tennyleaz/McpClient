@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,9 +19,12 @@ internal class DispatcherBackendService : CliService
         // Check for "mcp_servers.config.json"
         string jsonPath = GlobalService.McpHostConfigFile;
         // Add as "config-file" ASP.NET argument
-        string arguments = $"--config-file \"{jsonPath}\" --db-file \"{GlobalService.DispatcherDbFile}\"";
+        string arguments = $"--config-file \"{jsonPath}\" --db-file \"{GlobalService.DispatcherDbFile}\" --urls \"http://+:{DISPATCHER_PORT}\"";
 
-        string path = Path.Combine(GlobalService.DispatcherFolder, "dispatcher.exe");
+        string path = Path.Combine(GlobalService.DispatcherFolder, "dispatcher");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            path += ".exe";
+
         if (File.Exists(path))
             return new DispatcherBackendService(path, arguments);
         return null;

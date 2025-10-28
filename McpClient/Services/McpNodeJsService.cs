@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,10 @@ internal class McpNodeJsService : CliService
         // Add as "config-file" ASP.NET argument
         string arguments = $"--config-file \"{jsonPath}\"";
 
-        string path = Path.Combine(GlobalService.McpHostFolder, "mcp-host-use.exe");
+        string path = Path.Combine(GlobalService.McpHostFolder, "mcp-host-use");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            path += ".exe";
+
         if (File.Exists(path))
             return new McpNodeJsService(path, arguments);
         return null;

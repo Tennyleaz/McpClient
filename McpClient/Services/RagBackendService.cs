@@ -1,6 +1,7 @@
-﻿using System;
+﻿using McpClient.Utils;
+using System;
 using System.IO;
-using McpClient.Utils;
+using System.Runtime.InteropServices;
 
 namespace McpClient.Services;
 
@@ -14,7 +15,10 @@ internal class RagBackendService : CliService
         // Add as "database" ASP.NET argument
         string arguments = $"--database {databasePath} --urls \"http://+:{RAG_API_PORT}\"";
 
-        string path = Path.Combine(GlobalService.RagBackendFolder, "AiNexusRagService.exe");
+        string path = Path.Combine(GlobalService.RagBackendFolder, "AiNexusRagService");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            path += ".exe";
+
         if (File.Exists(path))
             return new RagBackendService(path, arguments);
         return null;
