@@ -3,8 +3,8 @@
 set -e
 
 # Configurable variables
-APP_NAME="ai-nexus-client"
-APP_DISPLAY_NAME="AI Nexus Client"
+APP_NAME="AINexusDesktop"
+APP_DISPLAY_NAME="AI Nexus Desktop"
 VERSION="0.0.2"
 RUNTIME="linux-x64"
 MAIN_EXECUTABLE="McpClient.Desktop"
