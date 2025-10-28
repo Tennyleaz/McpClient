@@ -21,9 +21,6 @@ public partial class MainView : UserControl
 
         if (Design.IsDesignMode)
             return;
-        //BtnBack.IsVisible = false;
-        //BtnSave.IsVisible = false;
-        //BtnRefresh.IsVisible = false;
 
         MyAppList.DownloadGroup += MyAppList_DownloadGroup;
         DataContext = GlobalService.MainViewModel;
@@ -33,26 +30,6 @@ public partial class MainView : UserControl
     {
         Chat.ReloadWebview();
     }
-
-    //private async Task ShowSettings()
-    //{
-    //    BtnBack.Content = "Cancel";
-
-    //    MainPanel.IsVisible = false;
-    //    McpSetting.IsVisible = true;
-    //    Chat.IsVisible = false;
-    //    SystemSetting.IsVisible = false;
-    //    McpStore.IsVisible = false;
-
-    //    BtnBack.IsVisible = true;
-    //    BtnSave.IsVisible = true;
-    //    BtnRefresh.IsVisible = false;
-
-    //    BtnBack.IsEnabled = BtnSave.IsEnabled = false;
-    //    await McpSetting.LoadConfig();
-    //    BtnBack.IsEnabled = BtnSave.IsEnabled = true;
-    //}
-
 
     private void BtnLogout_OnClick(object sender, RoutedEventArgs e)
     {
