@@ -302,7 +302,7 @@ internal abstract class CliService : IDisposable
     private static string GetProcessNameLinux(int pid)
     {
         string exeLink = $"/proc/{pid}/exe";
-        string targetExe = null;
+        string targetExe = string.Empty;
         if (File.Exists(exeLink))
         {
             var psi = new ProcessStartInfo
@@ -312,9 +312,18 @@ internal abstract class CliService : IDisposable
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             };
-            using var ps = Process.Start(psi);
-            targetExe = ps.StandardOutput.ReadToEnd().Trim();
-            ps.WaitForExit();
+
+            try
+            {
+                using var ps = Process.Start(psi);
+                targetExe = ps.StandardOutput.ReadToEnd().Trim();
+                ps.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to get pid {pid}'s process name using readlink: {ex.Message}");
+                return string.Empty;
+            }
         }
         return targetExe;
     }
@@ -326,10 +335,19 @@ internal abstract class CliService : IDisposable
             RedirectStandardOutput = true,
             UseShellExecute = false,
         };
-        using var ps = Process.Start(psi);
-        string outPath = ps.StandardOutput.ReadToEnd().Trim();
-        ps.WaitForExit();
-        return outPath;
+
+        try
+        {
+            using var ps = Process.Start(psi);
+            string outPath = ps.StandardOutput.ReadToEnd().Trim();
+            ps.WaitForExit();
+            return outPath;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to get pid {pid}'s process name using ps: {ex.Message}");
+            return string.Empty;
+        }
     }
 
     public void Dispose()
@@ -349,7 +367,7 @@ internal abstract class CliService : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine($"CheckHealth() for service {_friendlyName} failed: {ex.Message}");
             return false;
         }
     }
@@ -415,7 +433,7 @@ internal abstract class CliService : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Console.WriteLine($"SendShutdown() for service {_friendlyName} failed: {ex.Message}");
         }
         return false;
     }
