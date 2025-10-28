@@ -362,7 +362,18 @@ internal class NpmManager : PackageManager
 
     public override bool IsAvailable()
     {
-        string output = RunCommand("npm", "-v");
+        string output;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Use CMD to run npm, because it is a script
+            var result = RunShellCommand("npm -v");
+            output = result.Output;
+        }
+        else
+        {
+            output = RunCommand("npm", "-v");
+        }
+
         return !string.IsNullOrWhiteSpace(output);
     }
 

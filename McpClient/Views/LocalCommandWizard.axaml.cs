@@ -366,7 +366,8 @@ public partial class LocalCommandWizard : Window
             //if (!manager.IsAvailable())
             //    continue;
 
-            if (!manager.IsPackageInstalled(step.Package))
+
+            if (!manager.IsAvailable() || !manager.IsPackageInstalled(step.Package))
             //if (!LocalServiceUtils.FindCommand(step.Package))
             {
                 string cmd = manager.InstallCommand(step.Package);
