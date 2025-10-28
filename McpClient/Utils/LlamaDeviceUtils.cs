@@ -104,18 +104,27 @@ internal static class LlamaDeviceUtils
 
         using Process proc = new Process { StartInfo = psi };
 
-        proc.Start();
-
-        // Capture both stdout and stderr (in case info split!)
-        string stdout = proc.StandardOutput.ReadToEnd();
-        string stderr = proc.StandardError.ReadToEnd();
-
-        proc.WaitForExit();
-
-        int code = proc.ExitCode;
-        if (code != 0)
+        string stdout, stderr;
+        try
         {
-            //throw new Exception($"llama-cli exited with code {code}\nSTDERR:\n{stderr}\nSTDOUT:\n{stdout}");
+            proc.Start();
+
+            // Capture both stdout and stderr (in case info split!)
+            stdout = proc.StandardOutput.ReadToEnd();
+            stderr = proc.StandardError.ReadToEnd();
+
+            proc.WaitForExit();
+
+            int code = proc.ExitCode;
+            if (code != 0)
+            {
+                //throw new Exception($"llama-cli exited with code {code}\nSTDERR:\n{stderr}\nSTDOUT:\n{stdout}");
+                return new List<LlamaDevice>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error getting llama devices: " + ex.Message);
             return new List<LlamaDevice>();
         }
 

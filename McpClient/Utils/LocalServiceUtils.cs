@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -41,18 +42,25 @@ internal static class LocalServiceUtils
             FileName = "which"  // works for all unix like os
         };
 
-        using Process process = new Process();
-        process.StartInfo = psi;
-        process.Start();
-        process.WaitForExit(2000);
-
-        //string stdout = process.StandardOutput.ReadToEnd();
-        //string stderr = process.StandardError.ReadToEnd();
-
-        if (process.ExitCode == 0)
+        try
         {
-            // found in linux or macos
-            return true;
+            using Process process = new Process();
+            process.StartInfo = psi;
+            process.Start();
+            process.WaitForExit(2000);
+
+            //string stdout = process.StandardOutput.ReadToEnd();
+            //string stderr = process.StandardError.ReadToEnd();
+
+            if (process.ExitCode == 0)
+            {
+                // found in linux or macos
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to find command {command} using which: {ex.Message}");
         }
 
         return false;
@@ -108,15 +116,22 @@ internal static class LocalServiceUtils
 
         using Process process = new Process();
 
-        process.StartInfo = psi;
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd().Trim();
-        string error = process.StandardError.ReadToEnd().Trim();
-        process.WaitForExit();
+        try
+        {
+            process.StartInfo = psi;
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd().Trim();
+            string error = process.StandardError.ReadToEnd().Trim();
+            process.WaitForExit();
 
-        // Non-empty output means found (should be the path)
-        if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
-            return true;
+            // Non-empty output means found (should be the path)
+            if (process.ExitCode == 0 && !string.IsNullOrWhiteSpace(output))
+                return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to find command {command} using where.exe: {ex.Message}");
+        }
 
         return false;
     }

@@ -128,19 +128,28 @@ internal abstract class PackageManager
     /// <returns></returns>
     protected static string RunCommand(string cmd, string args = "")
     {
-        var psi = new ProcessStartInfo
+        try
         {
-            FileName = cmd,
-            Arguments = args,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            UseShellExecute = false
-        };
-        using var process = Process.Start(psi);
-        string result = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-        return result;
+            var psi = new ProcessStartInfo
+            {
+                FileName = cmd,
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            using var process = Process.Start(psi);
+            string result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("RunCommand() error: " + ex.Message);
+            // TODO: error output
+            return null;
+        }
     }
 
     /// <summary>
