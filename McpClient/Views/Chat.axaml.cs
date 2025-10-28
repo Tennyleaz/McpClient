@@ -144,6 +144,11 @@ public partial class Chat : UserControl
         ChatWebView.Reload();
     }
 
+    public void Deactivate()
+    {
+        
+    }
+
     public async Task SetToken(string username, string token)
     {
         WebviewToken webviewToken = new WebviewToken
