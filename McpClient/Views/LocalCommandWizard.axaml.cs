@@ -385,24 +385,36 @@ public partial class LocalCommandWizard : Window
     {
         List<Instruction> instructions = GetInstructions(depName);
 
+        CommandResult result = default;
         foreach (Instruction step in instructions)
         {
             PackageManager manager = PackageManagerFactory.Create(step.Manager);
-            if (!manager.IsAvailable()) 
+            if (!manager.IsAvailable())
+            {
+                TbInstallProgress.Text += $"\nFailed to detect package manager \"{manager.Name}\"!";
                 continue;
+            }
 
             if (!manager.IsPackageInstalled(step.Package))
             {
                 manager.ConsoleOutput += Manager_ConsoleOutput;
                 string cmd = manager.InstallCommand(step.Package);
-                CommandResult result = await manager.RunInstallCommand(cmd);
-
-                // update result to logs
-                //IbInstallProgress.Text += "\n" + result.Error;
-
+                result = await manager.RunInstallCommand(cmd);
                 manager.ConsoleOutput -= Manager_ConsoleOutput;
             }
         }
+
+        // Show final reuslt on UI logs
+        if (result.Success)
+        {
+            TbInstallProgress.Text += $"\nInstall success with exit code {result.ExitCode}";
+        }
+        else
+        {
+            TbInstallProgress.Text += $"\nInstall failed with exit code {result.ExitCode}";
+        }
+        TbInstallProgress.Text += "\nPlease click \"next\" to proceed.";
+        InstallLogScrollViewer.ScrollToEnd();
     }
 
     private void Manager_ConsoleOutput(object sender, ShellOutoutEventArgs e)

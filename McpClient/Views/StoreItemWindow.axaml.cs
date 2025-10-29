@@ -23,6 +23,7 @@ public partial class StoreItemWindow : Window
     private readonly List<string> _installedNames;
     private StoreMcpServerDetailBase detailBase;
     private McpServer parsedMcpServer;
+    private bool isBusy;
 
     public bool IsInstalled { get; private set; }
 
@@ -42,7 +43,7 @@ public partial class StoreItemWindow : Window
         DataContext = _mcpServer;
     }
 
-    private async void Control_OnLoaded(object sender, RoutedEventArgs e)
+    private async void Window_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (Design.IsDesignMode)
             return;
@@ -114,6 +115,7 @@ public partial class StoreItemWindow : Window
     {
         BtnInstall.IsEnabled = false;
         BtnInstall.Content = "Installing...";
+        isBusy = true;
 
         // check local command
         if (parsedMcpServer.type == McpServerType.Stdio)
@@ -138,6 +140,7 @@ public partial class StoreItemWindow : Window
                     // TODO: warn user again?
                     BtnInstall.IsEnabled = true;
                     BtnInstall.Content = "Install ¡õ";
+                    isBusy = false;
                     return;
                 }
             }
@@ -150,6 +153,7 @@ public partial class StoreItemWindow : Window
         {
             BtnInstall.IsEnabled = true;
             BtnInstall.Content = "Install ¡õ";
+            isBusy = false;
             return;
         }
 
@@ -175,6 +179,7 @@ public partial class StoreItemWindow : Window
             BtnInstall.Content = "Install ¡õ";
             BtnInstall.IsEnabled = true;
         }
+        isBusy = false;
     }
 
     private McpServer SeverTypeToLocalType(JsonNode node)
@@ -330,5 +335,13 @@ public partial class StoreItemWindow : Window
     private void BtnMcpSo_OnClick(object sender, RoutedEventArgs e)
     {
         Launcher.LaunchUriAsync(new Uri(detailBase.Url));
+    }
+
+    private void Window_OnClosing(object sender, WindowClosingEventArgs e)
+    {
+        if (isBusy)
+        {
+            e.Cancel = true;
+        }
     }
 }

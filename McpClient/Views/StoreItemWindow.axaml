@@ -10,7 +10,8 @@
         x:Class="McpClient.Views.StoreItemWindow"
         x:DataType="model:StoreMcpServer"
         WindowStartupLocation="CenterOwner"
-        Loaded="Control_OnLoaded" Width="1000" Height="600" MinWidth="900" MinHeight="500"
+        Loaded="Window_OnLoaded" Closing="Window_OnClosing"
+        Width="1000" Height="600" MinWidth="900" MinHeight="500"
         Title="{Binding Name}">
 	<Design.DataContext>
 		<vm:DesignStoreMcpServerViewModel/>
