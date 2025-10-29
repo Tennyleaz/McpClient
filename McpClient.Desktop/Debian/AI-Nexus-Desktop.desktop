@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Version=0.0.2
-Name=AI Nexus Client
+Name=AI Nexus Desktop
 GenericName=AI Client
 Comment=Advanced AI Desktop Client
-Exec=ainexusclient %U
+Exec=ai-nexus-desktop %U
 Icon=ainexusclient
 Terminal=false
 Categories=Office;Utility;

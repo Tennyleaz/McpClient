@@ -42,8 +42,8 @@ mkdir -p "$STAGING_DIR/usr/share/icons/hicolor/scalable/apps"
 cp ./Debian/control "$STAGING_DIR/DEBIAN"
 
 # Starter script
-cp ./Debian/ainexusclient.sh "$STAGING_DIR/usr/bin/ainexusclient"
-chmod +x "$STAGING_DIR/usr/bin/ainexusclient"
+cp ./Debian/ai-nexus-desktop.sh "$STAGING_DIR/usr/bin/ai-nexus-desktop"
+chmod +x "$STAGING_DIR/usr/bin/ai-nexus-desktop"
 
 # App binaries
 cp -f -a "$PUBLISH_DIR/." "$STAGING_DIR/usr/lib/$APP_NAME/"
@@ -107,7 +107,7 @@ fi
 ##########################################
 
 # Desktop shortcut
-cp ./Debian/AI-Nexus-Client.desktop "$STAGING_DIR/usr/share/applications/AI-Nexus-Client.desktop"
+cp ./Debian/AI-Nexus-Desktop.desktop "$STAGING_DIR/usr/share/applications/AI-Nexus-Desktop.desktop"
 
 # Desktop icon
 cp ./logo.png "$STAGING_DIR/usr/share/pixmaps/ainexusclient.png"
