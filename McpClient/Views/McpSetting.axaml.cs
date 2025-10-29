@@ -193,6 +193,24 @@ public partial class McpSetting : UserControl
         updateStatusTimer.Stop();
     }
 
+    private async Task UpdateSettingsToServer(McpServerConfigViewModel vm)
+    {
+        McpServerConfig config = vm.ToModel();
+        bool success = await _mcpService.SetConfig(config);
+        if (success)
+        {
+
+        }
+        else
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add new MCP config to server.",
+                ButtonEnum.Ok,
+                Icon.Error);
+            Window owner = TopLevel.GetTopLevel(this) as Window;
+            await box.ShowWindowDialogAsync(owner);
+        }
+    }
+
     private async void BtnAdd_OnClick(object sender, RoutedEventArgs e)
     {
         Window parent = TopLevel.GetTopLevel(this) as Window;
@@ -334,6 +352,17 @@ public partial class McpSetting : UserControl
                 await shareFolderWindow.ShowDialog(parent);
                 return;
             }
+            // Special case: playwright
+            if (mcpViewModel.IsPlaywright)
+            {
+                PlaywrightSettingWindow window = new PlaywrightSettingWindow(mcpViewModel);
+                await window.ShowDialog(parent);
+                if (DataContext is McpServerConfigViewModel mcpServerConfigViewModel)
+                {
+                    await UpdateSettingsToServer(mcpServerConfigViewModel);
+                }
+                return;
+            }
 
             AddServerWindow editWindow = new AddServerWindow(mcpViewModel);
             await editWindow.ShowDialog(parent);
@@ -378,20 +407,7 @@ public partial class McpSetting : UserControl
                 }
 
                 // Apply the change to server
-                McpServerConfig config = vm.ToModel();
-                bool success = await _mcpService.SetConfig(config);
-                if (success)
-                {
-
-                }
-                else
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Error", "Cannot add new MCP config to server.",
-                        ButtonEnum.Ok,
-                        Icon.Error);
-                    Window owner = TopLevel.GetTopLevel(this) as Window;
-                    await box.ShowWindowDialogAsync(owner);
-                }
+                await UpdateSettingsToServer(vm);
             }
         }
     }

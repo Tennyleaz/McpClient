@@ -234,5 +234,13 @@ internal class McpViewModel : ReactiveObject
             return _serverName == "filesystem" && _type == McpServerType.Stdio && _command == "npx";
         }
     }
+
+    public bool IsPlaywright
+    {
+        get
+        {
+            return _serverName == "playwright" && _type == McpServerType.Stdio && _command == "npx";
+        }
+    }
 }
 
