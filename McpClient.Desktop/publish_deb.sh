@@ -116,6 +116,6 @@ cp ./logo.png "$STAGING_DIR/usr/share/pixmaps/ainexusclient.png"
 cp ./logo.svg "$STAGING_DIR/usr/share/icons/hicolor/scalable/apps/ainexusclient.svg"
 
 # Make .deb file (output to $WORKSPACE)
-dpkg-deb --root-owner-group --build "$STAGING_DIR" "$WORKSPACE/${APP_NAME}_${VERSION}_amd64.deb"
+dpkg-deb --root-owner-group --build "$STAGING_DIR" "$WORKSPACE/${APP_NAME}-${VERSION}-amd64.deb"
 
-echo "Debian package created at: $WORKSPACE/${APP_NAME}_${VERSION}_amd64.deb"
+echo "Debian package created at: $WORKSPACE/${APP_NAME}-${VERSION}-amd64.deb"
