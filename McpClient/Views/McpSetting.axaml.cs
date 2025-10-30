@@ -364,7 +364,7 @@ public partial class McpSetting : UserControl
                 return;
             }
 
-            AddServerWindow editWindow = new AddServerWindow(mcpViewModel);
+            AddServerWindow editWindow = new AddServerWindow(mcpViewModel, _nexusService);
             await editWindow.ShowDialog(parent);
             McpServer editServer = editWindow.Result;
             if (editServer != null && DataContext is McpServerConfigViewModel vm)
@@ -405,6 +405,9 @@ public partial class McpSetting : UserControl
                 {
                     mcpViewModel.StreamableHttpUrl = editServer.streamable_http_url;
                 }
+
+                mcpViewModel.DetailUri = editServer.detail;
+                mcpViewModel.Description = editServer.description;
 
                 // Apply the change to server
                 await UpdateSettingsToServer(vm);

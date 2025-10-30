@@ -26,6 +26,8 @@ internal class McpServer
     public Dictionary<string, string> env { get; set; } = new();
     public Dictionary<string, string> http_headers { get; set; } = new();
     public string source { get; set; }
+    public string detail { get; set; }
+    public string description { get; set; }
 
     public override string ToString()
     {

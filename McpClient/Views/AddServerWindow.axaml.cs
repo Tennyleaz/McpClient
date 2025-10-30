@@ -11,6 +11,8 @@ using MsBox.Avalonia.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AvaloniaEdit.Utils;
+using McpClient.Services;
 using McpClient.Utils;
 
 namespace McpClient.Views;
@@ -22,6 +24,7 @@ public partial class AddServerWindow : Window
     private Dictionary<string, string> env = new();
     private Dictionary<string, string> headers = new();
     private readonly McpViewModel _mcpViewModel;
+    private readonly AiNexusService _aiNexusService;
 
     internal McpServer Result { get; private set; }
 
@@ -32,71 +35,80 @@ public partial class AddServerWindow : Window
         BtnReset.IsVisible = false;
     }
 
-    internal AddServerWindow(McpViewModel mcpViewModel)
+    internal AddServerWindow(McpViewModel mcpViewModel, AiNexusService aiNexusService)
     {
         InitializeComponent();
         _isEdit = true;
         BtnReset.IsVisible = mcpViewModel.IsCloud;
         _mcpViewModel = mcpViewModel;
+        _aiNexusService = aiNexusService;
     }
 
     private void Control_OnLoaded(object sender, RoutedEventArgs e)
     {
         if (Design.IsDesignMode)
             return;
+
         if (_isEdit)
         {
-            TbHeader.Text = Title = "Edit Agent";
-            TbServerName.IsVisible = false;
-            EditAgentName.Text = _mcpViewModel.ServerName;
-            EditAgentName.IsVisible = true;
-
-            if (!string.IsNullOrEmpty(_mcpViewModel.Owner))
-            {
-                TbOwner.IsEnabled = false;
-                TbOwner.Text = _mcpViewModel.Owner;
-            }
-
-            CbTypes.IsEnabled = false;
-            if (_mcpViewModel.Type == McpServerType.Stdio)
-            {
-                CbTypes.SelectedIndex = 0;
-                TbCommand.Text = _mcpViewModel.Command;
-            }
-            else if (_mcpViewModel.Type == McpServerType.SSE)
-            {
-                CbTypes.SelectedIndex = 1;
-                TbUrl.Text = _mcpViewModel.SseUrl;
-            }
-            else if (_mcpViewModel.Type == McpServerType.StreamableHttp)
-            {
-                CbTypes.SelectedIndex = 2;
-                TbUrl.Text = _mcpViewModel.StreamableHttpUrl;
-            }
-
-            env = _mcpViewModel.Env.ToDictionary();
-            if (env.Count == 0)
-                TbEnv.Text = "(empty)";
-            else
-                TbEnv.Text = string.Join(", ", env);
-
-            headers = _mcpViewModel.HttpHeaders.ToDictionary();
-            if (headers.Count == 0)
-                TbHttpHeader.Text = "(empty)";
-            else
-                TbHttpHeader.Text = string.Join(", ", headers);
-
-            args = _mcpViewModel.Args.ToList();
-            if (args.Count == 0)
-                TbArgs.Text = "(empty)";
-            else
-                TbArgs.Text = string.Join(", ", args);
+            LoadMcpConfigToUi();
         }
         else
         {
             CbTypes.SelectedIndex = -1;
             CbTypes_OnSelectionChanged(null, null);
         }
+    }
+
+    private void LoadMcpConfigToUi()
+    {
+        TbHeader.Text = Title = "Edit Agent";
+        TbServerName.IsVisible = false;
+        EditAgentName.Text = _mcpViewModel.ServerName;
+        EditAgentName.IsVisible = true;
+
+        if (!string.IsNullOrEmpty(_mcpViewModel.Owner))
+        {
+            TbOwner.IsEnabled = false;
+            TbOwner.Text = _mcpViewModel.Owner;
+        }
+
+        CbTypes.IsEnabled = false;
+        if (_mcpViewModel.Type == McpServerType.Stdio)
+        {
+            CbTypes.SelectedIndex = 0;
+            TbCommand.Text = _mcpViewModel.Command;
+        }
+        else if (_mcpViewModel.Type == McpServerType.SSE)
+        {
+            CbTypes.SelectedIndex = 1;
+            TbUrl.Text = _mcpViewModel.SseUrl;
+        }
+        else if (_mcpViewModel.Type == McpServerType.StreamableHttp)
+        {
+            CbTypes.SelectedIndex = 2;
+            TbUrl.Text = _mcpViewModel.StreamableHttpUrl;
+        }
+
+        env = _mcpViewModel.Env.ToDictionary();
+        if (env.Count == 0)
+            TbEnv.Text = "(empty)";
+        else
+            TbEnv.Text = string.Join(", ", env);
+
+        headers = _mcpViewModel.HttpHeaders.ToDictionary();
+        if (headers.Count == 0)
+            TbHttpHeader.Text = "(empty)";
+        else
+            TbHttpHeader.Text = string.Join(", ", headers);
+
+        args = _mcpViewModel.Args.ToList();
+        if (args.Count == 0)
+            TbArgs.Text = "(empty)";
+        else
+            TbArgs.Text = string.Join(", ", args);
+
+        TbDescription.Text = _mcpViewModel.Description;
     }
 
     private async void ButtonApply_OnClick(object sender, RoutedEventArgs e)
@@ -117,6 +129,8 @@ public partial class AddServerWindow : Window
         newServer.args = args;
         newServer.env = env;
         newServer.http_headers = headers;
+        newServer.description = TbDescription.Text;
+        newServer.detail = _mcpViewModel?.DetailUri;  // Only exist when download from MCP store
         if (CbTypes.SelectedIndex == 1)
         {
             newServer.type = McpServerType.SSE;
@@ -390,8 +404,63 @@ public partial class AddServerWindow : Window
         return true;
     }
 
-    private void BtnReset_OnClick(object sender, RoutedEventArgs e)
+    private async void BtnReset_OnClick(object sender, RoutedEventArgs e)
     {
-
+        if (!string.IsNullOrEmpty(_mcpViewModel.DetailUri))
+        {
+            string message = $"Do you want to reset \"{_mcpViewModel.ServerName}\", and get all configs from MCP store?";
+            var box = MessageBoxManager.GetMessageBoxStandard("Info", message,
+                ButtonEnum.YesNo, MsBox.Avalonia.Enums.Icon.Question);
+            var messagButtonResult = await box.ShowWindowDialogAsync(this);
+            if (messagButtonResult == ButtonResult.Yes)
+            {
+                IsEnabled = false;
+                StoreMcpServerDetailBase detailBase = await _aiNexusService.GetStoreMcpServerDetail(_mcpViewModel.DetailUri);
+                IsEnabled = true;
+                if (detailBase == null)
+                {
+                    // Show error when cannot get from server
+                    message = "Cannot download from MCP store.";
+                }
+                else if (detailBase is StoreMcpServerDetail detailReal)
+                {
+                    // Try to get config from server item
+                    McpServer parsedMcpServer = detailReal.SeverTypeToLocalType();
+                    if (parsedMcpServer != null)
+                    {
+                        // Copy every configs back to _mcpViewModel
+                        _mcpViewModel.Command = parsedMcpServer.command;
+                        // Args
+                        _mcpViewModel.Args.Clear();
+                        _mcpViewModel.Args.AddRange(parsedMcpServer.args);
+                        // Env
+                        _mcpViewModel.Env.Clear();
+                        _mcpViewModel.Env.AddRange(parsedMcpServer.env);
+                        // HTTP headers
+                        _mcpViewModel.HttpHeaders.Clear();
+                        _mcpViewModel.HttpHeaders.AddRange(parsedMcpServer.http_headers);
+                        // URL
+                        _mcpViewModel.SseUrl = parsedMcpServer.sse_url;
+                        _mcpViewModel.StreamableHttpUrl = parsedMcpServer.streamable_http_url;
+                        // Description
+                        _mcpViewModel.Description = parsedMcpServer.description;
+                        // Load to UI again on success
+                        LoadMcpConfigToUi();
+                        return;
+                    }
+                    // Show error message when config cannot parse
+                    message = "Cannot parse config from store. JSON config is not valid.";
+                }
+                box = MessageBoxManager.GetMessageBoxStandard("Info", message, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+                await box.ShowWindowDialogAsync(this);
+            }
+        }
+        else
+        {
+            // No detail uri is saved
+            string message = "There is no saved config URI to reset. Please manually download from MCP store again.";
+            var box = MessageBoxManager.GetMessageBoxStandard("Info", message, ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning);
+            await box.ShowWindowDialogAsync(this);
+        }
     }
 }

@@ -37,6 +37,8 @@ internal class McpViewModel : ReactiveObject
             _headers.Add(new KeyValuePair<string, string>(kv.Key, kv.Value));
         }
         _source = model.source;
+        _detail = model.detail;
+        _description = model.description;
     }
 
     private bool _enabled;
@@ -52,6 +54,8 @@ internal class McpViewModel : ReactiveObject
     private ObservableCollection<KeyValuePair<string, string>> _headers;
     private bool _isBusy;
     private string _source;
+    private string _detail;
+    private string _description;
 
     public bool Enabled
     {
@@ -223,7 +227,9 @@ internal class McpViewModel : ReactiveObject
             args = new List<string>(Args),
             env = new Dictionary<string, string>(Env),
             http_headers = new Dictionary<string, string>(HttpHeaders),
-            source = _source
+            source = _source,
+            detail = _detail,
+            description = _description
         };
     }
 
@@ -240,6 +246,24 @@ internal class McpViewModel : ReactiveObject
         get
         {
             return _serverName == "playwright" && _type == McpServerType.Stdio && _command == "npx";
+        }
+    }
+
+    public string DetailUri
+    {
+        get => _detail;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _detail, value);
+        }
+    }
+
+    public string Description
+    {
+        get => _description;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _description, value);
         }
     }
 }
