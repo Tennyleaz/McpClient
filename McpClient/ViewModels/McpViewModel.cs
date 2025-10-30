@@ -249,6 +249,13 @@ internal class McpViewModel : ReactiveObject
         }
     }
 
+    public bool IsRag
+    {
+        get => _serverName == "DocumentSearch" && _type == McpServerType.StreamableHttp && _streamableHttpUrl == "http://localhost:6400/";
+    }
+
+    public bool CannotDelete => IsFileSystem || IsRag;
+
     public string DetailUri
     {
         get => _detail;

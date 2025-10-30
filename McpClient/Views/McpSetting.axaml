@@ -43,9 +43,9 @@
                                     <TextBlock Text="{Binding CloudIcon}" Width="48" FontFamily="{StaticResource FontAwesome}" VerticalAlignment="Center"/>
                                     <TextBlock IsVisible="{Binding Active}" Foreground="Green" VerticalAlignment="Center" Width="80">● Active</TextBlock>
                                     <TextBlock IsVisible="{Binding !Active}" Foreground="Red" VerticalAlignment="Center" Width="80">■ Inactive</TextBlock>
-                                    <Button Name="BtnDelete" Margin="0,0,10,0" Click="BtnDelete_OnClick" IsEnabled="{Binding !IsFileSystem}">Delete ╳</Button>
+                                    <Button Name="BtnDelete" Margin="0,0,10,0" Click="BtnDelete_OnClick" IsEnabled="{Binding !CannotDelete}">Delete ╳</Button>
                                     <Button Name="BtnRestart" Margin="0,0,10,0" Click="BtnRestart_OnClick">Restart ↻</Button>
-                                    <Button Name="BtnEdit" Margin="0,0,10,0" Click="BtnEdit_OnClick">Edit 🖋️</Button>
+                                    <Button Name="BtnEdit" Margin="0,0,10,0" Click="BtnEdit_OnClick" IsEnabled="{Binding !IsRag}">Edit 🖋️</Button>
 						        </StackPanel>
 					        </DataTemplate>
 				        </ItemsControl.ItemTemplate>

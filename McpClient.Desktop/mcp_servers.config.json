@@ -1,12 +1,25 @@
 {
-    "mcp_servers": [{
-            "enabled": true,
-            "type": "Stdio",
-            "server_name": "filesystem",
-            "command": "npx",
-            "args": ["-y", "@modelcontextprotocol/server-filesystem"],
-            "env": {},
-            "http_headers": {}
-        }
-    ]
+  "mcp_servers": [
+    {
+      "enabled": true,
+      "type": "Stdio",
+      "server_name": "filesystem",
+      "owner": "AI Nexus",
+      "command": "npx",
+      "args": [ "-y", "@modelcontextprotocol/server-filesystem" ],
+      "env": {},
+      "http_headers": {}
+    },
+    {
+      "enabled": false,
+      "type": "StreamableHttp",
+      "server_name": "DocumentSearch",
+      "owner": "AI Nexus",
+      "streamable_http_url": "http://localhost:6400/",
+      "args": [],
+      "env": {},
+      "http_headers": {},
+      "description": "RAG search MCP"
+    }
+  ]
 }
