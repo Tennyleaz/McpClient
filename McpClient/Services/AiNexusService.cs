@@ -110,6 +110,25 @@ internal class AiNexusService
         return null;
     }
 
+    public async Task<OfflineWorkflow> GetOfflineGroupById(int groupId)
+    {
+        try
+        {
+            using HttpResponseMessage response = await _httpClient.GetAsync($"/api/v1/Groups/offline{groupId}");
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<OfflineWorkflow>(json, _options);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+        return null;
+    }
+
     public async Task<(bool success, int groupId)> SetOfflineGroup(string serverName, string modelName, string endpointUrl, string payload)
     {
         MultipartFormDataContent content = new MultipartFormDataContent();

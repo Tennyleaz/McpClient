@@ -46,36 +46,10 @@ public partial class RunOfflineWindow : Window
         TbOutput.Text = string.Empty;
 
         // Set custom message
-        TbPayload.IsVisible = false;
-        if (!string.IsNullOrWhiteSpace(_workflow.Payload))
-        {
-            TbPayload.IsVisible = true;
-            // Parse "message" JSON field
-            try
-            {
-                jsonNode = JsonNode.Parse(_workflow.Payload);
-                if (jsonNode != null)
-                {
-                    // Parse user message, let user to modify
-                    if (jsonNode["message"] != null)
-                    {
-                        TbPayload.Text = jsonNode["message"].ToString().Trim();
-                        TbPayload.IsVisible = true;
-                    }
-                    
-                    // Parse used MCP tool list
-                    if (jsonNode["tools"] != null)
-                    {
-                        usedTools = jsonNode["tools"].Deserialize<List<string>>();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                //TbPayload.Text = _workflow.Payload;
-            }
-        }
+        string prompt = _workflow.TryGetPrompt();
+        TbPayload.IsVisible = !string.IsNullOrEmpty(prompt);
+        // Set used tools
+        usedTools = _workflow.TryGetTools();
     }
 
     private async void Control_OnLoaded(object sender, RoutedEventArgs e)
