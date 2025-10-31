@@ -24,6 +24,7 @@ public partial class LocalCommandWizard : Window
     private int installIndex = 0;
     private readonly string platform;
     private readonly JsonNode allDepConfig;
+    private bool needRestart;
     
     public bool IsAllRuntimeInstalled { get; private set; }
 
@@ -306,6 +307,12 @@ public partial class LocalCommandWizard : Window
                 VerifyResult.Text = $"These runtime faied to install:\n\n{string.Join(", ", fails)}\n\nPlease install them manually.";
                 IsAllRuntimeInstalled = false;
             }
+
+            if (needRestart)
+            {
+                TbRestartHint.IsVisible = true;
+                TbRestartHint.Text = "Some runtimes have updated your environment.\nPlease log out and log back in to your computer.";
+            }
         }
     }
 
@@ -401,6 +408,16 @@ public partial class LocalCommandWizard : Window
                 string cmd = manager.InstallCommand(step.Package);
                 result = await manager.RunInstallCommand(cmd);
                 manager.ConsoleOutput -= Manager_ConsoleOutput;
+            }
+
+            // Special case:
+            // uv on windows must add $HOME/.local/bin to PATH
+            if (result.Success && depName == "uv" && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                TbInstallProgress.Text += "\nAdd uv directory to PATH...";
+                string uvBase = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".local\bin");
+                manager.AddToPathWindows(uvBase);
+                needRestart = true;
             }
         }
 

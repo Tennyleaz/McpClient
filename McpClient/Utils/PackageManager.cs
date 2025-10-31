@@ -269,6 +269,24 @@ internal abstract class PackageManager
         CommandResult result = await installTask;
         return result;
     }
+
+    public void AddToPathWindows(string path)
+    {
+        try
+        {
+            var name = "PATH";
+            var scope = EnvironmentVariableTarget.User;
+            var oldValue = Environment.GetEnvironmentVariable(name, scope);
+            if (oldValue != null && oldValue.Contains(path))
+                return;
+            var newValue = oldValue + ";" + path;
+            Environment.SetEnvironmentVariable(name, newValue, scope);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Failed to add to PATH: "+ ex.Message);
+        }
+    }
 }
 
 internal class WingetManager : PackageManager

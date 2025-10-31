@@ -48,10 +48,11 @@
             <TextBlock FontSize="{StaticResource FontSizeMedium}">Verification</TextBlock>
             <TextBlock Margin="0,8,0,0">Re-checking installed runtimes...</TextBlock>
             <TextBlock Margin="0,8,0,0" Name="VerifyResult" Text="All required runtimes are now installed."></TextBlock>
+            <TextBlock Margin="0,8,0,0" Name="TbRestartHint" Text="Need restart..." Foreground="{StaticResource ErrorColor}"></TextBlock>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Spacing="20">
-            <Button Name="BtnPrev" Click="BtnPrev_OnClick" IsVisible="False">Prev</Button>
+            <!--<Button Name="BtnPrev" Click="BtnPrev_OnClick" IsVisible="False">Prev</Button>-->
             <Button Name="BtnNext" Click="BtnNext_OnClick">Next</Button>
             <Button Name="BtnClose" Click="BtnClose_OnClick" IsVisible="False">Close</Button>
         </StackPanel>
