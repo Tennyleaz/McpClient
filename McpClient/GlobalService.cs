@@ -82,6 +82,7 @@ internal static class GlobalService
         }
 
         DispatcherDbFile = Path.Combine(settingFolder, "dispatcher.db");
+        QuartzDbFile = Path.Combine(settingFolder, "quartz.db");
 
         FileSystemFolders = new List<string>();
     }
@@ -100,6 +101,8 @@ internal static class GlobalService
     public static readonly string ChromaDbFolder;
 
     public static readonly string RagBackendFolder;
+
+    public static readonly string QuartzDbFile;
 
     public static LlamaService LlamaService { get; set; }
 
